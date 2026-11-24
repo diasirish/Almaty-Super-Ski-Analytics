@@ -25,7 +25,8 @@ echo "== 2/7  sunshine hours =="
 echo "== 3/7  Sentinel-2 cache for the window, sliced from the cluster =="
 KZ_AREA=superski python src/slice_window_cache.py
 
-echo "== 4/7  the drawn operating boundary =="
+echo "== 4/7  the drawn operating boundary and the QGIS pack =="
+(cd src && KZ_AREA=superski python build_qgis_pack.py)
 (cd src && KZ_AREA=superski python pipeline_operating_area.py)
 
 echo "== 5/7  notebooks =="
