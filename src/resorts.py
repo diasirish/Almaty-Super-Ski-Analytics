@@ -10,7 +10,7 @@ with one rule applied to all three places:
   lines, unioned with the ground within PISTE_CORRIDOR_M of its pistes.
 
 Kok Zhailau has neither, because nothing is built there yet, so its operating
-area is the reconstructed 1,022 ha footprint instead. That asymmetry cannot be
+area is the hand-drawn operating boundary instead. That asymmetry cannot be
 removed - it is the difference between a working resort and a plan - so the
 elevation-matched comparison below is the one that carries the conclusions, and
 every table prints each area's size next to its numbers.

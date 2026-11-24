@@ -1,23 +1,19 @@
 # %% [markdown]
-# # 05 — Kok Zhailau at project scale, and what open data can and cannot settle
+# # 05 — The boundary tested: other resorts, other DEMs, and what open data cannot settle
 #
 # **Kok Zhailau ski terrain analytics — an independent open-data case study**
 # Dias Irishev · Geo & Weather Data Scientist, Almaty
 #
-# Notebooks 01–03 work on a 69 km² rectangle around the plateau; notebook 04
-# widens to the 404 km² cluster. This one goes the other way: **down to the scale
-# the project is actually being built at**, and then spends the rest of its length
-# trying to break its own results.
+# Notebook 06 measures the hand-drawn operating boundary. This one spends its
+# whole length trying to break that measurement, and answers three questions an
+# engineering or GIS team would put to an outside analyst:
 #
-# It is written for three questions an engineering or GIS team on this project
-# would ask of an outside analyst:
-#
-# 1. **Can you work at our scale?** The operator states a territory of 1,022 ha.
-#    That is 1/40 of the cluster and 1/7 of the rectangle in notebook 01.
-# 2. **Will your model survive contact with a different input?** The whole chain —
-#    slope, aspect, horizon, sky view factor, insolation, sunshine duration — is
-#    re-run on two independent DEMs and the *products* are compared, not the
-#    elevations.
+# 1. **Does the boundary look sane next to places that already work?** It is
+#    compared with Shymbulak and Oi-Qaragai under one corridor rule, at matched
+#    elevations and matched gradients.
+# 2. **Will the model survive a different input?** The whole chain — slope,
+#    aspect, horizon, sky view factor, insolation, sunshine duration — is re-run
+#    on two independent DEMs and the *products* are compared, not the elevations.
 # 3. **What do you still need from the ground?** Clear-sky geometry and a
 #    satellite snow-detection frequency are not a snowpack model. The last
 #    section says exactly which quantities cannot be settled from orbit.
@@ -39,14 +35,13 @@
 #
 # What is **not** published: any boundary, any station coordinate, any lift
 # alignment, any run, any elevation, and any capacity in persons per hour. So
-# **no footprint in this notebook is the project's own**, and no planned lift is
-# drawn anywhere in this release. The 1,022 ha is reconstructed two ways and every
-# number is reported against both, which is the only honest way to use a figure
-# whose shape is unknown.
+# **no boundary in this project is the operator's own**, and no planned lift is
+# drawn anywhere in this release. What is measured here is the author's drawn
+# boundary, and it is named as such on every figure.
 
 # %%
 import os
-os.environ["KZ_AREA"] = "kz_project"       # must be set before importing config
+os.environ["KZ_AREA"] = "superski"         # must be set before importing config
 
 import json
 import sys
@@ -59,7 +54,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import footprint
 import ski_terrain as ST
 from config import (AOI_BBOX_WGS84, AREA_LABEL, AREA_NOTE, HORIZON_N_AZIMUTH,
                     INTERIM, OUT_PNG, OUT_TAB, OUT_TIF, OUTLOOK_YEAR,
@@ -84,165 +78,62 @@ print(f"horizon         : {HORIZON_N_AZIMUTH} azimuths ({360/HORIZON_N_AZIMUTH:.
 print(f"sunshine step   : {SUN_HOUR_STEP_MIN} min")
 print(f"\n{AREA_NOTE}")
 
-# %%
-published = pd.DataFrame([
-    {"parameter": "piste length", "published": f"{PROJECT_PISTE_KM:.0f} km"},
-    {"parameter": "lifts", "published": f"{PROJECT_LIFTS} "
-     f"({PROJECT_CABLEWAYS_POMA} cableways by POMA; the other 6 are not described)"},
-    {"parameter": "share of runs green and blue",
-     "published": f"about {PROJECT_GREEN_BLUE_SHARE*100:.0f} %"},
-    {"parameter": "designed daily capacity",
-     "published": f"up to {PROJECT_SKIERS_PER_DAY:,} skiers/day"},
-    {"parameter": "project territory", "published": f"{PROJECT_AREA_HA:,.0f} ha"},
-    {"parameter": "built-up area", "published": f"about {PROJECT_BUILT_HA:.0f} ha "
-     f"({100*PROJECT_BUILT_HA/PROJECT_AREA_HA:.1f} % of the territory)"},
-    {"parameter": "launch", "published": PROJECT_LAUNCH.replace("-", "/")},
-    {"parameter": "boundary / lift alignments / station coordinates",
-     "published": "not published"},
-    {"parameter": "lift capacity (persons per hour)", "published": "not published"},
-    {"parameter": "piste length by difficulty", "published": "not published"},
-])
-published.to_csv(OUT_TAB / "published_project_parameters.csv", index=False)
-print(published.to_string(index=False))
-
 # %% [markdown]
-# ## 1. Reconstructing 1,022 ha two ways
+# ## 1. The window, and the boundary inside it
 #
-# `footprint.py` derives two footprints of exactly the stated area inside the
-# window, both centred on the plateau reference point used since notebook 01:
+# The study area is the hand-drawn boundary in `qgis/operating_area.geojson`.
+# The rectangle this notebook computes on is that boundary's own envelope plus
+# a 1 km working margin — rasters need a margin for hillshade and for the
+# horizon to have surroundings, and a map needs context around its subject.
+# **Every figure reported below is masked to the boundary**, or, in section 3,
+# to a corridor rule applied identically to three places.
 #
-# * **A — disc.** The 1,022 ha closest to that point. It uses no terrain
-#   information at all, so it cannot flatter the ground.
-# * **B — gentlest.** The 1,022 ha of gentlest ground within 3 km of the same
-#   point, slope mean-filtered over 150 m first so a single flat pixel inside a
-#   cliff band cannot outrank a real bench. This is the most favourable territory
-#   a planner could pick, so any gradient conclusion that survives here is not an
-#   artefact of where the line was drawn.
+# ### What the two previous releases did instead, and why it is withdrawn
 #
-# The contiguity columns are the point of the table.
+# This notebook used to reconstruct the stated 1,022 ha two ways inside a
+# 42 km² window centred on the plateau — a disc that used no terrain
+# information, and the gentlest ground within 3 km — and report every number
+# against both. Both are withdrawn, and `footprint.py` is deleted:
+#
+# * Neither was the operating area. They were machine guesses at where a resort
+#   might be put, and the text then carried their numbers as if they described
+#   the project.
+# * The disc reached about 3 km north of the drawn boundary, over the dacha belt
+#   below the plateau — ground that is not part of any ski development and that
+#   this study has no business measuring.
+# * "Gentlest ground within 3 km" optimises one variable and is therefore the
+#   most flattering placement available. Reporting against it made the gradient
+#   arithmetic look settled when it was not.
+#
+# There is a drawn boundary now, so nothing synthetic stands in for it.
 
 # %%
+import operating_area as OA
+
+poly, poly_props = OA.load()
 t = terrain()
-fps = footprint.build(DEM_GRID, t["slope"])
-fp_summary = footprint.summary(fps, DEM_GRID, t["dem"], t["slope"])
-fp_summary.to_csv(OUT_TAB / "footprint_summary.csv", index=False)
-print(fp_summary.to_string(index=False))
+OA_MASK = OA.mask(DEM_GRID, poly)
+PX_HA = DEM_GRID.res ** 2 / 1e4
+# What notebook 06 measured inside the same boundary, read back rather than
+# recomputed, so the two notebooks cannot drift apart.
+oa_terrain = pd.read_csv(OUT_TAB / "operating_area_terrain.csv")
 
-NAME_A = [k for k in fps if k.startswith("footprint A")][0]
-NAME_B = [k for k in fps if k.startswith("footprint B")][0]
-NAME_W = [k for k in fps if k.startswith("project window")][0]
-A, B, W = fps[NAME_A], fps[NAME_B], fps[NAME_W]
-
-nA, bigA, _ = footprint.components(A)
-nB, bigB, bigB_mask = footprint.components(B)
-ha = DEM_GRID.res ** 2 / 1e4
-print(f"\nfootprint A: {nA} piece(s), largest {bigA*ha:,.0f} ha")
-print(f"footprint B: {nB} pieces,    largest {bigB*ha:,.0f} ha "
-      f"({100*bigB/B.sum():.0f} % of the footprint)")
-print("\nThe gentle ground exists. It is not in one place.")
-
-# %%
-from matplotlib.colors import ListedColormap
-
-fig, axes = plt.subplots(1, 3, figsize=(15.0, 5.0))
-map_panel(axes[0], t["dem"], DEM_GRID, cmap=ELEV_CMAP,
-          title="Elevation, project window", cbar_label="m")
-for ax, mask, colour, ttl in [
-        (axes[1], A, "#1f6fb4", f"Footprint A — {PROJECT_AREA_HA:,.0f} ha disc"),
-        (axes[2], B, "#d1441f", f"Footprint B — gentlest {PROJECT_AREA_HA:,.0f} ha")]:
-    layer = np.where(mask, 1.0, np.nan)
-    map_panel(ax, layer, DEM_GRID, cmap=ListedColormap([colour]), vmin=0, vmax=1,
-              dem=t["dem"], shade=0.45, title=ttl, cbar=False)
-fig.tight_layout()
-save(fig, "05_footprints.png",
-     f"Two reconstructions of the stated {PROJECT_AREA_HA:,.0f} ha. "
-     f"A is one piece; B is {nB} pieces, the largest {bigB*ha:,.0f} ha.")
+print(f"window   {DEM_GRID.width} x {DEM_GRID.height} px, {DEM_GRID.area_km2:.1f} km\u00b2, "
+      f"{np.nanmin(t['dem']):.0f}-{np.nanmax(t['dem']):.0f} m")
+print(f"boundary {OA_MASK.sum() * PX_HA:,.0f} ha = {100 * OA_MASK.mean():.0f} % of the window, "
+      f"{np.nanmin(t['dem'][OA_MASK]):.0f}-{np.nanmax(t['dem'][OA_MASK]):.0f} m, "
+      f"median slope {np.nanmedian(t['slope'][OA_MASK]):.1f}\u00b0")
+print(f"\nprovenance: {OA.provenance(poly_props)}")
 
 # %% [markdown]
-# ## 2. The published mix of runs against the ground
-#
-# Gradient classes are the percent grades of the **British Columbia All Season
-# Resort Guidelines, Chapter II (Mountain Resorts)**, converted to degrees. That
-# is a planning convention from another jurisdiction, chosen because it is public
-# and because it is the practice the named planners work in — it is **not** a
-# Kazakh standard and not this project's design criteria. "Green and blue" in the
-# operator's wording is read as beginner through low intermediate, i.e. grades up
-# to 35 % (19.3°).
-
-# %%
-grad = ST.class_table(t["slope"], DEM_GRID, fps)
-grad.to_csv(OUT_TAB / "gradient_classes_by_footprint.csv", index=False)
-piv = grad.pivot_table(index=["gradient_class", "slope_from_deg"],
-                       columns="area", values="share").sort_index(level=1)
-piv.index = [i[0] for i in piv.index]
-print((100 * piv).round(1).to_string())
-
-gb = ST.green_blue_share(t["slope"], fps, DEM_GRID)
-gb.to_csv(OUT_TAB / "green_blue_availability.csv", index=False)
-print()
-print(gb.to_string(index=False))
-
-# %% [markdown]
-# The operator publishes a **length** (60 km) and a **mix** (60.9 % green and
-# blue on its own general plan; "about 70 %" in press reporting) but no **width**,
-# and width is what turns a length into an area. Three plausible mean widths are
-# carried through instead of one assumed value.
-
-# %%
-demand = ST.piste_area_demand(PROJECT_PISTE_KM, PROJECT_GREEN_BLUE_SHARE)
-feas = pd.concat([ST.feasibility(demand, r.green_blue_ha, r.area)
-                  for _, r in gb.iterrows()], ignore_index=True)
-feas.to_csv(OUT_TAB / "green_blue_feasibility.csv", index=False)
-print(feas[["footprint", "assumed_mean_piste_width_m", "green_blue_piste_ha",
-            "available_green_blue_ha", "share_of_available_consumed"]]
-      .to_string(index=False))
-
-row_a = feas[(feas.footprint == NAME_A) & (feas.assumed_mean_piste_width_m == 40)].iloc[0]
-row_b = feas[(feas.footprint == NAME_B) & (feas.assumed_mean_piste_width_m == 40)].iloc[0]
-print(f"""
-Read-out at a 40 m mean width:
-  on footprint A the green/blue runs would need {row_a.green_blue_piste_ha:.0f} ha of the
-  {row_a.available_green_blue_ha:.0f} ha of gentle ground that exists there —
-  {100*row_a.share_of_available_consumed:.0f} % of it, and at 50 m the arithmetic does not close at all;
-  on footprint B, the most favourable 1,022 ha, the same runs need
-  {100*row_b.share_of_available_consumed:.0f} % — but that gentle ground arrives in {nB} pieces.
-
-So the binding constraint on a beginner-led resort here is not how much gentle
-ground Kok Zhailau has. It is how little of it is connected.""")
-
-# %%
-cls = ST.class_index(t["slope"]).astype("float32")
-cls[~np.isfinite(t["slope"])] = np.nan
-write_geotiff(OUT_TIF / "gradient_class.tif", cls, DEM_GRID, nodata=-1,
-              description="BC All Season Resort Guidelines gradient class, 0=beginner..5=expert")
-for nm, m, fn in [("footprint_a_disc", A, "footprint_a_disc.tif"),
-                  ("footprint_b_gentlest", B, "footprint_b_gentlest.tif")]:
-    write_geotiff(OUT_TIF / fn, m.astype("uint8"), DEM_GRID, nodata=255,
-                  dtype="uint8", description=f"derived {PROJECT_AREA_HA:.0f} ha footprint: {nm}")
-for nm in ("dem", "slope", "aspect", "svf"):
-    arr = t[nm]
-    write_geotiff(OUT_TIF / f"{'elevation_m' if nm=='dem' else nm}.tif",
-                  arr, DEM_GRID, nodata=-9999,
-                  description=f"{nm} on the project-scale grid")
-print("rasters written:", sorted(p.name for p in OUT_TIF.glob("*.tif")))
-
-# %% [markdown]
-# ## 3. Sun at project scale: energy and duration, per footprint
-#
-# At 42 km² the horizon can be sampled every 5° instead of every 10°, and the
-# sunshine-duration integration stepped every 5 minutes instead of 15. Both are
-# refinements the cluster run could not afford; the cost of the finer sampling is
-# reported below so the reader can see what it bought.
+# Sun and energy are computed on the window and read back inside the boundary.
+# The horizon is sampled every 5° and the sunshine-duration integration stepped
+# every 10 minutes — refinements the 404 km² cluster run could not afford.
 
 # %%
 from pipeline_sun import run as run_sun
 
 sun, sun_monthly, sun_profile, zone_masks, _ = run_sun(OUTLOOK_YEAR)
-cols = ["month_name", "days", "median_sun_hours", "max_sun_hours",
-        "median_hours_per_day"] + [c for c in sun_monthly.columns
-                                   if c.startswith("median_h__footprint")]
-print(sun_monthly[cols].to_string(index=False))
-
 season_hours = sum(sun[m]["hours"] for m in sun)
 ins = all_insolation(t)
 season_kwh = (ins[f"{OUTLOOK_YEAR}_11"]["total"] + ins[f"{OUTLOOK_YEAR}_12"]["total"]
@@ -252,53 +143,47 @@ write_geotiff(OUT_TIF / f"sun_hours_nov_apr_{OUTLOOK_YEAR}.tif", season_hours,
               DEM_GRID, nodata=-9999, description="direct sunshine hours, Nov-Apr")
 write_geotiff(OUT_TIF / f"insolation_nov_apr_{OUTLOOK_YEAR}_kwh_m2.tif", season_kwh,
               DEM_GRID, nodata=-9999, description="clear-sky plane-of-array energy, Nov-Apr")
+write_geotiff(OUT_TIF / "operating_boundary_mask.tif", OA_MASK.astype("uint8"),
+              DEM_GRID, dtype="uint8",
+              description="hand-drawn operating boundary, rasterised on the 30 m grid")
 
-rows = []
-for nm, m in fps.items():
-    rows.append({"footprint": nm,
-                 "sun_hours_median": round(float(np.nanmedian(season_hours[m])), 1),
-                 "sun_hours_p10": round(float(np.nanpercentile(season_hours[m], 10)), 1),
-                 "sun_hours_p90": round(float(np.nanpercentile(season_hours[m], 90)), 1),
-                 "insolation_median": round(float(np.nanmedian(season_kwh[m])), 1),
-                 "december_hours_median": round(float(np.nanmedian(sun[12]["hours"][m])), 1),
-                 "december_hours_per_day": round(float(np.nanmedian(sun[12]["hours"][m]))/31, 2),
-                 "march_hours_median": round(float(np.nanmedian(sun[3]["hours"][m])), 1)})
-sun_fp = pd.DataFrame(rows)
-sun_fp.to_csv(OUT_TAB / "sun_by_footprint.csv", index=False)
-print()
-print(sun_fp.to_string(index=False))
-
-dA = sun_fp.loc[sun_fp.footprint == NAME_A, "december_hours_median"].iloc[0]
-dB = sun_fp.loc[sun_fp.footprint == NAME_B, "december_hours_median"].iloc[0]
-print(f"""
-December, the month a December launch has to work in: footprint A gets a median
-of {dA:.0f} h of direct sun across the whole month — {dA/31:.1f} h a day — against {dB:.0f} h
-({dB/31:.1f} h a day) on footprint B. Where the 1,022 ha is put inside Kok Zhailau
-changes mid-winter sun by a factor of {dB/dA:.1f}. The plateau itself faces the city,
-which is north: good for holding snow, poor for winter sun.""")
+inside = pd.DataFrame([{
+    "zone": "drawn operating boundary", "area_ha": round(OA_MASK.sum() * PX_HA, 1),
+    "elev_min_m": round(float(np.nanmin(t["dem"][OA_MASK]))),
+    "elev_max_m": round(float(np.nanmax(t["dem"][OA_MASK]))),
+    "slope_median_deg": round(float(np.nanmedian(t["slope"][OA_MASK])), 1),
+    "sun_hours_nov_apr_median": round(float(np.nanmedian(season_hours[OA_MASK])), 1),
+    "insolation_nov_apr_median_kwh": round(float(np.nanmedian(season_kwh[OA_MASK])), 1),
+}, {
+    "zone": "the rest of the window", "area_ha": round((~OA_MASK).sum() * PX_HA, 1),
+    "elev_min_m": round(float(np.nanmin(t["dem"][~OA_MASK]))),
+    "elev_max_m": round(float(np.nanmax(t["dem"][~OA_MASK]))),
+    "slope_median_deg": round(float(np.nanmedian(t["slope"][~OA_MASK])), 1),
+    "sun_hours_nov_apr_median": round(float(np.nanmedian(season_hours[~OA_MASK])), 1),
+    "insolation_nov_apr_median_kwh": round(float(np.nanmedian(season_kwh[~OA_MASK])), 1),
+}])
+inside.to_csv(OUT_TAB / "boundary_vs_window.csv", index=False)
+print(inside.to_string(index=False))
 
 # %%
-fig, axes = plt.subplots(1, 2, figsize=(13.4, 5.2))
-vmax = float(np.nanpercentile(season_hours, 99.5))
-map_panel(axes[0], season_hours, DEM_GRID, cmap="inferno", vmin=0, vmax=vmax,
-          title=f"Direct sunshine hours, Nov {OUTLOOK_YEAR} – Apr {OUTLOOK_YEAR+1}",
-          cbar_label="hours")
-map_panel(axes[1], sun[12]["hours"], DEM_GRID, cmap="inferno", vmin=0,
-          title=f"December {OUTLOOK_YEAR} only", cbar_label="hours")
-# map_panel draws in kilometres, so every overlay must be in kilometres too.
-EXT_KM = [DEM_GRID.xmin / 1000, DEM_GRID.xmax / 1000,
-          DEM_GRID.ymin / 1000, DEM_GRID.ymax / 1000]
+fig, axes = plt.subplots(1, 2, figsize=(11.4, 5.0))
+extent = (DEM_GRID.xmin / 1000, DEM_GRID.xmax / 1000,
+          DEM_GRID.ymin / 1000, DEM_GRID.ymax / 1000)
+map_panel(axes[0], t["dem"], DEM_GRID, cmap=ELEV_CMAP,
+          title="The working window", cbar_label="m")
+map_panel(axes[1], season_hours, DEM_GRID, cmap="magma", dem=t["dem"], shade=0.45,
+          title=f"Direct sunshine hours, Nov\u2013Apr {OUTLOOK_YEAR}", cbar_label="hours")
 for ax in axes:
-    for m, col in [(A, "#4da3ff"), (B, "#ff9a3c")]:
-        ax.contour(np.flipud(m.astype(float)), levels=[0.5], colors=[col],
-                   linewidths=1.3, extent=EXT_KM)
+    ax.contour(OA_MASK.astype(float), levels=[0.5], colors=["#e8590c"], linewidths=1.6,
+               extent=extent, origin="upper", zorder=12)
 fig.tight_layout()
-save(fig, "05_sun_hours_project_scale.png",
-     f"Both footprints outlined: A blue, B orange. December median on A is "
-     f"{dA/31:.1f} h a day, on B {dB/31:.1f} h.")
+save(fig, "05_window_and_boundary.png",
+     f"The drawn boundary (orange) inside the rectangle this notebook computes on. "
+     f"The boundary is {100 * OA_MASK.mean():.0f} % of the window; every figure below is "
+     f"read inside it.")
 
 # %% [markdown]
-# ## 4. Snow at project scale, from the scenes already read
+# ## 2. Snow inside the boundary, from the scenes already read
 #
 # The 20 m project grid is a pixel-aligned subset of the 20 m cluster grid, so
 # the 115 Sentinel-2 windows read for notebook 04 contain every observation this
@@ -382,7 +267,7 @@ whole. Any monthly snow figure for that month is a statement about the sunnier,
 gentler part of the terrain, not about the terrain. Reported, not hidden.""")
 
 # %% [markdown]
-# ## 5. Kok Zhailau against Shymbulak and Oi-Qaragai — one rule for all three
+# ## 3. Kok Zhailau against Shymbulak and Oi-Qaragai — one rule for all three
 #
 # The previous release compared Kok Zhailau against the OSM
 # `landuse=winter_sports` polygons for Shymbulak and Oi-Qaragai. Those are 2.2
@@ -392,12 +277,15 @@ gentler part of the terrain, not about the terrain. Reported, not hidden.""")
 # with the ground within 100 m of its pistes.** Lines are assigned to the nearest
 # named place within 3.5 km; anything further stays unassigned.
 #
-# Kok Zhailau has neither lifts nor pistes, because nothing is built there, so it
-# enters as its reconstructed footprints. That asymmetry is real and cannot be
-# removed — a working resort's corridors are *where planners chose to build*,
-# which is a selected sample of good terrain. That is exactly why footprint B,
-# Kok Zhailau's own best ground, is the reference below: best-selected against
-# best-selected.
+# Kok Zhailau has neither lifts nor pistes, because nothing is built there, so
+# it enters as the **drawn operating boundary** — the same polygon the rest of
+# this release measures, rasterised onto the cluster grid. That asymmetry is
+# real and cannot be removed: a working resort's corridors are *where planners
+# chose to build*, which is a selected sample of good terrain, while the drawn
+# boundary is a line round a whole mountainside. So the comparison below runs at
+# matched elevations and matched gradients, and the boundary is cut to skiable
+# gradients before any of it is read — otherwise the difference being measured
+# would be the difference between a corridor and a hillside.
 
 # %%
 import osm
@@ -440,12 +328,10 @@ for _, r in inv.iterrows():
     if r.named_lifts:
         print(f"  {r.place}: {r.named_lifts}")
 
-c_fps = footprint.build(cluster_grid, c_slope)
-cA = [v for k, v in c_fps.items() if k.startswith("footprint A")][0]
-cB = [v for k, v in c_fps.items() if k.startswith("footprint B")][0]
-areas = {"Kok Zhailau — footprint A (disc)": cA,
-         "Kok Zhailau — footprint B (gentlest)": cB,
+c_oa = OA.mask(cluster_grid, poly)
+areas = {"Kok Zhailau — drawn boundary": c_oa,
          **resorts.envelopes(cluster_grid, feat)}
+print(f"\ndrawn boundary on the cluster grid: {c_oa.sum() * cluster_grid.res ** 2 / 1e4:,.0f} ha")
 ha_c = cluster_grid.res ** 2 / 1e4
 rows = []
 for k, m in areas.items():
@@ -477,7 +363,7 @@ bands.to_csv(OUT_TAB / "three_area_elevation_bands.csv", index=False)
 print(bands.pivot_table(index="band_m", columns="area",
                         values="insolation_kwh_m2").round(0).to_string())
 
-REF = "Kok Zhailau — footprint B (gentlest)"
+REF = "Kok Zhailau — drawn boundary"
 matched = pd.concat([resorts.matched_pairs(bands, lay, REF)
                      for lay in layers], ignore_index=True)
 matched.to_csv(OUT_TAB / "three_area_matched_differences.csv", index=False)
@@ -496,8 +382,7 @@ def mdiff(prefix, layer):
 shy_i, shy_s = mdiff("Shymbulak", "insolation_kwh_m2"), mdiff("Shymbulak", "snow_freq_march")
 oq_i, oq_s = mdiff("Oi-Qaragai", "insolation_kwh_m2"), mdiff("Oi-Qaragai", "snow_freq_march")
 print(f"""
-Against Kok Zhailau's own best 1,022 ha, at matched elevations and matched
-gradients:
+Against the drawn boundary, at matched elevations and matched gradients:
 
   Shymbulak's working corridors receive {shy_i:+.0f} kWh/m² of winter energy and hold
   snow {shy_s:+.3f} more often in March. They trade sun for snow.
@@ -517,10 +402,8 @@ for ax, (lay, lab, unit) in zip(axes, [
     for name, d in bands.groupby("area"):
         d = d.sort_values("band_low_m")
         style = dict(marker="o", ms=3.4, lw=1.5)
-        if name.startswith("Kok Zhailau — footprint B"):
+        if name.startswith("Kok Zhailau"):
             style.update(color="#d1441f", lw=2.4)
-        elif name.startswith("Kok Zhailau"):
-            style.update(color="#1f6fb4", ls="--")
         elif name.startswith("Shymbulak"):
             style.update(color="#2e7d32")
         else:
@@ -536,7 +419,7 @@ save(fig, "05_three_area_elevation_bands.png",
      "at least 50 pixels in that band.")
 
 # %% [markdown]
-# ## 6. Engineering check: does the DEM choice change the answer?
+# ## 4. Engineering check: does the DEM choice change the answer?
 #
 # Three global DEMs agree on elevation to a few metres, and a table of elevation
 # differences is the half of a DEM check that flatters every product. The
@@ -582,7 +465,7 @@ ref_prod = prod["Copernicus GLO-30"]
 others_p = {k: v for k, v in prod.items() if k != "Copernicus GLO-30"}
 ski = np.isfinite(t["slope"]) & (t["slope"] >= SKIABLE_SLOPE_MIN) & (t["slope"] <= SKIABLE_SLOPE_MAX)
 print(f"comparison mask: {int(ski.sum()):,} skiable pixels "
-      f"({ski.sum()*ha:,.0f} ha of the {DEM_GRID.area_km2*100:,.0f} ha window)")
+      f"({ski.sum()*PX_HA:,.0f} ha of the {DEM_GRID.area_km2*100:,.0f} ha window)")
 
 inputs = pd.concat([
     DV.compare_layer(t["dem"], {k: v["dem"] for k, v in others_t.items()}, "elevation_m", ski),
@@ -638,7 +521,7 @@ So: screen sites with this, on any of the three. Do not sign off a single
 site's December number on it without measurement.""")
 
 # %% [markdown]
-# ## 7. Weather data: what reanalysis can carry, and where it stops
+# ## 5. Weather data: what reanalysis can carry, and where it stops
 #
 # A December opening is a weather commitment, so the weather inputs deserve the
 # same treatment as the DEM. Two things matter here and neither is a detail:
@@ -680,7 +563,7 @@ for k, v in outlooks.items():
           f"{v.get('spatial_scale','')[:58]}")
 
 # %% [markdown]
-# ## 8. What this cannot settle, and what I would measure
+# ## 6. What this cannot settle, and what I would measure
 #
 # Everything above is geometry and detection frequency. Neither is a snowpack,
 # and no amount of further processing turns one into the other. The table below
@@ -695,7 +578,7 @@ needed = pd.DataFrame([
                            "same elevation band",
      "why_satellite_cannot": "optical imagery sees the surface, not the depth below it"},
     {"question": "real (not clear-sky) irradiance",
-     "needed_measurement": "two pyranometers on contrasting aspects inside the footprint",
+     "needed_measurement": "two pyranometers on contrasting aspects inside the boundary",
      "why_satellite_cannot": "the model here is clear-sky by construction; cloud "
                              "attenuation is unmeasured"},
     {"question": "the December sun figure for one specific site",
@@ -703,7 +586,7 @@ needed = pd.DataFrame([
                            "photogrammetric or lidar DEM",
      "why_satellite_cannot": f"the three open DEMs disagree by "
                              f"{dec.pct_p95_abs.min():.0f}-{dec.pct_p95_abs.max():.0f} % at the 95th percentile on "
-                             f"exactly this quantity (section 6)"},
+                             f"exactly this quantity (section 4)"},
     {"question": "snowmaking windows",
      "needed_measurement": "wet-bulb temperature at the gun line, wind speed and "
                            "direction, water yield and temperature, equipment curves",
@@ -721,14 +604,15 @@ needed = pd.DataFrame([
      "needed_measurement": "ground observation, or Sentinel-1 SAR wet-snow retrieval "
                            "to see through cloud",
      "why_satellite_cannot": f"in the thinnest month only "
-                             f"{100*worst.qualifying_share:.0f} % of this window has four clear "
+                             f"{100*worst.qualifying_share:.0f} % of the boundary has four clear "
                              f"observations, and that subset is biased "
-                             f"{worst['insolation__skew']:+.0f} kWh/m² sunnier (section 4)"},
+                             f"{worst['insolation__skew']:+.0f} kWh/m² sunnier (section 2)"},
     {"question": "where the beginner terrain can physically go",
      "needed_measurement": "a design-grade survey of the gentle benches and of what can "
                            "be linked by lift",
-     "why_satellite_cannot": f"a 30 m DEM resolves that the gentle ground arrives in "
-                             f"{nB} pieces, not whether two of them can be joined"},
+     "why_satellite_cannot": f"a 30 m DEM resolves that the gentle ground inside the "
+                             f"boundary arrives in {int(oa_terrain.green_blue_pieces.iloc[0])} "
+                             f"pieces, not whether two of them can be joined"},
 ])
 needed.to_csv(OUT_TAB / "local_measurements_required.csv", index=False)
 for _, r in needed.iterrows():
@@ -741,17 +625,18 @@ meta = {
     "bbox": list(AOI_BBOX_WGS84),
     "window_km2": round(DEM_GRID.area_km2, 2),
     "derivation": AREA_NOTE,
-    "published_parameters": {r.parameter: r.published for _, r in published.iterrows()},
-    "footprints": {
-        "stated_area_ha": PROJECT_AREA_HA,
-        "A_pieces": nA, "B_pieces": nB,
-        "B_largest_piece_ha": round(bigB * ha, 1),
-        "A_green_blue_share": float(gb.loc[gb.area == NAME_A, "green_blue_share"].iloc[0]),
-        "B_green_blue_share": float(gb.loc[gb.area == NAME_B, "green_blue_share"].iloc[0]),
+    "operating_boundary": {
+        "stated_territory_ha": PROJECT_AREA_HA,
+        "drawn_area_ha": round(float(OA_MASK.sum() * PX_HA), 1),
+        "share_of_window": round(float(OA_MASK.mean()), 3),
+        "green_blue_ha": float(oa_terrain.green_blue_ha.iloc[0]),
+        "green_blue_pieces": int(oa_terrain.green_blue_pieces.iloc[0]),
+        "green_blue_largest_ha": float(oa_terrain.green_blue_largest_ha.iloc[0]),
+        "provenance": OA.provenance(poly_props),
     },
     "sun": {"horizon_azimuths": HORIZON_N_AZIMUTH,
             "sunshine_step_min": SUN_HOUR_STEP_MIN,
-            "december_hours_median_A": float(dA), "december_hours_median_B": float(dB)},
+            "nov_apr_hours_median_inside": round(float(np.nanmedian(season_hours[OA_MASK])), 1)},
     "snow": {"scenes": int(len(manifest)), "dates": int(len(days)),
              "failures": int(len(failed)),
              "scene_cache_reused_from": slice_info["source"],

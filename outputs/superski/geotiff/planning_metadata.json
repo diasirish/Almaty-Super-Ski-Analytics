@@ -9,15 +9,15 @@
   35.0
  ],
  "field_priority": {
-  "insol_low_cut_kwh_m2": 291.6,
-  "insol_high_cut_kwh_m2": 461.5,
+  "insol_low_cut_kwh_m2": 285.7,
+  "insol_high_cut_kwh_m2": 464.7,
   "freq_high_threshold": 0.75,
   "freq_low_threshold": 0.4,
   "slope_window_deg": [
    15.0,
    35.0
   ],
-  "skiable_area_km2": 83.889,
+  "skiable_area_km2": 46.286,
   "labels": {
    "0": "outside the 15-35 deg slope window",
    "1": "low exposure and frequent snow",
@@ -26,24 +26,24 @@
    "4": "skiable, insufficient observation coverage"
   },
   "class_counts": {
-   "0": 103348,
-   "1": 34877,
-   "2": 21287,
-   "3": 151688,
-   "4": 1871
+   "0": 59084,
+   "1": 18401,
+   "2": 11045,
+   "3": 84543,
+   "4": 1727
   },
   "class_area_km2": {
-   "0": 41.339,
-   "1": 13.951,
-   "2": 8.515,
-   "3": 60.675,
-   "4": 0.748
+   "0": 23.634,
+   "1": 7.36,
+   "2": 4.418,
+   "3": 33.817,
+   "4": 0.691
   }
  },
  "steep_layer": {
   "threshold_deg": 30.0,
-  "n_pixels": 156764,
-  "area_km2": 62.706,
+  "n_pixels": 94654,
+  "area_km2": 37.862,
   "note": "Geometry only. Avalanche terrain classification needs snowpack, wind transport, start/runout zones and local expertise."
  },
  "spring_window": [
@@ -56,38 +56,38 @@
    "scenario": "10 days earlier (03-11 \u221210d)",
    "n_dates": 33,
    "n_seasons": 4,
-   "coverage_full_grid": 0.987,
-   "median_freq_common_mask": 0.898,
-   "p25": 0.562,
+   "coverage_full_grid": 0.981,
+   "median_freq_common_mask": 0.925,
+   "p25": 0.602,
    "p75": 1.0,
-   "area_freq_above_0.8_km2": 45.26,
-   "median_freq_2200_2300": 0.812
+   "area_freq_above_0.8_km2": 25.06,
+   "median_freq_2200_2300": 0.771
   },
   {
    "scenario": "historical analogue (03-11\u219204-20)",
    "n_dates": 31,
    "n_seasons": 4,
-   "coverage_full_grid": 0.982,
-   "median_freq_common_mask": 0.85,
-   "p25": 0.458,
+   "coverage_full_grid": 0.974,
+   "median_freq_common_mask": 0.893,
+   "p25": 0.5,
    "p75": 1.0,
-   "area_freq_above_0.8_km2": 41.14,
-   "median_freq_2200_2300": 0.736
+   "area_freq_above_0.8_km2": 23.13,
+   "median_freq_2200_2300": 0.683
   },
   {
    "scenario": "10 days later (04-20 +10d)",
    "n_dates": 26,
    "n_seasons": 4,
-   "coverage_full_grid": 0.915,
-   "median_freq_common_mask": 0.679,
-   "p25": 0.225,
-   "p75": 0.964,
-   "area_freq_above_0.8_km2": 32.35,
-   "median_freq_2200_2300": 0.521
+   "coverage_full_grid": 0.872,
+   "median_freq_common_mask": 0.742,
+   "p25": 0.28,
+   "p75": 1.0,
+   "area_freq_above_0.8_km2": 18.5,
+   "median_freq_2200_2300": 0.5
   }
  ],
- "common_mask_pixels": 192333,
- "common_mask_km2": 76.933,
+ "common_mask_pixels": 100962,
+ "common_mask_km2": 40.385,
  "seasonal_outlooks": {
   "kazhydromet_winter_2026_27": {
    "issuer": "RSE Kazhydromet, Hydrometeorological Centre (Ministry of Ecology and Natural Resources, Kazakhstan)",

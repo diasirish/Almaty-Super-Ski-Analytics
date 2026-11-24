@@ -14,44 +14,26 @@ from pathlib import Path
 # Which rectangle the pipeline runs on. Set KZ_AREA before importing this
 # module (the notebooks do it explicitly on their first line).
 #
-#   kok_zhailau  the original 69 km2 rectangle around the plateau
-#   kz_project   the project-scale window around the plateau, inside which the
-#                stated 1,022 ha territory is reconstructed two ways
-#   superski     the masterplan area, derived from the control points named on
-#                the operator's general-plan sheet (supersedes kok_zhailau)
-#   cluster      the Almaty SuperSki cluster area: every place named in the
-#                government statements plus Kok Zhailau and Kumbel
+#   superski   the drawn operating boundary and the 1 km working window
+#              around it; this is the study area
+#   cluster    the Almaty SuperSki cluster area: every place named in the
+#              government statements plus Kok Zhailau and Kumbel
 STUDY_AREAS = {
-    "kok_zhailau": {
-        "bbox": (76.960, 43.105, 77.065, 43.174),
-        "label": "Kok Zhailau study rectangle",
-        "note": "Author's own study area around the plateau reference point.",
-    },
-    "kz_project": {
-        "bbox": (76.965, 43.115, 77.045, 43.170),
-        "label": "Kok Zhailau project-scale window",
-        "note": ("Project-scale window centred on the plateau reference point. "
-                 "Kazakh Tourism Development states a project territory of "
-                 "1,022 ha with about 20 ha built up; no boundary has been "
-                 "published. The 1,022 ha footprints are therefore derived "
-                 "inside this window (see footprint.py) and this window is "
-                 "the surrounding context, not the project area."),
-        "horizon_n_azimuth": 72,
-        "sun_hour_step_min": 5,
-    },
     "superski": {
-        "bbox": (76.955, 43.078, 77.095, 43.172),
-        "label": "Almaty SuperSki masterplan area",
-        "note": ("Derived from the Kazakh Tourism Development general-plan sheet "
-                 "'Генеральный план горнолыжного курорта Almaty Superski'. The "
-                 "sheet is a perspective panorama with no projection or scale, so "
-                 "nothing is traced from it. Instead the features it labels "
-                 "(Medeu, Kokgailau plateau 1951 m, Three Brothers Rocks, Mountain "
-                 "Kumbel 3250 m, the Kumbeltau range, Kimasar saddle, Shymbulak) "
-                 "were located independently in OpenStreetMap, and this rectangle "
-                 "is their envelope plus a 1.5 km working buffer. It supersedes the "
-                 "author-chosen 'kok_zhailau' rectangle, which ended 2.6 km north of "
-                 "the Kumbeltau range and so excluded the whole high half of the plan."),
+        "bbox": (76.950, 43.085, 77.055, 43.155),
+        "label": "Almaty SuperSki - the drawn operating boundary and its working window",
+        "note": ("The study area is the boundary in qgis/operating_area.geojson, "
+                 "hand-digitised over satellite imagery. This rectangle is nothing "
+                 "more than that boundary's own envelope plus the 1 km working "
+                 "buffer operating_area.bbox() returns: rasters need a margin for "
+                 "hillshade and for the horizon to have surroundings, and a map "
+                 "needs context around its subject. Every figure reported for the "
+                 "operating area is masked to the boundary. Earlier releases ran on "
+                 "two larger author-chosen rectangles - a 69 km2 box around the "
+                 "plateau and a 125 km2 envelope of the general-plan control points "
+                 "- and both reached about 3 km north of the boundary into the "
+                 "dacha belt below 1,775 m, which is ground this study has no "
+                 "business measuring. Both are withdrawn."),
         "horizon_n_azimuth": 72,
         "sun_hour_step_min": 10,
     },
@@ -77,12 +59,11 @@ _AREA_CFG = STUDY_AREAS[AREA]
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 RAW = DATA / "raw"
-# The original area keeps the flat layout the first release shipped with;
-# every other area gets its own subtree so runs never overwrite each other.
-_SUB = "" if AREA == "kok_zhailau" else AREA
-INTERIM = DATA / "interim" / _SUB if _SUB else DATA / "interim"
-PROCESSED = DATA / "processed" / _SUB if _SUB else DATA / "processed"
-OUT = ROOT / "outputs" / _SUB if _SUB else ROOT / "outputs"
+# Every area gets its own subtree so runs never overwrite each other.
+_SUB = AREA
+INTERIM = DATA / "interim" / _SUB
+PROCESSED = DATA / "processed" / _SUB
+OUT = ROOT / "outputs" / _SUB
 OUT_TIF = OUT / "geotiff"
 OUT_PNG = OUT / "png"
 OUT_TAB = OUT / "tables"
@@ -131,11 +112,6 @@ PROJECT_LIFTS = 16
 PROJECT_LIFTS_PRESS = 17
 PROJECT_SNOWMAKING_SHARE = 0.70
 PROJECT_TOURISTS_PER_YEAR = 9_000_000
-# Search radius for the terrain-derived footprint around the plateau point.
-FOOTPRINT_SEARCH_RADIUS_M = 3000.0
-# Mean-filter window used to favour contiguous gentle ground.
-FOOTPRINT_SMOOTH_M = 150.0
-
 # Reference point on the plateau (lon, lat). Used only as a QA landmark.
 PLATEAU_POINT = (77.00433, 43.14239)
 

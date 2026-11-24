@@ -1,3 +1,0 @@
-period,n_dates,n_pixels_skiable,n_low_insol,n_high_insol,coverage_low,coverage_high,median_snow_freq_low,median_snow_freq_high,snow_freq_difference
-"spring window 03-11→04-20, 4 seasons",31,6812,1703,1703,0.98,1.0,0.933,0.484,0.449
-March–April 2023 only,13,6812,1703,1703,0.864,0.999,0.778,0.3,0.478

@@ -18,7 +18,6 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import footprint
 import operating_area as oa
 import ski_terrain as st
 import viz
@@ -48,43 +47,40 @@ def _components(mask: np.ndarray):
 
 
 # --------------------------------------------------------------------------
-def shape_and_terrain(poly, dem, slope, mask) -> pd.DataFrame:
-    """The boundary against two same-area reconstructions of the same site.
+def terrain_inside(dem, slope, mask) -> pd.DataFrame:
+    """What the drawn boundary contains: size, vertical, gradient, contiguity.
 
-    A drawn boundary is only interesting if it beats what a rule would pick:
-    a disc on the plateau (what you get with no terrain knowledge) and the
-    gentlest ground available (what you get optimising slope alone).
+    One row, one boundary. Earlier releases reported this against two synthetic
+    footprints of the same area - a disc on the plateau and the gentlest ground
+    within 3.5 km. Both were machine guesses at where a resort might go, both
+    reached north into the dacha belt below the plateau, and neither was the
+    operating area anyone intends to build. They are gone: the drawn boundary
+    is the study area, not a candidate competing with inventions.
     """
-    area_ha = float(mask.sum() * PX_HA)
-    alts = {"Drawn boundary": mask,
-            "A - disc of the same area at the plateau": footprint.disc(G, area_ha, None)[0],
-            "B - gentlest ground of the same area within 3.5 km":
-                footprint.gentlest(G, slope, area_ha, None, 3500.0, 150.0)}
-    rows = []
-    for label, m in alts.items():
-        m = m & np.isfinite(dem) & np.isfinite(slope)
-        d, s = dem[m], slope[m]
-        k, sizes = _components(m)
-        gb = m & (slope <= st.GREEN_BLUE_MAX_DEG)
-        gk, gsizes = _components(gb)
-        rows.append({
-            "footprint": label, "area_ha": round(m.sum() * PX_HA, 1), "pieces": k,
-            "elev_min_m": round(float(d.min())), "elev_max_m": round(float(d.max())),
-            "vertical_m": round(float(d.max() - d.min())),
-            "median_elev_m": round(float(np.median(d))),
-            "median_slope_deg": round(float(np.median(s)), 1),
-            "above_31deg_share": round(float(np.mean(s > 31.0)), 4),
-            "green_blue_ha": round(float(gb.sum() * PX_HA), 1),
-            "green_blue_share": round(float(np.mean(s <= st.GREEN_BLUE_MAX_DEG)), 4),
-            "green_blue_pieces": gk,
-            "green_blue_largest_ha": round(float(gsizes[0]), 1),
-            "green_blue_largest_share": round(float(gsizes[0] / gsizes.sum()), 4),
-        })
-    return pd.DataFrame(rows), alts
+    m = mask & np.isfinite(dem) & np.isfinite(slope)
+    d, sl = dem[m], slope[m]
+    k, sizes = _components(m)
+    gb = m & (slope <= st.GREEN_BLUE_MAX_DEG)
+    gk, gsizes = _components(gb)
+    row = {
+        "boundary": "Drawn boundary",
+        "area_ha": round(m.sum() * PX_HA, 1), "pieces": k,
+        "elev_min_m": round(float(d.min())), "elev_max_m": round(float(d.max())),
+        "vertical_m": round(float(d.max() - d.min())),
+        "median_elev_m": round(float(np.median(d))),
+        "median_slope_deg": round(float(np.median(sl)), 1),
+        "above_31deg_share": round(float(np.mean(sl > 31.0)), 4),
+        "green_blue_ha": round(float(gb.sum() * PX_HA), 1),
+        "green_blue_share": round(float(np.mean(sl <= st.GREEN_BLUE_MAX_DEG)), 4),
+        "green_blue_pieces": gk,
+        "green_blue_largest_ha": round(float(gsizes[0]), 1),
+        "green_blue_largest_share": round(float(gsizes[0] / gsizes.sum()), 4),
+    }
+    return pd.DataFrame([row])
 
 
-def gradients(slope, alts) -> pd.DataFrame:
-    return st.class_table(slope, G, alts)
+def gradients(slope, mask) -> pd.DataFrame:
+    return st.class_table(slope, G, {"Drawn boundary": mask})
 
 
 def feasibility(green_blue_ha: float) -> pd.DataFrame:
@@ -291,52 +287,64 @@ def published_parameters() -> pd.DataFrame:
     return pd.DataFrame(rows, columns=["parameter", "published", "source"])
 
 
-def figure_reconstructions(dem, slope, alts) -> Path:
-    """Why the drawn boundary is worth having: gentle ground, three placements."""
+def figure_gentle_ground(dem, slope, mask) -> Path:
+    """The gentle ground inside the boundary, and how much of it is in one place."""
     import matplotlib.patheffects as pe
     import matplotlib.pyplot as plt
     from matplotlib.colors import ListedColormap
     from scipy import ndimage
 
-    union = np.zeros_like(next(iter(alts.values())))
-    for m in alts.values():
-        union |= m
-    rs, cs = np.where(union)
-    pad = 10
+    rs, cs = np.where(mask)
+    pad = 8
     r0, r1 = max(rs.min() - pad, 0), min(rs.max() + pad + 1, G.height)
     c0, c1 = max(cs.min() - pad, 0), min(cs.max() + pad + 1, G.width)
     CG = Grid(G.xmin + c0 * G.res, G.ymax - r1 * G.res,
               G.xmin + c1 * G.res, G.ymax - r0 * G.res, G.res, G.crs)
     cut = lambda a: a[r0:r1, c0:c1]
-    dm, sl = cut(dem), cut(slope)
+    dm, sl, mk = cut(dem), cut(slope), cut(mask)
 
-    titles = {"Drawn boundary": "Drawn boundary",
-              "A - disc of the same area at the plateau": "A — disc, no terrain input",
-              "B - gentlest ground of the same area within 3.5 km": "B — gentlest ground"}
-    fig, axes = plt.subplots(1, 3, figsize=(16.2, 5.2))
-    for ax, (key, m) in zip(axes, alts.items()):
-        mk = cut(m)
-        gb = mk & (sl <= st.GREEN_BLUE_MAX_DEG) & np.isfinite(sl)
-        plane = np.where(gb, 2.0, np.where(mk, 1.0, 0.0))
-        viz.map_panel(ax, plane, CG, cmap=ListedColormap(["#efefef", "#c9c2b6", "#1f9d55"]),
-                      vmin=0, vmax=2, dem=dm, shade=0.5, mark_plateau=False, cbar=False,
-                      title=titles[key])
-        lab, k = ndimage.label(gb)
-        sizes = np.bincount(lab.ravel())[1:] * PX_HA
-        big = lab == (sizes.argmax() + 1)
-        ax.contour(big.astype(float), levels=[0.5], colors=["#0b3d20"], linewidths=1.6,
-                   extent=(CG.xmin / 1000, CG.xmax / 1000, CG.ymin / 1000, CG.ymax / 1000),
-                   origin="upper", zorder=11)
-        ax.annotate(f"{gb.sum() * PX_HA:,.0f} ha gentle, {k} pieces\n"
-                    f"largest {sizes.max():,.0f} ha = {100 * sizes.max() / sizes.sum():.0f} %",
-                    (0.03, 0.04), xycoords="axes fraction", fontsize=8.6, fontweight="bold",
-                    color="#0b3d20", zorder=14,
-                    path_effects=[pe.withStroke(linewidth=2.8, foreground="white")])
+    gb = mk & (sl <= st.GREEN_BLUE_MAX_DEG) & np.isfinite(sl)
+    lab, k = ndimage.label(gb)
+    sizes = np.bincount(lab.ravel())[1:] * PX_HA
+    big = lab == (sizes.argmax() + 1)
+    extent = (CG.xmin / 1000, CG.xmax / 1000, CG.ymin / 1000, CG.ymax / 1000)
+
+    hrs = cut(np.load(INTERIM / "sunhours" / "sun_2027_12.npz")["hours"])
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.4, 5.2))
+
+    plane = np.where(gb, 2.0, np.where(mk, 1.0, 0.0))
+    viz.map_panel(axes[0], plane, CG,
+                  cmap=ListedColormap(["#efefef", "#c9c2b6", "#1f9d55"]),
+                  vmin=0, vmax=2, dem=dm, shade=0.5, mark_plateau=False, cbar=False,
+                  title=f"Gentle ground inside the boundary \u2014 {gb.sum() * PX_HA:,.0f} ha")
+    axes[0].contour(mk.astype(float), levels=[0.5], colors=["#e8590c"], linewidths=1.3,
+                    extent=extent, origin="upper", zorder=10)
+    axes[0].contour(big.astype(float), levels=[0.5], colors=["#0b3d20"], linewidths=1.6,
+                    extent=extent, origin="upper", zorder=11)
+    axes[0].annotate(f"{k} pieces; the largest is {sizes.max():,.0f} ha\n"
+                     f"= {100 * sizes.max() / sizes.sum():.0f} % of all the gentle ground",
+                     (0.03, 0.04), xycoords="axes fraction", fontsize=8.6, fontweight="bold",
+                     color="#0b3d20", zorder=14,
+                     path_effects=[pe.withStroke(linewidth=2.8, foreground="white")])
+
+    lit = np.where(gb, hrs, np.nan)
+    viz.map_panel(axes[1], lit, CG, cmap="magma", dem=dm, shade=0.55,
+                  mark_plateau=False, cbar=True,
+                  cbar_label="hours of direct sun in December",
+                  title="The same ground, by December sun")
+    axes[1].contour(mk.astype(float), levels=[0.5], colors=["#e8590c"], linewidths=1.3,
+                    extent=extent, origin="upper", zorder=10)
+    axes[1].annotate(f"median {np.nanmedian(hrs[gb]):.0f} h "
+                     f"({np.nanmedian(hrs[gb]) / 31:.1f} h a day)",
+                     (0.03, 0.04), xycoords="axes fraction", fontsize=8.6, fontweight="bold",
+                     color="#1a1a1a", zorder=14,
+                     path_effects=[pe.withStroke(linewidth=2.8, foreground="white")])
+
     fig.tight_layout()
-    return viz.save(fig, "07_boundary_vs_reconstructions.png", subtitle=(
-        "Green is ground at green/blue gradients (\u226419.3\u00b0); the dark outline is the largest "
-        "unbroken piece of it. All three cover exactly the same area, so only the placement differs. "
-        "B maximises gentle hectares and minimises how much of them are in one place."))
+    return viz.save(fig, "07_gentle_ground.png", subtitle=(
+        "Green is ground at green/blue gradients (\u226419.3\u00b0) inside the drawn boundary; the dark "
+        "outline is the largest unbroken piece of it. Nothing outside the boundary is measured."))
 
 
 def run(verbose: bool = True) -> dict:
@@ -354,12 +362,12 @@ def run(verbose: bool = True) -> dict:
     shape["provenance"] = oa.provenance(props)
     pd.DataFrame([shape]).to_csv(OUT_TAB / "operating_area_summary.csv", index=False)
 
-    cmp_df, alts = shape_and_terrain(poly, dem, slope, mask)
-    cmp_df.to_csv(OUT_TAB / "operating_area_vs_reconstructions.csv", index=False)
+    cmp_df = terrain_inside(dem, slope, mask)
+    cmp_df.to_csv(OUT_TAB / "operating_area_terrain.csv", index=False)
 
-    gradients(slope, alts).to_csv(OUT_TAB / "operating_area_gradient_classes.csv", index=False)
+    gradients(slope, mask).to_csv(OUT_TAB / "operating_area_gradient_classes.csv", index=False)
 
-    gb_ha = float(cmp_df.loc[cmp_df.footprint == "Drawn boundary", "green_blue_ha"].iloc[0])
+    gb_ha = float(cmp_df.green_blue_ha.iloc[0])
     feasibility(gb_ha).to_csv(OUT_TAB / "operating_area_piste_feasibility.csv", index=False)
 
     sun_df = sun(mask, slope)
@@ -370,7 +378,7 @@ def run(verbose: bool = True) -> dict:
 
     published_parameters().to_csv(OUT_TAB / "published_project_parameters.csv", index=False)
     png = figure(poly, props, dem, slope, mask, ctx)
-    png2 = figure_reconstructions(dem, slope, alts)
+    png2 = figure_gentle_ground(dem, slope, mask)
 
     if verbose:
         print(f"boundary       {shape['raster_area_ha']:,.0f} ha, {shape['n_vertices']} vertices, "
@@ -382,7 +390,7 @@ def run(verbose: bool = True) -> dict:
         print("\n" + snow_df.to_string(index=False))
         print(f"\nfigures -> {png}\n            {png2}")
         print(f"tables -> {OUT_TAB}")
-    return {"summary": shape, "comparison": cmp_df, "sun": sun_df, "snow": snow_df, "png": png}
+    return {"summary": shape, "terrain": cmp_df, "sun": sun_df, "snow": snow_df, "png": png}
 
 
 if __name__ == "__main__":

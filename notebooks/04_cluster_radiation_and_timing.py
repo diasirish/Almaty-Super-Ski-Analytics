@@ -128,15 +128,20 @@ draw_osm(ax, feat, DEM_GRID, labels=LABEL_PLACES,
          label_kinds=("peak", "saddle", "place", "station"),
          lift_label_min_m=1500)
 lift_legend(ax)
-# the original 69 km² rectangle, for scale
-from pyproj import Transformer
-_tr = Transformer.from_crs("EPSG:4326", DEM_GRID.crs, always_xy=True)
-w, s, e, n = STUDY_AREAS["kok_zhailau"]["bbox"]
-(x0, x1), (y0, y1) = _tr.transform([w, e], [s, n])
-ax.add_patch(plt.Rectangle((x0/1000, y0/1000), (x1-x0)/1000, (y1-y0)/1000,
-                           fill=False, ec="#c0392b", lw=1.4, ls="--", zorder=8))
-ax.annotate("notebooks 01–03\nstudy rectangle", (x0/1000, y1/1000), fontsize=7.4,
-            color="#c0392b", textcoords="offset points", xytext=(3, 5), zorder=9)
+# the drawn operating boundary, for scale: the study area the rest of this
+# release reports over, shown inside the cluster it sits in
+import operating_area as _OA
+_poly, _ = _OA.load()
+_m = _OA.mask(DEM_GRID, _poly)
+_ext = (DEM_GRID.xmin/1000, DEM_GRID.xmax/1000, DEM_GRID.ymin/1000, DEM_GRID.ymax/1000)
+ax.contour(_m.astype(float), levels=[0.5], colors=["#c0392b"], linewidths=1.6,
+           extent=_ext, origin="upper", zorder=8)
+_rs, _cs = np.where(_m)
+ax.annotate("drawn operating\nboundary (1,776 ha)",
+            ((DEM_GRID.xmin + _cs.min()*DEM_GRID.res)/1000,
+             (DEM_GRID.ymax - _rs.min()*DEM_GRID.res)/1000),
+            fontsize=7.4, color="#c0392b", textcoords="offset points",
+            xytext=(3, 5), zorder=9)
 ax.set_title(f"{AREA_LABEL} — terrain and the existing lift network\n"
              f"{DEM_GRID.area_km2:.0f} km² · {np.nanmin(dem):.0f}–{np.nanmax(dem):.0f} m · "
              f"{len(lifts)} lift lines, {lift_tbl.length_m.sum()/1000:.1f} km")

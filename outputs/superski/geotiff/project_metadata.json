@@ -1,0 +1,46 @@
+{
+ "run_date": "2026-11-24",
+ "area": "Almaty SuperSki - the drawn operating boundary and its working window",
+ "bbox": [
+  76.95,
+  43.085,
+  77.055,
+  43.155
+ ],
+ "window_km2": 70.17,
+ "derivation": "The study area is the boundary in qgis/operating_area.geojson, hand-digitised over satellite imagery. This rectangle is nothing more than that boundary's own envelope plus the 1 km working buffer operating_area.bbox() returns: rasters need a margin for hillshade and for the horizon to have surroundings, and a map needs context around its subject. Every figure reported for the operating area is masked to the boundary. Earlier releases ran on two larger author-chosen rectangles - a 69 km2 box around the plateau and a 125 km2 envelope of the general-plan control points - and both reached about 3 km north of the boundary into the dacha belt below 1,775 m, which is ground this study has no business measuring. Both are withdrawn.",
+ "operating_boundary": {
+  "stated_territory_ha": 1022.0,
+  "drawn_area_ha": 1775.5,
+  "share_of_window": 0.253,
+  "green_blue_ha": 363.9,
+  "green_blue_pieces": 133,
+  "green_blue_largest_ha": 182.2,
+  "provenance": "Boundary digitised by the author (Google Earth, hand-digitised over satellite imagery, exported as KML, 2026-11-19). Not an official boundary. Kazakh Tourism Development states a territory of 1,022 ha but has published no coordinates; this polygon is one informed reading of the operating area from imagery and the operator's general-plan sheet, and is larger than the stated territory."
+ },
+ "sun": {
+  "horizon_azimuths": 72,
+  "sunshine_step_min": 10,
+  "nov_apr_hours_median_inside": 1187.6
+ },
+ "snow": {
+  "scenes": 115,
+  "dates": 112,
+  "failures": 0,
+  "scene_cache_reused_from": "658320_4770420_1040x970_20m",
+  "reuse_check_differing_pixels": 0,
+  "thinnest_month": 12,
+  "thinnest_month_qualifying_share": 0.4971
+ },
+ "dem_validation": {
+  "collections": {
+   "NASADEM": "nasadem",
+   "ALOS AW3D30": "alos-dem"
+  },
+  "elevation_min_correlation": 0.999916,
+  "slope_min_correlation": 0.826749,
+  "top_decile_overlap_min": 0.8362,
+  "top_decile_overlap_max": 0.9441
+ },
+ "three_area_reference": "Kok Zhailau \u2014 drawn boundary"
+}

@@ -118,5 +118,5 @@ def feasibility(demand, available_ha: float, label: str):
     d["available_green_blue_ha"] = round(available_ha, 1)
     d["share_of_available_consumed"] = (
         d["green_blue_piste_ha"] / available_ha).round(3)
-    d["footprint"] = label
+    d["area"] = label
     return d

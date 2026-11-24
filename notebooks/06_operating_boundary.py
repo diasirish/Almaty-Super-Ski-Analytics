@@ -4,14 +4,18 @@
 # **Almaty SuperSki terrain analytics — an independent open-data case study**
 # Dias Irishev · Geo & Weather Data Scientist, Almaty
 #
-# Notebooks 01–03 report a 69 km² rectangle the author chose around the plateau.
-# Notebook 04 widens to the 404 km² cluster; notebook 05 narrows to a 42 km²
-# project window and reconstructs the stated 1,022 ha two ways.
+# This release has one study area: a boundary drawn by hand over satellite
+# imagery. Everything else is a working window around it.
 #
-# **All four of those pick their study area by assertion.** This notebook replaces
-# that twice over — first with a rectangle derived from the operator's own
-# published general plan, then with a boundary drawn by hand over satellite
-# imagery — and reports what is actually inside it.
+# Getting there took two retractions. The first release picked a 69 km² rectangle
+# around the plateau by assertion. The second derived a 125 km² rectangle from the
+# control points on the operator's general plan — better placed, but still a
+# rectangle, and only 14 % of it was the site. Both reached about 3 km north of
+# where any skiing is planned, over the dacha belt below the plateau, and both
+# reported medians over that ground as if they described the project. Both are
+# withdrawn, and so are the two synthetic 1,022 ha footprints notebook 05 used to
+# carry. What remains is the drawn boundary and a rectangle that exists only to
+# give it a margin.
 #
 # Everything here is computed by `src/pipeline_operating_area.py`. This notebook
 # calls that module rather than reimplementing it, so there is exactly one
@@ -36,13 +40,12 @@ import pandas as pd
 
 sys.path.insert(0, str(Path.cwd().parent / "src"))
 
-import footprint
 import operating_area as OA
 import pipeline_operating_area as PL
 import ski_terrain as ST
 import viz
-from config import (AREA_LABEL, AREA_NOTE, DATA, HORIZON_N_AZIMUTH, INTERIM,
-                    MIN_VALID_OBS, OUT_PNG, OUT_TAB, PROJECT_AREA_HA,
+from config import (AOI_BBOX_WGS84, AREA_LABEL, AREA_NOTE, HORIZON_N_AZIMUTH,
+                    INTERIM, MIN_VALID_OBS, OUT_PNG, OUT_TAB, PROJECT_AREA_HA,
                     PROJECT_GREEN_BLUE_SHARE, PROJECT_GREEN_BLUE_SHARE_PRESS,
                     PROJECT_LIFTS, PROJECT_LIFTS_PRESS, PROJECT_PISTE_KM,
                     PROJECT_SNOWMAKING_SHARE, STUDY_AREAS, SUN_HOUR_STEP_MIN)
@@ -58,13 +61,14 @@ print(f"horizon     : {HORIZON_N_AZIMUTH} azimuths ({360//HORIZON_N_AZIMUTH} deg
 print(f"sun step    : {SUN_HOUR_STEP_MIN} min")
 
 # %% [markdown]
-# ## 1. Why the study area moved
+# ## 1. Why the study area moved, twice
 #
-# The rectangle notebooks 01–03 use was chosen before the operator's general plan
-# was on hand. Measured against the features that plan names, it is in the wrong
-# place. The plan itself is a perspective panorama — no projection, no scale bar,
-# no graticule — so **nothing is traced from it**. What it carries is *named
-# features*, and those can be located independently in OpenStreetMap.
+# The operator's general plan is a perspective panorama — no projection, no scale
+# bar, no graticule — so **nothing is traced from it**. What it carries is *named
+# features*, and those can be located independently in OpenStreetMap. Those seven
+# points are what showed the first rectangle was in the wrong place; they are kept
+# here because they are the evidence, not because the rectangle they produced
+# survived.
 
 # %%
 CONTROL_POINTS = {
@@ -76,45 +80,52 @@ CONTROL_POINTS = {
     "KIMASAR":                  (77.08281, 43.17116, "OSM saddle «Кімасар», 2080 m"),
     "SHYMBULAK":                (77.09312, 43.12275, "OSM landuse=winter_sports"),
 }
+# The two retired rectangles, kept as literals so the record can be checked.
+# Neither is a study area any more; neither is in config.py.
+RETIRED = {
+    "1st release — author's 69 km² box": (76.960, 43.105, 77.065, 43.174),
+    "2nd release — 125 km² control-point envelope": (76.955, 43.078, 77.095, 43.172),
+}
 cp = pd.DataFrame([{"sheet_label": k, "lon": v[0], "lat": v[1], "located_as": v[2]}
                    for k, v in CONTROL_POINTS.items()])
-old = STUDY_AREAS["kok_zhailau"]["bbox"]
-cp["inside_old_rectangle"] = [(old[0] <= r.lon <= old[2]) and (old[1] <= r.lat <= old[3])
-                              for r in cp.itertuples()]
+for label, bb in RETIRED.items():
+    cp[label.split(" —")[0]] = [(bb[0] <= r.lon <= bb[2]) and (bb[1] <= r.lat <= bb[3])
+                                for r in cp.itertuples()]
 print(cp.to_string(index=False))
-print(f"\ncontrol points the superseded 69 km2 rectangle misses: "
-      f"{(~cp.inside_old_rectangle).sum()} of {len(cp)}")
+print(f"\ncontrol points the 1st rectangle misses: "
+      f"{(~cp['1st release']).sum()} of {len(cp)}")
+print(f"control points the 2nd rectangle misses: "
+      f"{(~cp['2nd release']).sum()} of {len(cp)}")
 
 # %% [markdown]
-# The old rectangle fails on three counts at once, and the failures point the same
-# way: it sampled the ground **below** the resort and stopped short of the ground
-# **above** it.
+# The first rectangle stopped 2.6 km short of the Kumbeltau range and so excluded
+# the whole high half of the plan. The second fixed that and introduced the
+# opposite fault: it was sized to hold every named feature, including Medeu and
+# Kimasar down at the city edge, so most of what it measured was not ski terrain
+# at all. The table below is pure geometry — no raster needed — and it is the
+# reason there is a drawn boundary.
 
 # %%
-# The superseded rectangle keeps the flat cache layout the first release shipped
-# with, so its terrain is data/interim/terrain.npz. Spelled out from DATA rather
-# than walked up from INTERIM, whose depth differs between areas.
-dem_old = np.load(DATA / "interim" / "terrain.npz")["dem"]
-dem_new = np.load(INTERIM / "terrain.npz")["dem"]
-BANDS = {"below the base village (<1,900 m)": (0, 1900),
-         "the plan's operating band (1,900–3,400 m)": (1900, 3400),
-         "above the plan's top station (>3,400 m)": (3400, 1e9)}
+import math
+
+poly_pre, _ = OA.load()
+bl, bs, br, bn = poly_pre.bounds
+KM_LAT, KM_LON = 110.57, 111.32 * math.cos(math.radians(43.12))
 rows = []
-for label, d, res in (("superseded 69 km²", dem_old, 30.0), ("superski 125 km²", dem_new, 30.0)):
-    ha = res ** 2 / 1e4
-    row = {"rectangle": label, "total_ha": round(float(np.isfinite(d).sum() * ha))}
-    for name, (lo, hi) in BANDS.items():
-        row[name] = round(float(((d >= lo) & (d < hi)).sum() * ha))
-    rows.append(row)
+for label, bb in list(RETIRED.items()) + [
+        ("this release — the boundary's own window", tuple(AOI_BBOX_WGS84))]:
+    w, h = (bb[2] - bb[0]) * KM_LON, (bb[3] - bb[1]) * KM_LAT
+    rows.append({
+        "rectangle": label,
+        "km²": round(w * h, 1),
+        "km north of the boundary": round(max(bb[3] - bn, 0) * KM_LAT, 1),
+        "km south of the boundary": round(max(bs - bb[1], 0) * KM_LAT, 1),
+        "boundary as % of it": round(100 * 17.76 / (w * h)),
+    })
 extent = pd.DataFrame(rows)
 print(extent.to_string(index=False))
-print("\nThe replacement more than doubles the terrain the plan actually uses,")
-print("while the ground below the village grows by only ~160 ha.")
-
-# %% [markdown]
-# The `superski` rectangle is the envelope of those seven control points plus a
-# 1.5 km working buffer. It is **derived, not given** — and it is still only a
-# compute grid, because a rectangle is not a site.
+print("\nThe drawn boundary is 17.8 km². Everything else in any of these")
+print("rectangles is margin, and margin is not a study area.")
 
 # %% [markdown]
 # ## 2. The boundary itself
@@ -127,7 +138,8 @@ print("while the ground below the village grows by only ~160 ha.")
 
 # %%
 poly, props = OA.load()
-summary = OA.summary(poly, DEM_GRID, dem_new, np.load(INTERIM / "terrain.npz")["slope"])
+_t = np.load(INTERIM / "terrain.npz")
+summary = OA.summary(poly, DEM_GRID, _t["dem"], _t["slope"])
 print(f"provenance : {OA.provenance(props)}\n")
 for k, v in summary.items():
     print(f"  {k:24s} {v}")
@@ -143,34 +155,33 @@ print(f"drawn boundary           {summary['raster_area_ha']:,.0f} ha "
 # re-derives.
 
 # %% [markdown]
-# ## 3. Is the drawn boundary better than a rule?
+# ## 3. What is inside it
 #
-# A hand-drawn boundary is only worth having if it beats what an algorithm would
-# pick. Two reconstructions of **exactly the same area** are the reference:
-#
-# * **A — a disc on the plateau.** What you get with no terrain information.
-# * **B — the gentlest ground within 3.5 km.** The most favourable placement
-#   available, and therefore the right adversarial reference rather than a
-#   flattering one.
+# One boundary, one row. `pipeline_operating_area.terrain_inside` reports size,
+# vertical, gradient and — the column that matters for a lift network —
+# contiguity.
 
 # %%
 terrain = np.load(INTERIM / "terrain.npz")
 dem, slope, svf = terrain["dem"], terrain["slope"], terrain["svf"]
 mask = OA.mask(DEM_GRID, poly)
-cmp_df, alts = PL.shape_and_terrain(poly, dem, slope, mask)
-print(cmp_df.to_string(index=False))
+cmp_df = PL.terrain_inside(dem, slope, mask)
+print(cmp_df.T.to_string(header=False))
 
 # %% [markdown]
-# Read the last three columns together. **B finds twice the gentle ground and
-# scatters it**: its largest unbroken field holds only ~28 % of its own gentle
-# hectares. The drawn boundary takes more gentle ground than the disc, more
-# vertical, and keeps half of its gentle ground in **one** field.
+# **Half of the gentle ground is in one field.** 364 ha lies at green/blue
+# gradients, scattered over 133 fragments, but the largest single unbroken piece
+# is 182 ha — 50 % of the total. Quantity is not the constraint here;
+# connectivity is, and connectivity is what a lift network consumes.
 #
-# Connectivity, not quantity, is what separates the three — and connectivity is
-# what a lift network actually consumes.
+# Earlier releases reported this row against two synthetic footprints of the same
+# area — a disc on the plateau, and the gentlest ground within 3.5 km. Both are
+# **withdrawn** (`METHODS.md` §31): neither was the operating area, the disc sat
+# over the dacha belt, and "gentlest ground" is by construction the most
+# flattering placement available.
 
 # %%
-PL.figure_reconstructions(dem, slope, alts)
+PL.figure_gentle_ground(dem, slope, mask)
 
 # %% [markdown]
 # ## 4. The published mix of runs, against the gradients that exist
@@ -191,12 +202,12 @@ print()
 print(PL.published_parameters().to_string(index=False))
 
 # %%
-grad = PL.gradients(slope, alts)
+grad = PL.gradients(slope, mask)
 print(grad.pivot(index="gradient_class", columns="area", values="area_ha")
           .reindex([c[0] for c in ST.GRADIENT_CLASSES]).to_string())
 
 # %%
-gb_ha = float(cmp_df.loc[cmp_df.footprint == "Drawn boundary", "green_blue_ha"].iloc[0])
+gb_ha = float(cmp_df.green_blue_ha.iloc[0])
 feas = PL.feasibility(gb_ha)
 print(feas[["green_blue_source", "assumed_mean_piste_width_m", "green_blue_piste_ha",
             "available_green_blue_ha", "share_of_available_consumed"]].to_string(index=False))
@@ -227,7 +238,7 @@ print(sun.to_string(index=False))
 # ground sees 5.4 h.** The plateau faces the city, which is north; the gentle
 # shelves that would carry beginner runs are not the north-facing part of it.
 #
-# That inverts an earlier reading of this site, which took the whole footprint's
+# That inverts an earlier reading of this site, which took the whole area's
 # December median as the number a beginner area would live with.
 
 # %% [markdown]
@@ -256,18 +267,20 @@ PL.figure(poly, props, dem, slope, mask, ctx)
 # %% [markdown]
 # ## 7. What this notebook supersedes
 #
-# | earlier claim | where | status |
+# | earlier claim | where it was | status |
 # |---|---|---|
-# | 69 km² rectangle is the study area | nb 01–03 | superseded by the control-point extent |
-# | 1,022 ha reconstructed as footprints A and B | nb 05 §1 | kept as the adversarial reference only |
+# | the 69 km² rectangle is the study area | nb 01–03, 1st release | **withdrawn** — wrong place, misses 3 of 7 control points |
+# | the 125 km² control-point envelope is the study area | nb 01–03, 2nd release | **withdrawn** — right place, but 86 % of it is not the site |
+# | the stated 1,022 ha, reconstructed as footprints A and B | nb 05 §1–§3 | **deleted** — `footprint.py` is gone; neither was the operating area |
 # | green/blue runs need up to 101 % of available ground | nb 05 §2 | **withdrawn** — 30–50 % here |
 # | gentle ground exists but is not in one place | nb 05 §1 | **withdrawn** — half of it is one 182 ha field |
-# | placement moves December sun by 3.9× | nb 05 §3 | narrowed — gentle ground is the sunny ground |
-# | 17 lifts, about 70 % green and blue | nb 05 §0 | superseded by the general plan; both carried |
+# | placement moves December sun by 3.9× | nb 05 §3 | **withdrawn** — it measured the gap between two inventions |
+# | 17 lifts, about 70 % green and blue | press, April 2026 | superseded by the general plan; both carried |
 #
-# Notebook 04 (the 404 km² cluster) and notebook 05 §5–§6 (the three-area
-# comparison and the DEM propagation check) are **unaffected**: neither depends on
-# where this boundary is drawn.
+# Notebook 04 (the 404 km² cluster) is unaffected: it never depended on where
+# this boundary is drawn. Notebook 05 now tests this boundary rather than a
+# reconstruction — its three-area comparison uses the drawn polygon as the Kok
+# Zhailau reference, and its DEM propagation check runs on the window around it.
 
 # %% [markdown]
 # ## 8. Outputs

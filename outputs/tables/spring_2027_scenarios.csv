@@ -1,4 +1,0 @@
-scenario,n_dates,n_seasons,coverage_full_grid,median_freq_common_mask,p25,p75,area_freq_above_0.8_km2,median_freq_2200_2300
-10 days earlier (03-11 −10d),33,4,0.986,0.833,0.467,1.0,22.84,0.844
-historical analogue (03-11→04-20),31,4,0.981,0.75,0.368,1.0,20.2,0.768
-10 days later (04-20 +10d),26,4,0.891,0.5,0.104,0.917,14.72,0.601

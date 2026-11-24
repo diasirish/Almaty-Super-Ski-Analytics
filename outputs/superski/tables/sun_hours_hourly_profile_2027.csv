@@ -1,361 +1,145 @@
 zone,month,hour,sunlit_fraction,n_steps
-all terrain,11,6,0.0002,40
-all terrain,11,7,0.0266,180
-all terrain,11,8,0.2266,180
-all terrain,11,9,0.495,180
-all terrain,11,10,0.663,180
-all terrain,11,11,0.7292,180
-all terrain,11,12,0.7081,180
-all terrain,11,13,0.6195,180
-all terrain,11,14,0.476,180
-all terrain,11,15,0.2926,180
-all terrain,11,16,0.1461,81
-skiable 15-35 deg,11,6,0.0002,40
-skiable 15-35 deg,11,7,0.0255,180
-skiable 15-35 deg,11,8,0.2203,180
-skiable 15-35 deg,11,9,0.4977,180
-skiable 15-35 deg,11,10,0.6816,180
-skiable 15-35 deg,11,11,0.7555,180
-skiable 15-35 deg,11,12,0.7303,180
-skiable 15-35 deg,11,13,0.6273,180
-skiable 15-35 deg,11,14,0.4756,180
-skiable 15-35 deg,11,15,0.2941,180
-skiable 15-35 deg,11,16,0.1445,81
-existing lift corridors,11,6,0.0,40
-existing lift corridors,11,7,0.0,180
-existing lift corridors,11,8,0.1389,180
-existing lift corridors,11,9,0.4774,180
-existing lift corridors,11,10,0.7634,180
-existing lift corridors,11,11,0.8314,180
-existing lift corridors,11,12,0.7987,180
-existing lift corridors,11,13,0.6804,180
-existing lift corridors,11,14,0.3684,180
-existing lift corridors,11,15,0.0412,180
-existing lift corridors,11,16,0.0,81
-mapped pistes,11,6,0.0,40
-mapped pistes,11,7,0.0,180
-mapped pistes,11,8,0.0018,180
-mapped pistes,11,9,0.1597,180
-mapped pistes,11,10,0.6667,180
-mapped pistes,11,11,0.8837,180
-mapped pistes,11,12,0.9071,180
-mapped pistes,11,13,0.8429,180
-mapped pistes,11,14,0.5951,180
-mapped pistes,11,15,0.083,180
-mapped pistes,11,16,0.0,81
-Shymbulak (OSM area),11,6,0.0,40
-Shymbulak (OSM area),11,7,0.0,180
-Shymbulak (OSM area),11,8,0.0127,180
-Shymbulak (OSM area),11,9,0.2601,180
-Shymbulak (OSM area),11,10,0.7469,180
-Shymbulak (OSM area),11,11,0.8961,180
-Shymbulak (OSM area),11,12,0.8991,180
-Shymbulak (OSM area),11,13,0.8218,180
-Shymbulak (OSM area),11,14,0.5038,180
-Shymbulak (OSM area),11,15,0.0607,180
-Shymbulak (OSM area),11,16,0.0,81
-all terrain,12,7,0.0019,128
-all terrain,12,8,0.0633,186
-all terrain,12,9,0.2934,186
-all terrain,12,10,0.4913,186
-all terrain,12,11,0.5823,186
-all terrain,12,12,0.5805,186
-all terrain,12,13,0.5044,186
-all terrain,12,14,0.3718,186
-all terrain,12,15,0.2003,186
-all terrain,12,16,0.0813,48
-skiable 15-35 deg,12,7,0.0016,128
-skiable 15-35 deg,12,8,0.0604,186
-skiable 15-35 deg,12,9,0.2887,186
-skiable 15-35 deg,12,10,0.4939,186
-skiable 15-35 deg,12,11,0.5903,186
-skiable 15-35 deg,12,12,0.5868,186
-skiable 15-35 deg,12,13,0.5026,186
-skiable 15-35 deg,12,14,0.3704,186
-skiable 15-35 deg,12,15,0.2003,186
-skiable 15-35 deg,12,16,0.0763,48
-existing lift corridors,12,7,0.0,128
-existing lift corridors,12,8,0.009,186
-existing lift corridors,12,9,0.1736,186
-existing lift corridors,12,10,0.4607,186
-existing lift corridors,12,11,0.5935,186
-existing lift corridors,12,12,0.5982,186
-existing lift corridors,12,13,0.4604,186
-existing lift corridors,12,14,0.1459,186
-existing lift corridors,12,15,0.0,186
-existing lift corridors,12,16,0.0,48
-mapped pistes,12,7,0.0,128
-mapped pistes,12,8,0.0,186
-mapped pistes,12,9,0.0,186
-mapped pistes,12,10,0.1179,186
-mapped pistes,12,11,0.5255,186
-mapped pistes,12,12,0.6052,186
-mapped pistes,12,13,0.5836,186
-mapped pistes,12,14,0.2786,186
-mapped pistes,12,15,0.0,186
-mapped pistes,12,16,0.0,48
-Shymbulak (OSM area),12,7,0.0,128
-Shymbulak (OSM area),12,8,0.0,186
-Shymbulak (OSM area),12,9,0.0046,186
-Shymbulak (OSM area),12,10,0.2779,186
-Shymbulak (OSM area),12,11,0.6172,186
-Shymbulak (OSM area),12,12,0.6677,186
-Shymbulak (OSM area),12,13,0.5956,186
-Shymbulak (OSM area),12,14,0.2076,186
-Shymbulak (OSM area),12,15,0.0,186
-Shymbulak (OSM area),12,16,0.0,48
-all terrain,1,7,0.0011,117
-all terrain,1,8,0.0658,186
-all terrain,1,9,0.3153,186
-all terrain,1,10,0.5329,186
-all terrain,1,11,0.6437,186
-all terrain,1,12,0.6582,186
-all terrain,1,13,0.5966,186
-all terrain,1,14,0.4737,186
-all terrain,1,15,0.3083,186
-all terrain,1,16,0.1483,128
-skiable 15-35 deg,1,7,0.001,117
-skiable 15-35 deg,1,8,0.0625,186
-skiable 15-35 deg,1,9,0.3098,186
-skiable 15-35 deg,1,10,0.5381,186
-skiable 15-35 deg,1,11,0.6592,186
-skiable 15-35 deg,1,12,0.6741,186
-skiable 15-35 deg,1,13,0.603,186
-skiable 15-35 deg,1,14,0.4728,186
-skiable 15-35 deg,1,15,0.3092,186
-skiable 15-35 deg,1,16,0.1466,128
-existing lift corridors,1,7,0.0,117
-existing lift corridors,1,8,0.0094,186
-existing lift corridors,1,9,0.215,186
-existing lift corridors,1,10,0.5387,186
-existing lift corridors,1,11,0.7196,186
-existing lift corridors,1,12,0.7278,186
-existing lift corridors,1,13,0.6423,186
-existing lift corridors,1,14,0.3838,186
-existing lift corridors,1,15,0.052,186
-existing lift corridors,1,16,0.0003,128
-mapped pistes,1,7,0.0,117
-mapped pistes,1,8,0.0,186
-mapped pistes,1,9,0.0001,186
-mapped pistes,1,10,0.1948,186
-mapped pistes,1,11,0.7012,186
-mapped pistes,1,12,0.7999,186
-mapped pistes,1,13,0.7653,186
-mapped pistes,1,14,0.581,186
-mapped pistes,1,15,0.1149,186
-mapped pistes,1,16,0.0,128
-Shymbulak (OSM area),1,7,0.0,117
-Shymbulak (OSM area),1,8,0.0,186
-Shymbulak (OSM area),1,9,0.01,186
-Shymbulak (OSM area),1,10,0.3513,186
-Shymbulak (OSM area),1,11,0.7594,186
-Shymbulak (OSM area),1,12,0.8194,186
-Shymbulak (OSM area),1,13,0.7689,186
-Shymbulak (OSM area),1,14,0.5096,186
-Shymbulak (OSM area),1,15,0.0846,186
-Shymbulak (OSM area),1,16,0.0,128
-all terrain,2,6,0.001,25
-all terrain,2,7,0.0322,163
-all terrain,2,8,0.2521,168
-all terrain,2,9,0.5545,168
-all terrain,2,10,0.761,168
-all terrain,2,11,0.8596,168
-all terrain,2,12,0.8715,168
-all terrain,2,13,0.8142,168
-all terrain,2,14,0.6958,168
-all terrain,2,15,0.5324,168
-all terrain,2,16,0.332,168
-all terrain,2,17,0.2004,53
-skiable 15-35 deg,2,6,0.001,25
-skiable 15-35 deg,2,7,0.0319,163
-skiable 15-35 deg,2,8,0.2472,168
-skiable 15-35 deg,2,9,0.5629,168
-skiable 15-35 deg,2,10,0.7935,168
-skiable 15-35 deg,2,11,0.8985,168
-skiable 15-35 deg,2,12,0.9105,168
-skiable 15-35 deg,2,13,0.8482,168
-skiable 15-35 deg,2,14,0.7103,168
-skiable 15-35 deg,2,15,0.5338,168
-skiable 15-35 deg,2,16,0.3334,168
-skiable 15-35 deg,2,17,0.203,53
-existing lift corridors,2,6,0.0,25
-existing lift corridors,2,7,0.0,163
-existing lift corridors,2,8,0.1603,168
-existing lift corridors,2,9,0.653,168
-existing lift corridors,2,10,0.8828,168
-existing lift corridors,2,11,0.957,168
-existing lift corridors,2,12,0.9491,168
-existing lift corridors,2,13,0.888,168
-existing lift corridors,2,14,0.7779,168
-existing lift corridors,2,15,0.4794,168
-existing lift corridors,2,16,0.0954,168
-existing lift corridors,2,17,0.0002,53
-mapped pistes,2,6,0.0,25
-mapped pistes,2,7,0.0,163
-mapped pistes,2,8,0.0797,168
-mapped pistes,2,9,0.4976,168
-mapped pistes,2,10,0.8792,168
-mapped pistes,2,11,0.9747,168
-mapped pistes,2,12,0.9808,168
-mapped pistes,2,13,0.976,168
-mapped pistes,2,14,0.9466,168
-mapped pistes,2,15,0.7587,168
-mapped pistes,2,16,0.202,168
-mapped pistes,2,17,0.0006,53
-Shymbulak (OSM area),2,6,0.0,25
-Shymbulak (OSM area),2,7,0.0,163
-Shymbulak (OSM area),2,8,0.1034,168
-Shymbulak (OSM area),2,9,0.5677,168
-Shymbulak (OSM area),2,10,0.9054,168
-Shymbulak (OSM area),2,11,0.9772,168
-Shymbulak (OSM area),2,12,0.9779,168
-Shymbulak (OSM area),2,13,0.9688,168
-Shymbulak (OSM area),2,14,0.9191,168
-Shymbulak (OSM area),2,15,0.6426,168
-Shymbulak (OSM area),2,16,0.1519,168
-Shymbulak (OSM area),2,17,0.0005,53
-all terrain,3,5,0.0075,14
-all terrain,3,6,0.0504,156
-all terrain,3,7,0.2661,186
-all terrain,3,8,0.6035,186
-all terrain,3,9,0.8604,186
-all terrain,3,10,0.9686,186
-all terrain,3,11,0.989,186
-all terrain,3,12,0.9895,186
-all terrain,3,13,0.9737,186
-all terrain,3,14,0.9,186
-all terrain,3,15,0.7475,186
-all terrain,3,16,0.5669,186
-all terrain,3,17,0.3645,166
-all terrain,3,18,0.2716,8
-skiable 15-35 deg,3,5,0.0065,14
-skiable 15-35 deg,3,6,0.0501,156
-skiable 15-35 deg,3,7,0.2654,186
-skiable 15-35 deg,3,8,0.6179,186
-skiable 15-35 deg,3,9,0.897,186
-skiable 15-35 deg,3,10,0.9882,186
-skiable 15-35 deg,3,11,0.9978,186
-skiable 15-35 deg,3,12,0.9978,186
-skiable 15-35 deg,3,13,0.9909,186
-skiable 15-35 deg,3,14,0.9304,186
-skiable 15-35 deg,3,15,0.761,186
-skiable 15-35 deg,3,16,0.5669,186
-skiable 15-35 deg,3,17,0.3682,166
-skiable 15-35 deg,3,18,0.2833,8
-existing lift corridors,3,5,0.0,14
-existing lift corridors,3,6,0.0002,156
-existing lift corridors,3,7,0.1011,186
-existing lift corridors,3,8,0.7284,186
-existing lift corridors,3,9,0.9593,186
-existing lift corridors,3,10,0.995,186
-existing lift corridors,3,11,0.9992,186
-existing lift corridors,3,12,0.9991,186
-existing lift corridors,3,13,0.9894,186
-existing lift corridors,3,14,0.9344,186
-existing lift corridors,3,15,0.8441,186
-existing lift corridors,3,16,0.5478,186
-existing lift corridors,3,17,0.1306,166
-existing lift corridors,3,18,0.0,8
-mapped pistes,3,5,0.0,14
-mapped pistes,3,6,0.0,156
-mapped pistes,3,7,0.0822,186
-mapped pistes,3,8,0.7565,186
-mapped pistes,3,9,0.9849,186
-mapped pistes,3,10,0.9972,186
-mapped pistes,3,11,0.9986,186
-mapped pistes,3,12,0.9992,186
-mapped pistes,3,13,0.9986,186
-mapped pistes,3,14,0.9961,186
-mapped pistes,3,15,0.9862,186
-mapped pistes,3,16,0.8299,186
-mapped pistes,3,17,0.2311,166
-mapped pistes,3,18,0.0001,8
-Shymbulak (OSM area),3,5,0.0,14
-Shymbulak (OSM area),3,6,0.0,156
-Shymbulak (OSM area),3,7,0.0687,186
-Shymbulak (OSM area),3,8,0.7519,186
-Shymbulak (OSM area),3,9,0.9868,186
-Shymbulak (OSM area),3,10,0.9974,186
-Shymbulak (OSM area),3,11,0.9989,186
-Shymbulak (OSM area),3,12,0.9994,186
-Shymbulak (OSM area),3,13,0.9991,186
-Shymbulak (OSM area),3,14,0.9968,186
-Shymbulak (OSM area),3,15,0.9679,186
-Shymbulak (OSM area),3,16,0.7363,186
-Shymbulak (OSM area),3,17,0.1919,166
-Shymbulak (OSM area),3,18,0.0,8
-all terrain,4,4,0.0242,4
-all terrain,4,5,0.0739,137
-all terrain,4,6,0.2831,180
-all terrain,4,7,0.6096,180
-all terrain,4,8,0.887,180
-all terrain,4,9,0.9891,180
-all terrain,4,10,0.9988,180
-all terrain,4,11,0.9995,180
-all terrain,4,12,0.9992,180
-all terrain,4,13,0.9981,180
-all terrain,4,14,0.9863,180
-all terrain,4,15,0.8988,180
-all terrain,4,16,0.7356,180
-all terrain,4,17,0.5559,180
-all terrain,4,18,0.3855,98
-skiable 15-35 deg,4,4,0.0231,4
-skiable 15-35 deg,4,5,0.0748,137
-skiable 15-35 deg,4,6,0.286,180
-skiable 15-35 deg,4,7,0.622,180
-skiable 15-35 deg,4,8,0.9212,180
-skiable 15-35 deg,4,9,0.9973,180
-skiable 15-35 deg,4,10,0.9999,180
+all terrain,11,6,0.0004,40
+all terrain,11,7,0.0331,180
+all terrain,11,8,0.2367,180
+all terrain,11,9,0.487,180
+all terrain,11,10,0.6518,180
+all terrain,11,11,0.7153,180
+all terrain,11,12,0.6945,180
+all terrain,11,13,0.6132,180
+all terrain,11,14,0.4815,180
+all terrain,11,15,0.3266,180
+all terrain,11,16,0.1926,82
+skiable 15-35 deg,11,6,0.0004,40
+skiable 15-35 deg,11,7,0.0312,180
+skiable 15-35 deg,11,8,0.2286,180
+skiable 15-35 deg,11,9,0.4854,180
+skiable 15-35 deg,11,10,0.6659,180
+skiable 15-35 deg,11,11,0.7403,180
+skiable 15-35 deg,11,12,0.7144,180
+skiable 15-35 deg,11,13,0.6201,180
+skiable 15-35 deg,11,14,0.4836,180
+skiable 15-35 deg,11,15,0.3295,180
+skiable 15-35 deg,11,16,0.1932,82
+all terrain,12,7,0.0031,128
+all terrain,12,8,0.081,186
+all terrain,12,9,0.2974,186
+all terrain,12,10,0.4756,186
+all terrain,12,11,0.5651,186
+all terrain,12,12,0.5645,186
+all terrain,12,13,0.5008,186
+all terrain,12,14,0.3861,186
+all terrain,12,15,0.2397,186
+all terrain,12,16,0.1178,48
+skiable 15-35 deg,12,7,0.0025,128
+skiable 15-35 deg,12,8,0.0748,186
+skiable 15-35 deg,12,9,0.2899,186
+skiable 15-35 deg,12,10,0.4703,186
+skiable 15-35 deg,12,11,0.5666,186
+skiable 15-35 deg,12,12,0.5686,186
+skiable 15-35 deg,12,13,0.5006,186
+skiable 15-35 deg,12,14,0.3875,186
+skiable 15-35 deg,12,15,0.2433,186
+skiable 15-35 deg,12,16,0.1176,48
+all terrain,1,7,0.0017,116
+all terrain,1,8,0.0817,186
+all terrain,1,9,0.3173,186
+all terrain,1,10,0.52,186
+all terrain,1,11,0.6281,186
+all terrain,1,12,0.642,186
+all terrain,1,13,0.5873,186
+all terrain,1,14,0.4769,186
+all terrain,1,15,0.3363,186
+all terrain,1,16,0.1933,128
+skiable 15-35 deg,1,7,0.0015,116
+skiable 15-35 deg,1,8,0.0762,186
+skiable 15-35 deg,1,9,0.31,186
+skiable 15-35 deg,1,10,0.5182,186
+skiable 15-35 deg,1,11,0.6386,186
+skiable 15-35 deg,1,12,0.6556,186
+skiable 15-35 deg,1,13,0.5929,186
+skiable 15-35 deg,1,14,0.4782,186
+skiable 15-35 deg,1,15,0.3395,186
+skiable 15-35 deg,1,16,0.1947,128
+all terrain,2,6,0.0016,25
+all terrain,2,7,0.037,163
+all terrain,2,8,0.2578,168
+all terrain,2,9,0.5497,168
+all terrain,2,10,0.758,168
+all terrain,2,11,0.8544,168
+all terrain,2,12,0.8651,168
+all terrain,2,13,0.807,168
+all terrain,2,14,0.6927,168
+all terrain,2,15,0.5394,168
+all terrain,2,16,0.3685,168
+all terrain,2,17,0.248,54
+skiable 15-35 deg,2,6,0.0016,25
+skiable 15-35 deg,2,7,0.0369,163
+skiable 15-35 deg,2,8,0.2501,168
+skiable 15-35 deg,2,9,0.5532,168
+skiable 15-35 deg,2,10,0.7877,168
+skiable 15-35 deg,2,11,0.8949,168
+skiable 15-35 deg,2,12,0.9048,168
+skiable 15-35 deg,2,13,0.8391,168
+skiable 15-35 deg,2,14,0.7066,168
+skiable 15-35 deg,2,15,0.5429,168
+skiable 15-35 deg,2,16,0.3712,168
+skiable 15-35 deg,2,17,0.2519,54
+all terrain,3,5,0.0138,13
+all terrain,3,6,0.0574,156
+all terrain,3,7,0.2697,186
+all terrain,3,8,0.601,186
+all terrain,3,9,0.8655,186
+all terrain,3,10,0.9722,186
+all terrain,3,11,0.9919,186
+all terrain,3,12,0.9922,186
+all terrain,3,13,0.976,186
+all terrain,3,14,0.9025,186
+all terrain,3,15,0.7499,186
+all terrain,3,16,0.5805,186
+all terrain,3,17,0.3991,166
+all terrain,3,18,0.3093,8
+skiable 15-35 deg,3,5,0.0121,13
+skiable 15-35 deg,3,6,0.0574,156
+skiable 15-35 deg,3,7,0.2691,186
+skiable 15-35 deg,3,8,0.6107,186
+skiable 15-35 deg,3,9,0.8988,186
+skiable 15-35 deg,3,10,0.9896,186
+skiable 15-35 deg,3,11,0.9985,186
+skiable 15-35 deg,3,12,0.9985,186
+skiable 15-35 deg,3,13,0.9916,186
+skiable 15-35 deg,3,14,0.9313,186
+skiable 15-35 deg,3,15,0.7634,186
+skiable 15-35 deg,3,16,0.5829,186
+skiable 15-35 deg,3,17,0.4065,166
+skiable 15-35 deg,3,18,0.325,8
+all terrain,4,4,0.0401,4
+all terrain,4,5,0.0908,136
+all terrain,4,6,0.2893,180
+all terrain,4,7,0.6072,180
+all terrain,4,8,0.8942,180
+all terrain,4,9,0.9941,180
+all terrain,4,10,0.9998,180
+all terrain,4,11,0.9999,180
+all terrain,4,12,0.9998,180
+all terrain,4,13,0.9993,180
+all terrain,4,14,0.9891,180
+all terrain,4,15,0.9026,180
+all terrain,4,16,0.7397,180
+all terrain,4,17,0.5655,180
+all terrain,4,18,0.4063,98
+skiable 15-35 deg,4,4,0.0382,4
+skiable 15-35 deg,4,5,0.0908,136
+skiable 15-35 deg,4,6,0.2956,180
+skiable 15-35 deg,4,7,0.6181,180
+skiable 15-35 deg,4,8,0.9248,180
+skiable 15-35 deg,4,9,0.9987,180
+skiable 15-35 deg,4,10,1.0,180
 skiable 15-35 deg,4,11,1.0,180
-skiable 15-35 deg,4,12,0.9999,180
-skiable 15-35 deg,4,13,0.9997,180
-skiable 15-35 deg,4,14,0.996,180
-skiable 15-35 deg,4,15,0.9205,180
-skiable 15-35 deg,4,16,0.7397,180
-skiable 15-35 deg,4,17,0.5556,180
-skiable 15-35 deg,4,18,0.3927,98
-existing lift corridors,4,4,0.0,4
-existing lift corridors,4,5,0.0009,137
-existing lift corridors,4,6,0.091,180
-existing lift corridors,4,7,0.589,180
-existing lift corridors,4,8,0.9607,180
-existing lift corridors,4,9,0.9976,180
-existing lift corridors,4,10,1.0,180
-existing lift corridors,4,11,1.0,180
-existing lift corridors,4,12,1.0,180
-existing lift corridors,4,13,1.0,180
-existing lift corridors,4,14,0.9849,180
-existing lift corridors,4,15,0.9334,180
-existing lift corridors,4,16,0.8446,180
-existing lift corridors,4,17,0.5833,180
-existing lift corridors,4,18,0.2474,98
-mapped pistes,4,4,0.0,4
-mapped pistes,4,5,0.0,137
-mapped pistes,4,6,0.0121,180
-mapped pistes,4,7,0.5111,180
-mapped pistes,4,8,0.9825,180
-mapped pistes,4,9,0.9999,180
-mapped pistes,4,10,1.0,180
-mapped pistes,4,11,1.0,180
-mapped pistes,4,12,1.0,180
-mapped pistes,4,13,1.0,180
-mapped pistes,4,14,1.0,180
-mapped pistes,4,15,0.9997,180
-mapped pistes,4,16,0.9953,180
-mapped pistes,4,17,0.885,180
-mapped pistes,4,18,0.5195,98
-Shymbulak (OSM area),4,4,0.0,4
-Shymbulak (OSM area),4,5,0.0,137
-Shymbulak (OSM area),4,6,0.0148,180
-Shymbulak (OSM area),4,7,0.507,180
-Shymbulak (OSM area),4,8,0.9848,180
-Shymbulak (OSM area),4,9,0.9999,180
-Shymbulak (OSM area),4,10,1.0,180
-Shymbulak (OSM area),4,11,1.0,180
-Shymbulak (OSM area),4,12,1.0,180
-Shymbulak (OSM area),4,13,1.0,180
-Shymbulak (OSM area),4,14,1.0,180
-Shymbulak (OSM area),4,15,0.9998,180
-Shymbulak (OSM area),4,16,0.9853,180
-Shymbulak (OSM area),4,17,0.8075,180
-Shymbulak (OSM area),4,18,0.4191,98
+skiable 15-35 deg,4,12,1.0,180
+skiable 15-35 deg,4,13,0.9999,180
+skiable 15-35 deg,4,14,0.9966,180
+skiable 15-35 deg,4,15,0.9228,180
+skiable 15-35 deg,4,16,0.7446,180
+skiable 15-35 deg,4,17,0.5698,180
+skiable 15-35 deg,4,18,0.4191,98

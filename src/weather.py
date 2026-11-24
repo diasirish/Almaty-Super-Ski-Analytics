@@ -203,7 +203,7 @@ SEASONAL_OUTLOOKS = {
 def write_sources(path=None) -> str:
     # DOCS is absolute (config derives it from __file__), so this is the same
     # path whichever study area is active. Deriving it by walking up from
-    # INTERIM is not: that path gains a level for every area but kok_zhailau.
+    # INTERIM is not: that path depends on which area is active.
     path = path or (DOCS / "seasonal_outlooks.json")
     json.dump(SEASONAL_OUTLOOKS, open(path, "w"), indent=1, ensure_ascii=False)
     return str(path)

@@ -24,7 +24,7 @@ mask**; the rectangle stays the compute grid.
 | `00_same_view_as_the_plan.png` | the DEM rendered from the general plan's own viewpoint — looking south from Almaty, east on the left — so the sheet and the terrain can be compared feature by feature |
 | `operating_area.geojson` | the operating-area boundary, 21 vertices, EPSG:4326. Reshape it here to change what every number is reported over |
 | `02_masterplan_control_points.geojson` | the seven labels, located in OSM |
-| `03_reference_extents.geojson` | the superseded `kok_zhailau` rectangle, the `kz_project` window and the proposed compute rectangle |
+| `03_reference_extents.geojson` | the two retired rectangles (69 and 125 km²) and the current working window, for reference only |
 | `04_osm_lifts_and_pistes.geojson` | existing lifts, pistes and stations (OpenStreetMap, ODbL) |
 | `hillshade.tif`, `dem_30m.tif`, `slope_deg.tif` | the analysis terrain itself, EPSG:32643 |
 | `load_in_qgis.py` | adds all of the above plus a satellite basemap in one paste |

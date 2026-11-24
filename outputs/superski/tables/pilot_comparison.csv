@@ -1,7 +1,7 @@
 quantity,pilot,this_run,agrees
-area of the study rectangle (km²),69.1,125.34,"no - the study area moved, see notebook 06"
+area of the study rectangle (km²),69.1,70.17,"no - the study area moved, see notebook 06"
 "candidate dates, Mar–Apr 2023",12,13,within one date
-"coverage at ≥4 usable obs, Mar–Apr 2023",~74%,89%,higher here
-"2200–2300 m, low-insolation quartile",~94%,80%,lower here
-"2200–2300 m, high-insolation quartile",~23%,17%,close
+"coverage at ≥4 usable obs, Mar–Apr 2023",~74%,86%,higher here
+"2200–2300 m, low-insolation quartile",~94%,75%,lower here
+"2200–2300 m, high-insolation quartile",~23%,10%,close
 seasons processed,1 of 4 complete (41 of 112 scenes cached),4 of 4 complete (114 historical scenes),improved

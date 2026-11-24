@@ -1,0 +1,7 @@
+area,reference,layer,shared_bands,band_low_min_m,band_low_max_m,median_difference,min_difference,max_difference
+Oi-Qaragai operating area,Kok Zhailau — drawn boundary,insolation_kwh_m2,3,1800,2200,94.698,-261.395,185.909
+Shymbulak operating area,Kok Zhailau — drawn boundary,insolation_kwh_m2,8,1800,3200,-61.809,-324.612,106.476
+Oi-Qaragai operating area,Kok Zhailau — drawn boundary,sun_hours,3,1800,2200,88.75,-15.75,388.375
+Shymbulak operating area,Kok Zhailau — drawn boundary,sun_hours,8,1800,3200,-223.688,-318.75,128.75
+Oi-Qaragai operating area,Kok Zhailau — drawn boundary,snow_freq_march,3,1800,2200,0.301,-0.264,0.467
+Shymbulak operating area,Kok Zhailau — drawn boundary,snow_freq_march,8,1800,3200,0.018,0.0,0.367

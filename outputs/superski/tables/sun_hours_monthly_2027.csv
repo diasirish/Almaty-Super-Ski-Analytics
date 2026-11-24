@@ -1,7 +1,7 @@
-year,month,month_name,days,median_sun_hours,mean_sun_hours,p95_sun_hours,max_sun_hours,median_hours_per_day,max_hours_per_day,median_h__all terrain,median_h__skiable 15-35 deg,median_h__existing lift corridors,median_h__mapped pistes,median_h__Shymbulak (OSM area)
-2027,11,November,30,143.0,129.1,237.5,279.2,4.77,9.31,143.0,143.8,135.1,137.3,140.8
-2027,12,December,31,101.2,96.4,218.3,269.5,3.26,8.69,101.2,101.3,86.7,70.8,94.3
-2027,1,January,31,125.5,114.6,232.2,278.8,4.05,8.99,125.5,125.8,115.0,111.7,123.0
-2027,2,February,28,173.7,161.5,247.0,283.2,6.2,10.11,173.7,175.8,173.5,182.2,180.8
-2027,3,March,31,260.5,255.6,320.8,365.5,8.4,11.79,260.5,264.8,261.7,275.2,271.0
-2027,4,April,30,308.0,306.2,363.2,399.8,10.27,13.33,308.0,311.8,310.3,319.5,317.3
+year,month,month_name,days,median_sun_hours,mean_sun_hours,p95_sun_hours,max_sun_hours,median_hours_per_day,max_hours_per_day,median_h__drawn operating boundary,median_h__all terrain,median_h__skiable 15-35 deg
+2027,11,November,30,147.0,129.8,242.5,277.7,4.9,9.26,157.3,147.0,147.5
+2027,12,December,31,101.3,97.4,225.8,267.8,3.27,8.64,110.2,101.3,100.3
+2027,1,January,31,128.0,115.4,238.5,277.2,4.13,8.94,138.5,128.0,127.7
+2027,2,February,28,178.3,162.6,249.3,283.0,6.37,10.11,188.4,178.3,180.0
+2027,3,March,31,263.7,257.9,321.3,363.7,8.51,11.73,274.3,263.7,267.5
+2027,4,April,30,308.8,308.1,364.0,399.7,10.29,13.32,321.5,308.8,312.5

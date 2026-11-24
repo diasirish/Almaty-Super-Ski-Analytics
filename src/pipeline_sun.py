@@ -33,11 +33,15 @@ def run(year: int = OUTLOOK_YEAR, months=None, force: bool = False):
     months = months or SEASON_MONTHS
     t = terrain()
     masks = build_zones(DEM_GRID, t["slope"])
-    if AREA == "kz_project":
-        # At project scale the reported zones are the reconstructed footprints,
-        # because the window itself is context and carries no OSM network.
-        import footprint
-        masks = {**footprint.build(DEM_GRID, t["slope"]), **masks}
+    if AREA == "superski":
+        # The drawn operating boundary is a reported zone in its own right: the
+        # window around it is context, and nothing synthetic stands in for it.
+        try:
+            import operating_area as _oa
+            _poly, _ = _oa.load()
+            masks = {"drawn operating boundary": _oa.mask(DEM_GRID, _poly), **masks}
+        except Exception as exc:                       # boundary not drawn yet
+            print(f"  (no operating boundary zone: {exc})")
     clat, clon = centroid()
 
     out, rows, profiles = {}, [], []

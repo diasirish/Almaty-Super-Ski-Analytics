@@ -3,7 +3,7 @@
 This is the document meant to be read by an engineering, GIS or mountain-planning
 team. It is deliberately separate from kok-zhailau-brief.pdf, which stays at six
 slides and tells the wider story. Every number is read from
-outputs/kz_project/tables/, never hard-coded.
+outputs/superski/tables/, never hard-coded.
 """
 from __future__ import annotations
 
@@ -20,13 +20,10 @@ from build_brief import (ACCENT, FAINT, H, INK, M, MUTED, PANEL, RULE, W, WARM,
                          bullet, caption, fit, panel, para, slide_frame, stat)
 from config import PROJECT_PISTE_KM as PISTE_KM, ROOT
 
-TAB = ROOT / "outputs" / "kz_project" / "tables"
-PNG = ROOT / "outputs" / "kz_project" / "png"
-# Slides 1, 2 and the snow statistic on slide 4 are reported over the drawn
-# operating boundary, not over the reconstructed footprints they replaced.
-OA_TAB = ROOT / "outputs" / "superski" / "tables"
-OA_PNG = ROOT / "outputs" / "superski" / "png"
-META = ROOT / "outputs" / "kz_project" / "geotiff" / "project_metadata.json"
+# One study area: the drawn operating boundary and the working window round it.
+TAB = OA_TAB = ROOT / "outputs" / "superski" / "tables"
+PNG = OA_PNG = ROOT / "outputs" / "superski" / "png"
+META = ROOT / "outputs" / "superski" / "geotiff" / "project_metadata.json"
 OUT_PDF = ROOT / "almaty-superski-gis-demo.pdf"
 N = 4
 
@@ -42,13 +39,8 @@ def _o(name: str) -> pd.DataFrame:
 def build():
     meta = json.loads(META.read_text())
     pub = _o("published_project_parameters.csv")
-    fps = _t("footprint_summary.csv")
-    gb = _t("green_blue_availability.csv")
-    feas = _t("green_blue_feasibility.csv")
-    sun = _t("sun_by_footprint.csv")
     oa = _o("operating_area_summary.csv").iloc[0]
-    oacmp = _o("operating_area_vs_reconstructions.csv").set_index(
-        _o("operating_area_vs_reconstructions.csv").footprint.str[0])
+    D = _o("operating_area_terrain.csv").iloc[0]
     oafeas = _o("operating_area_piste_feasibility.csv")
     oasun = _o("operating_area_sun_by_month.csv").set_index("month")
     oasnow = _o("operating_area_snow_by_month.csv").set_index("month")
@@ -61,16 +53,6 @@ def build():
     needed = _t("local_measurements_required.csv")
     clim = _t("reanalysis_monthly_climatology.csv").set_index("month")
 
-    A = fps[fps.footprint.str.startswith("footprint A")].iloc[0]
-    B = fps[fps.footprint.str.startswith("footprint B")].iloc[0]
-    gbA = gb[gb.area.str.startswith("footprint A")].iloc[0]
-    gbB = gb[gb.area.str.startswith("footprint B")].iloc[0]
-    f40A = feas[(feas.footprint.str.startswith("footprint A"))
-                & (feas.assumed_mean_piste_width_m == 40)].iloc[0]
-    f40B = feas[(feas.footprint.str.startswith("footprint B"))
-                & (feas.assumed_mean_piste_width_m == 40)].iloc[0]
-    sA = sun[sun.footprint.str.startswith("footprint A")].iloc[0]
-    sB = sun[sun.footprint.str.startswith("footprint B")].iloc[0]
     dec_chain = chain[chain.layer == "insolation_december_kwh_m2"]
     elev_r = chain[chain.layer == "elevation_m"].correlation.min()
     slope_r = chain[chain.layer == "slope_deg"].correlation.min()
@@ -87,7 +69,6 @@ def build():
     c.setSubject("Independent open-data case study; not commissioned by any operator")
 
     # ---------------------------------------------------------------- slide 1
-    D, A2, B2 = oacmp.loc["D"], oacmp.loc["A"], oacmp.loc["B"]
     dsun = oasun.loc["December"]
     slide_frame(c, 1, N, "Kok Zhailau at the scale it is being built",
                 "Operating-area GIS, local model validation and weather data \u2014 "
@@ -101,19 +82,19 @@ def build():
     bullet(c, "The territory is stated. Its boundary is not.",
            f"The operator publishes {PISTE_KM:.0f} km of runs, {lifts} lifts, "
            f"{gbpub} green and blue, up to 10,000 skiers a day on "
-           f"{meta['footprints']['stated_area_ha']:,.0f} ha, launch December 2028. No boundary, "
+           f"{meta['operating_boundary']['stated_territory_ha']:,.0f} ha, launch December 2028. No boundary, "
            f"no lift alignment, no station coordinate and no capacity in persons per "
            f"hour. Press reporting of the April statement gave 17 lifts and \u2018about "
            f"70 % green and blue\u2019; the plan attaches its 70 % to snowmaking. Both "
            f"sources are carried, and every table names which one it used.",
            xs[0], ytop, COL)
-    bullet(c, "So the boundary is drawn, and then tested.",
+    bullet(c, "So the boundary is drawn, and nothing stands in for it.",
            f"{oa.raster_area_ha:,.0f} ha over {int(oa.n_vertices)} vertices, digitised over imagery \u2014 "
-           f"{100*oa.share_of_stated:.0f} % of the stated territory, and not an official line. It is "
-           f"reported against two reconstructions of exactly the same area: a disc on "
-           f"the plateau that uses no terrain information, and the gentlest ground "
-           f"within 3.5 km, which is the most favourable placement available and so "
-           f"the right adversarial reference.",
+           f"{100*oa.share_of_stated:.0f} % of the stated territory, and not an official line. Every "
+           f"figure in this deck is read inside it. Two earlier releases reported "
+           f"medians over author-chosen rectangles of 69 and 125 km\u00b2, and over two "
+           f"synthetic 1,022 ha footprints; all four reached into ground no one plans "
+           f"to ski on, and all four are withdrawn.",
            xs[1], ytop, COL, WARM)
     bullet(c, "December sun is not where you expect it.",
            f"Median direct sun across the whole of December is {dsun.median_sun_h:.0f} h inside the "
@@ -148,12 +129,12 @@ def build():
          f"{100*D.above_31deg_share:.0f} % above 31\u00b0).")
     stat(c, M + 232, sy, f"{D.green_blue_largest_ha:,.0f} ha",
          f"of that is one unbroken field \u2014 {100*D.green_blue_largest_share:.0f} % of all the gentle "
-         f"ground inside the boundary. The disc manages {A2.green_blue_largest_ha:,.0f} ha "
-         f"({100*A2.green_blue_largest_share:.0f} %).", WARM)
-    stat(c, M + 462, sy, f"{int(B2.green_blue_pieces)} pieces",
-         f"is how the gentlest placement arrives at {B2.green_blue_ha:,.0f} ha \u2014 twice the gentle "
-         f"ground, with only {100*B2.green_blue_largest_share:.0f} % of it in its largest piece. "
-         f"Optimising slope alone is the worst of the three for a lift network.")
+         f"ground inside the boundary. The rest arrives in {int(D.green_blue_pieces)-1} smaller "
+         f"fragments. Connectivity, not quantity, is the constraint.", WARM)
+    stat(c, M + 462, sy, f"{D.vertical_m:,.0f} m",
+         f"of vertical, {D.elev_min_m:,.0f}\u2013{D.elev_max_m:,.0f} m, in one connected piece. "
+         f"Ample for the published 60 km of runs; the question the gradient table "
+         f"answers is whether the easy half of that network fits.")
     stat(c, M + 692, sy, f"{100*f40.share_of_available_consumed:.0f} %",
          f"of the gentle ground the green/blue runs would consume at a 40 m mean width: "
          f"{f40.green_blue_piste_ha:.0f} ha needed against {f40.available_green_blue_ha:.0f} ha available. "
@@ -172,16 +153,16 @@ def build():
     y = para(c, f"The easy-terrain budget closes with room: the binding constraint on a "
                 f"beginner-led resort here is not how much gentle ground exists. An "
                 f"earlier draft of this deck put the same arithmetic at up to 101 % of "
-                f"available ground; that figure combined a superseded footprint with the "
-                f"conflated 70 %, and it is withdrawn. What a 30 m DEM still cannot show "
+                f"available ground; that figure combined a synthetic footprint with the "
+                f"conflated 70 %, and both are withdrawn. What a 30 m DEM still cannot show "
                 f"is whether two gentle benches can be joined by a lift \u2014 a survey "
                 f"question, and it is in the handover table on slide 4.",
              M, y, 420, size=10.0, leading=13.4, color=INK)
 
-    img, ix, iy, iw, ih = fit(OA_PNG / "07_boundary_vs_reconstructions.png", 480, 86, 446, 200)
+    img, ix, iy, iw, ih = fit(OA_PNG / "07_gentle_ground.png", 480, 86, 446, 200)
     c.drawImage(str(img), ix, iy, iw, ih, mask="auto")
-    caption(c, "Green is ground at green/blue gradients; the dark outline is the largest "
-               "unbroken piece. All three cover the same area, so only placement differs.",
+    caption(c, "Green is ground at green/blue gradients inside the drawn boundary; the dark "
+               "outline is the largest unbroken piece of it. Nothing outside is measured.",
             480, 78, 446)
     c.showPage()
 
@@ -202,13 +183,13 @@ def build():
            M, ytop, COL)
     bullet(c, "Then hold altitude and gradient constant.",
            "Every area is cut to 15\u201335\u00b0 and compared band by 200 m band, a band "
-           "reported only where that area has 50 pixels in it. The reference is Kok "
-           "Zhailau's own best ground, footprint B: best-selected against "
-           "best-selected, because a working resort's corridors are where planners "
-           "already chose to build.",
+           "reported only where that area has 50 pixels in it. The reference is the "
+           "drawn operating boundary, cut to the same gradients \u2014 otherwise the "
+           "difference being measured would be the difference between a lift "
+           "corridor and a whole hillside.",
            M + 300, ytop, COL, WARM)
     bullet(c, "Sun and snow rank them differently.",
-           f"Against footprint B, Shymbulak's corridors take {shy_i.median_difference:+.0f} kWh/m\u00b2 "
+           f"Against the drawn boundary, Shymbulak's corridors take {shy_i.median_difference:+.0f} kWh/m\u00b2 "
            f"of winter energy over {int(shy_i.shared_bands)} shared bands and hold snow "
            f"{shy_s.median_difference:+.3f} more often in March: they trade sun for snow. "
            f"Oi-Qaragai takes {oq_i.median_difference:+.0f} kWh/m\u00b2, but sits at 1,520\u20132,280 m "
@@ -290,7 +271,7 @@ def build():
     caption(c, "Clear-sky geometry and a satellite detection frequency are not a "
                "snowpack model, and no further processing turns one into the other. "
                "The full table, with why orbit cannot supply each quantity, is in "
-               "outputs/kz_project/tables/local_measurements_required.csv.",
+               "outputs/superski/tables/local_measurements_required.csv.",
             bx, by - 2, bw)
     c.showPage()
 

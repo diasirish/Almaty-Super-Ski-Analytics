@@ -1,0 +1,7 @@
+layer,dem,n_pixels,top_fraction,top_n,overlap,overlap_share,spearman_rho
+insolation_nov_apr_kwh_m2,NASADEM,49883,0.1,4988,4171,0.8362,0.977347
+insolation_nov_apr_kwh_m2,ALOS AW3D30,49883,0.1,4988,4691,0.9405,0.987759
+insolation_december_kwh_m2,NASADEM,49883,0.1,4988,4257,0.8534,0.969141
+insolation_december_kwh_m2,ALOS AW3D30,49883,0.1,4988,4709,0.9441,0.980168
+direct_sun_hours_nov_apr,NASADEM,49883,0.1,4988,4337,0.8695,0.971891
+direct_sun_hours_nov_apr,ALOS AW3D30,49883,0.1,4988,4666,0.9354,0.983858
