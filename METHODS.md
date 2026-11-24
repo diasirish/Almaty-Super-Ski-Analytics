@@ -750,3 +750,163 @@ including the three that Part III itself created the case for: a site-specific
 December sun figure (section 25), mid-winter snow statistics on shaded ground
 (section 23), and whether two gentle benches can be joined by a lift
 (section 19).
+
+---
+
+# Part IV — the study area, re-derived and then hand-drawn
+
+Parts I–III ran on a rectangle the author chose. Part IV replaces it twice: once
+with a rectangle derived from the operator's own general plan, and once more with
+a boundary drawn over imagery. Several Part III numbers do not survive that, and
+section 31 lists each one that is withdrawn.
+
+## 28. Two published sources, and the 70 % that belongs to snowmaking
+
+Sheet 3 of the Kazakh Tourism Development general plan, *«Генеральный план
+горнолыжного курорта Almaty Superski»*, states **16 lifts**, a difficulty split
+of **10.6 % green / 50.3 % blue / 22.7 % red / 16.4 % black**, 60 km of runs,
+10,000 skiers a day, 9,000,000 tourists a year, and that **70 % of runs will be
+equipped with snowmaking**. Press reporting of the April 2026 statement gave
+**17 lifts** and "about 70 % of runs green and blue", which Parts II and III used.
+
+Green and blue on the operator's own sheet sum to **60.9 %**, not 70 %. The same
+70 % appearing in the sheet against snowmaking makes a conflation the most
+economical explanation, but the April text was not re-read for this release — a
+search of the primeminister.kz archive reached only as far back as October 2026 —
+so the press figure is **not disproved, only contradicted by a later and more
+detailed source**. `config.py` therefore carries both:
+
+```python
+PROJECT_DIFFICULTY_PLAN  = {"green": .106, "blue": .503, "red": .227, "black": .164}
+PROJECT_GREEN_BLUE_SHARE = 0.609          # default: the operator's own sheet
+PROJECT_GREEN_BLUE_SHARE_PRESS = 0.70     # carried for comparison
+PROJECT_LIFTS = 16 ; PROJECT_LIFTS_PRESS = 17
+PROJECT_SNOWMAKING_SHARE = 0.70
+```
+
+`operating_area_piste_feasibility.csv` reports every demand figure twice, once
+per source, and names the source in a column. Nothing downstream picks silently.
+
+## 29. Re-deriving the rectangle from control points
+
+The general-plan sheet is a perspective panorama: no projection, no scale bar, no
+graticule. It cannot be georeferenced, because an affine or polynomial transform
+assumes a plan view. **Nothing in this release is traced from it.**
+
+What it does carry is named features, and those can be located independently.
+Seven labels on the sheet were resolved against OpenStreetMap peaks, saddles and
+places, plus this project's own plateau reference point:
+
+| sheet label | OSM feature | lon, lat | ele |
+|---|---|---|---|
+| MEDEU | place, suburb | 77.05757, 43.15944 | — |
+| KOKGAILAU PLATEAU 1951 m | project reference point | 77.00433, 43.14239 | — |
+| THREE BROTHERS ROCKS | peak «Три брата» | 77.01337, 43.12687 | 2860 |
+| MOUNTAIN KUMBEL 3250 m | peak «Qumbel» | 77.03130, 43.11934 | 3221 |
+| KUMBELTAU RANGE 3500 m | peak «Qumbeltau» | 77.04056, 43.08490 | 3618 |
+| KIMASAR | saddle «Кімасар» | 77.08281, 43.17116 | 2080 |
+| SHYMBULAK | landuse=winter_sports | 77.09312, 43.12275 | — |
+
+The `superski` rectangle is the envelope of those points plus a 1.5 km working
+buffer: 76.955–77.095° E, 43.078–43.172° N, 125 km², 389 × 358 at 30 m.
+
+The rectangle it replaces failed three tests against the same control points.
+Kumbeltau (3,618 m), Shymbulak and the Kimasar saddle all fell outside it; **37.1 %**
+of it lay below 1,900 m, the elevation of the base village on the plan; and
+**0 ha** of it reached above 3,400 m, where the plan puts a top station. In the
+plan's 1,900–3,400 m operating band the old rectangle held 4,117 ha against
+**8,847 ha** in the new one, while the ground below the village grew only from
+2,431 to 2,592 ha. The replacement adds relevant terrain, not margin.
+
+Horizon sampling was raised to **72 azimuths** and sunshine duration to a
+**10-minute** step for this area, affordable because it is a third of the
+cluster's size.
+
+## 30. The hand-drawn operating boundary
+
+A rectangle is a compute grid, not a site. The reporting boundary is a polygon of
+**24 vertices** digitised over satellite imagery in Google Earth and exported as
+KML, held at `qgis/operating_area.geojson` in EPSG:4326.
+
+`src/operating_area.py` is the whole contract. It loads the polygon, repairs a
+self-intersection with a zero-width buffer if one is present and refuses anything
+that is not a single valid `Polygon`; derives a buffered, outward-snapped compute
+bbox from it; rasterises it onto any analysis grid with `rasterio.features`; and
+returns a provenance sentence that every figure caption and table carries, so a
+reader never has to ask which boundary a number came from. `is_draft()`
+distinguishes a machine-generated starting shape from one a human has drawn.
+
+`src/pipeline_operating_area.py` runs everything the boundary decides —
+shape, the comparison against two same-area reconstructions, gradient classes,
+piste feasibility under both published mixes, monthly sun, monthly snow with its
+coverage audit, and the three-panel figure — and rewrites eight tables. Redrawing
+the polygon and re-running that one script is the entire update path; terrain,
+horizon, insolation and sunshine hours are not recomputed, because the boundary
+cannot change them. The boundary must therefore lie inside the compute rectangle,
+and the script fails loudly if it does not.
+
+The boundary encloses **1,776 ha**, which is **174 %** of the 1,022 ha the
+operator states. That gap is not an error in either number: 1,022 ha is a stated
+territory with no published coordinates, and this polygon is a reading of the
+*operating area*, which may legitimately extend beyond a land allocation. It is
+recorded as a difference, not reconciled away. **It is not an official boundary.**
+
+### What the boundary is worth
+
+A drawn boundary is only interesting if it beats what a rule would pick, so every
+number is reported against two reconstructions of exactly the same area: **A**, a
+disc on the plateau, which uses no terrain information, and **B**, the gentlest
+ground within 3.5 km, which is the most favourable placement available and
+therefore the right adversarial reference.
+
+| | drawn | A, disc | B, gentlest |
+|---|---|---|---|
+| pieces | 1 | 1 | 49 |
+| elevation | 1775–3291 m | 1569–3002 m | 1334–3208 m |
+| vertical | **1516 m** | 1432 m | 1874 m |
+| median slope | 28.8° | 29.5° | 21.0° |
+| green/blue | 364 ha (20.5 %) | 318 ha (17.9 %) | 738 ha (41.6 %) |
+| green/blue pieces | 141 | 206 | 352 |
+| largest gentle field | **182 ha (50 %)** | 149 ha (47 %) | 209 ha (28 %) |
+
+B wins on raw gentle hectares and loses on all of them being somewhere else: its
+largest field holds 28 % of its own gentle ground. The drawn boundary takes more
+gentle ground than the disc, more vertical, and keeps half of its gentle ground in
+one field. Connectivity is the quantity that separates the three, and it is the
+one a lift network actually consumes.
+
+## 31. What Part III claimed that Part IV withdraws
+
+* **"The implied green/blue area is up to 101 % of the gentle ground that exists."**
+  Withdrawn. It combined the superseded footprint A with the conflated 70 %. On
+  the drawn boundary and the operator's own 60.9 %, the same arithmetic gives
+  **30–50 %** depending on assumed piste width, and **35–58 %** on the press
+  figure. The easy-terrain budget is not the binding constraint.
+* **"The gentle ground exists; it is not in one place."**
+  Withdrawn as stated. Inside the drawn boundary half of the gentle ground is a
+  single 182 ha field. Fragmentation is a property of the slope-optimised
+  placement, not of the site.
+* **"Where the 1,022 ha is placed moves mid-winter sun by 3.9×."**
+  Narrowed. The spread between placements is real, but the drawn boundary's
+  December median is 110 h with **168 h on its green/blue ground**: the gentle
+  shelves are sunnier than the site average, not darker.
+* **"In December only 43.2 % of the window qualifies, median one valid
+  observation."** Superseded by the boundary's own audit: **51.9 %** on a median
+  of **5**, biased **+42.5 kWh/m²** sunnier and **4.0°** gentler. March is sound at
+  97.9 % on a median of 24, bias +1.3 kWh/m² and −0.2°.
+* **17 lifts and about 70 % green and blue.** Superseded by the general plan; see
+  section 28. Both figures remain in `config.py` under their source.
+
+Sections 25 (DEM propagation) and 24 (comparable operating areas) are unaffected:
+both were computed on the project window and are reported as such.
+
+## 32. What Part IV still cannot settle
+
+The boundary is one person's reading of imagery. It is not surveyed, not official,
+and 174 % of the stated territory; a published GIS layer would replace it in one
+file. Neither it nor any rectangle here establishes where a lift may legally be
+built: the site lies against Ile-Alatau National Park, and no protected-area
+geometry is carried in this release. Whether the 182 ha gentle field can actually
+be served by the same lift that serves the upper mountain is a question about
+alignment and vertical, not about the terrain statistics computed here, and
+section 27's list of measurements that orbit cannot supply still stands in full.

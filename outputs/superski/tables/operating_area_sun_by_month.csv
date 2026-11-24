@@ -1,7 +1,7 @@
-month,days,median_sun_h,h_per_day,p10_sun_h,p90_sun_h,median_sun_h_green_blue,median_total_kwh_m2,median_shaded_frac
-November,30,159.2,5.31,0.0,231.0,206.2,55.2,0.447
-December,31,114.8,3.7,0.0,210.0,171.5,30.7,0.576
-January,31,141.7,4.57,0.0,225.3,194.5,44.1,0.502
-February,28,189.8,6.78,42.2,243.0,224.3,81.8,0.348
-March,31,275.5,8.89,196.7,320.7,301.2,155.1,0.243
-April,30,321.2,10.71,274.8,365.3,340.5,215.9,0.193
+month,days,median_sun_h,median_h_per_day,p10_sun_h,p90_sun_h,median_sun_h_green_blue,median_h_per_day_green_blue,median_total_kwh_m2,median_shaded_fraction
+November,30,157.3,5.24,0.3,233.3,204.0,6.8,53.9,0.454
+December,31,110.5,3.56,0.0,212.9,168.0,5.42,29.6,0.591
+January,31,138.6,4.47,0.0,228.2,190.4,6.14,42.8,0.514
+February,28,188.5,6.73,58.1,243.3,223.3,7.98,80.7,0.353
+March,31,274.3,8.85,201.0,318.3,300.8,9.7,154.4,0.247
+April,30,321.5,10.72,275.3,362.0,340.8,11.36,216.0,0.193

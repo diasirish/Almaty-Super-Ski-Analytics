@@ -18,10 +18,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from build_brief import (ACCENT, FAINT, H, INK, M, MUTED, PANEL, RULE, W, WARM,
                          bullet, caption, fit, panel, para, slide_frame, stat)
-from config import ROOT
+from config import PROJECT_PISTE_KM as PISTE_KM, ROOT
 
 TAB = ROOT / "outputs" / "kz_project" / "tables"
 PNG = ROOT / "outputs" / "kz_project" / "png"
+# Slides 1, 2 and the snow statistic on slide 4 are reported over the drawn
+# operating boundary, not over the reconstructed footprints they replaced.
+OA_TAB = ROOT / "outputs" / "superski" / "tables"
+OA_PNG = ROOT / "outputs" / "superski" / "png"
 META = ROOT / "outputs" / "kz_project" / "geotiff" / "project_metadata.json"
 OUT_PDF = ROOT / "almaty-superski-gis-demo.pdf"
 N = 4
@@ -31,14 +35,23 @@ def _t(name: str) -> pd.DataFrame:
     return pd.read_csv(TAB / name)
 
 
+def _o(name: str) -> pd.DataFrame:
+    return pd.read_csv(OA_TAB / name)
+
+
 def build():
     meta = json.loads(META.read_text())
-    pub = _t("published_project_parameters.csv")
+    pub = _o("published_project_parameters.csv")
     fps = _t("footprint_summary.csv")
     gb = _t("green_blue_availability.csv")
     feas = _t("green_blue_feasibility.csv")
     sun = _t("sun_by_footprint.csv")
-    bias = _t("snow_coverage_bias.csv")
+    oa = _o("operating_area_summary.csv").iloc[0]
+    oacmp = _o("operating_area_vs_reconstructions.csv").set_index(
+        _o("operating_area_vs_reconstructions.csv").footprint.str[0])
+    oafeas = _o("operating_area_piste_feasibility.csv")
+    oasun = _o("operating_area_sun_by_month.csv").set_index("month")
+    oasnow = _o("operating_area_snow_by_month.csv").set_index("month")
     chain = _t("dem_propagation.csv")
     ranks = _t("dem_rank_stability.csv")
     overview = _t("three_area_overview.csv")
@@ -58,7 +71,6 @@ def build():
                 & (feas.assumed_mean_piste_width_m == 40)].iloc[0]
     sA = sun[sun.footprint.str.startswith("footprint A")].iloc[0]
     sB = sun[sun.footprint.str.startswith("footprint B")].iloc[0]
-    dec_bias = bias[bias.month == 12].iloc[0]
     dec_chain = chain[chain.layer == "insolation_december_kwh_m2"]
     elev_r = chain[chain.layer == "elevation_m"].correlation.min()
     slope_r = chain[chain.layer == "slope_deg"].correlation.min()
@@ -75,89 +87,102 @@ def build():
     c.setSubject("Independent open-data case study; not commissioned by any operator")
 
     # ---------------------------------------------------------------- slide 1
+    D, A2, B2 = oacmp.loc["D"], oacmp.loc["A"], oacmp.loc["B"]
+    dsun = oasun.loc["December"]
     slide_frame(c, 1, N, "Kok Zhailau at the scale it is being built",
-                "Project-scale GIS, local model validation and weather data — "
+                "Operating-area GIS, local model validation and weather data \u2014 "
                 "what open data settles, and what it cannot")
     COL = 288.0
     xs = [M, M + 300, M + 600]
     ytop = H - M - 72
+    lifts = pub[(pub.parameter == "lifts") & (pub.source.str.startswith("general"))].published.iloc[0]
+    gbpub = pub[(pub.parameter == "runs green and blue")
+                & (pub.source.str.startswith("general"))].published.iloc[0]
     bullet(c, "The territory is stated. Its boundary is not.",
-           f"The operator publishes {pub[pub.parameter=='piste length'].published.iloc[0]} of runs, "
-           f"{pub[pub.parameter=='lifts'].published.iloc[0]}, "
-           f"{pub[pub.parameter=='share of runs green and blue'].published.iloc[0]} green and blue, "
-           f"{pub[pub.parameter=='designed daily capacity'].published.iloc[0]} on "
-           f"{meta['footprints']['stated_area_ha']:,.0f} ha, launch December 2028. No boundary, no "
-           "lift alignment, no station coordinate and no capacity in persons per "
-           "hour is published \u2014 so the 1,022 ha is reconstructed two ways here "
-           "and every number is reported against both.",
+           f"The operator publishes {PISTE_KM:.0f} km of runs, {lifts} lifts, "
+           f"{gbpub} green and blue, up to 10,000 skiers a day on "
+           f"{meta['footprints']['stated_area_ha']:,.0f} ha, launch December 2028. No boundary, "
+           f"no lift alignment, no station coordinate and no capacity in persons per "
+           f"hour. Press reporting of the April statement gave 17 lifts and \u2018about "
+           f"70 % green and blue\u2019; the plan attaches its 70 % to snowmaking. Both "
+           f"sources are carried, and every table names which one it used.",
            xs[0], ytop, COL)
-    bullet(c, "The gentle ground exists. Not in one place.",
-           f"Footprint A, the {A.area_ha:,.0f} ha nearest the plateau, is one piece and "
-           f"{100*gbA.green_blue_share:.0f} % of it lies at green or blue gradients. Footprint B, the "
-           f"gentlest {B.area_ha:,.0f} ha within 3 km \u2014 the most favourable ground a planner "
-           f"could choose \u2014 reaches {100*gbB.green_blue_share:.0f} %, but arrives in "
-           f"{int(B.pieces)} separate pieces, the largest {B.largest_piece_ha:,.0f} ha.",
+    bullet(c, "So the boundary is drawn, and then tested.",
+           f"{oa.raster_area_ha:,.0f} ha over {int(oa.n_vertices)} vertices, digitised over imagery \u2014 "
+           f"{100*oa.share_of_stated:.0f} % of the stated territory, and not an official line. It is "
+           f"reported against two reconstructions of exactly the same area: a disc on "
+           f"the plateau that uses no terrain information, and the gentlest ground "
+           f"within 3.5 km, which is the most favourable placement available and so "
+           f"the right adversarial reference.",
            xs[1], ytop, COL, WARM)
-    bullet(c, "A December launch is a December problem.",
-           f"Median direct sun across the whole of December: {sA.december_hours_median:.0f} h on "
-           f"footprint A, {sA.december_hours_per_day:.1f} h a day, against {sB.december_hours_median:.0f} h "
-           f"({sB.december_hours_per_day:.1f} h a day) on footprint B. Where the 1,022 ha is placed "
-           f"moves mid-winter sun by {sB.december_hours_median/sA.december_hours_median:.1f}\u00d7. The plateau faces the city, "
-           "which is north: good for holding snow, poor for winter sun.",
+    bullet(c, "December sun is not where you expect it.",
+           f"Median direct sun across the whole of December is {dsun.median_sun_h:.0f} h inside the "
+           f"boundary, {dsun.median_h_per_day:.1f} h a day, and the bottom tenth of it sees none at all. "
+           f"On the green and blue ground it is {dsun.median_sun_h_green_blue:.0f} h, "
+           f"{dsun.median_h_per_day_green_blue:.1f} h a day. The plateau faces the city, "
+           f"which is north \u2014 but the gentle shelves that would carry beginner runs "
+           f"are not the north-facing part of it.",
            xs[2], ytop, COL)
 
-    img, ix, iy, iw, ih = fit(PNG / "05_footprints.png", M, 86, W - 2 * M, 232)
+    img, ix, iy, iw, ih = fit(OA_PNG / "06_operating_area.png", M, 86, W - 2 * M, 232)
     c.drawImage(str(img), ix, iy, iw, ih, mask="auto")
-    caption(c, f"Two reconstructions of the stated 1,022 ha inside the 42 km\u00b2 project "
-               f"window; neither is the project's own boundary. Grid 30 m, EPSG:32643 \u00b7 "
-               f"horizon {meta['sun']['horizon_azimuths']} azimuths "
-               f"({360//meta['sun']['horizon_azimuths']}\u00b0) to 6 km \u00b7 sunshine duration stepped "
-               f"{meta['sun']['sunshine_step_min']} min \u00b7 Copernicus DEM GLO-30.",
+    caption(c, f"The drawn operating area, read three ways. Grid 30 m, EPSG:32643 \u00b7 "
+               f"horizon 72 azimuths (5\u00b0) to 6 km \u00b7 sunshine duration stepped 10 min \u00b7 "
+               f"Copernicus DEM GLO-30 \u00b7 snow from Sentinel-2 L2A over four seasons. "
+               f"The boundary is the author's, not the project's.",
             M, 80, W - 2 * M)
     c.showPage()
 
     # ---------------------------------------------------------------- slide 2
+    plan = oafeas[oafeas.green_blue_source.str.startswith("general")]
+    f40 = plan[plan.assumed_mean_piste_width_m == 40].iloc[0]
+    f50 = plan[plan.assumed_mean_piste_width_m == 50].iloc[0]
     slide_frame(c, 2, N, "The published mix of runs, against the ground",
-                "60 km of runs and about 70 % green and blue, measured against "
-                "the gradients that exist")
+                "60 km of runs at the operator's own 60.9 % green and blue, "
+                "measured against the gradients that exist")
     panel(c, M - 10, 346, W - 2 * M + 20, 100)
     sy = 424
-    stat(c, M + 2, sy, f"{100*gbA.green_blue_share:.0f} %",
-         f"of footprint A is at green/blue gradients (grades up to 35 %, "
-         f"{gbA.slope_median_deg:.0f}° median slope, {100*gbA.above_31deg_share:.0f} % above 31°).")
-    stat(c, M + 232, sy, f"{100*f40A.share_of_available_consumed:.0f} %",
-         f"of that gentle ground the green/blue runs would consume at a 40 m mean "
-         f"width — {f40A.green_blue_piste_ha:.0f} ha needed, {f40A.available_green_blue_ha:.0f} ha available.", WARM)
-    stat(c, M + 462, sy, f"{int(B.pieces)} pieces",
-         f"is how the gentlest 1,022 ha arrives. On it the same runs need only "
-         f"{100*f40B.share_of_available_consumed:.0f} %, but the largest piece is {B.largest_piece_ha:,.0f} ha.")
-    stat(c, M + 692, sy, f"{B.vertical_m:,.0f} m",
-         f"of vertical inside footprint B ({B.elev_min_m:,.0f}–{B.elev_max_m:,.0f} m); "
-         f"footprint A holds {A.vertical_m:,.0f} m.")
+    stat(c, M + 2, sy, f"{D.green_blue_ha:,.0f} ha",
+         f"of the {oa.raster_area_ha:,.0f} ha lies at green/blue gradients "
+         f"({100*D.green_blue_share:.0f} %, {D.median_slope_deg:.0f}\u00b0 median slope, "
+         f"{100*D.above_31deg_share:.0f} % above 31\u00b0).")
+    stat(c, M + 232, sy, f"{D.green_blue_largest_ha:,.0f} ha",
+         f"of that is one unbroken field \u2014 {100*D.green_blue_largest_share:.0f} % of all the gentle "
+         f"ground inside the boundary. The disc manages {A2.green_blue_largest_ha:,.0f} ha "
+         f"({100*A2.green_blue_largest_share:.0f} %).", WARM)
+    stat(c, M + 462, sy, f"{int(B2.green_blue_pieces)} pieces",
+         f"is how the gentlest placement arrives at {B2.green_blue_ha:,.0f} ha \u2014 twice the gentle "
+         f"ground, with only {100*B2.green_blue_largest_share:.0f} % of it in its largest piece. "
+         f"Optimising slope alone is the worst of the three for a lift network.")
+    stat(c, M + 692, sy, f"{100*f40.share_of_available_consumed:.0f} %",
+         f"of the gentle ground the green/blue runs would consume at a 40 m mean width: "
+         f"{f40.green_blue_piste_ha:.0f} ha needed against {f40.available_green_blue_ha:.0f} ha available. "
+         f"At 50 m, {100*f50.share_of_available_consumed:.0f} %.", WARM)
 
     y = 300
     y = para(c, "Gradient classes are the percent grades of the British Columbia All "
                 "Season Resort Guidelines, Chapter II, converted to degrees. That is a "
                 "public planning convention from the jurisdiction the named planners "
-                "work in — not a Kazakh standard and not this project's design "
+                "work in \u2014 not a Kazakh standard and not this project's design "
                 "criteria. The operator publishes a length and a mix but no width, so "
-                "three mean widths are carried through instead of one assumption: at "
-                "30 m the green/blue runs need 126 ha, at 40 m 168 ha, at 50 m 210 ha.",
+                "three mean widths are carried through instead of one assumption, and "
+                "both published mixes are reported side by side.",
              M, y, 420, size=10.0, leading=13.4)
     y -= 6
-    y = para(c, f"On footprint A only {f40A.available_green_blue_ha:.0f} ha of gentle ground exists, so at "
-                f"50 m the arithmetic does not close at all. The binding constraint on a "
-                f"beginner-led resort here is therefore not how much gentle ground Kok "
-                f"Zhailau has — it is how little of it is connected, and a 30 m DEM can "
-                f"show that it fragments without showing whether two benches can be "
-                f"joined by a lift. That is a survey question, and it is in the handover "
-                f"table on slide 4.",
+    y = para(c, f"The easy-terrain budget closes with room: the binding constraint on a "
+                f"beginner-led resort here is not how much gentle ground exists. An "
+                f"earlier draft of this deck put the same arithmetic at up to 101 % of "
+                f"available ground; that figure combined a superseded footprint with the "
+                f"conflated 70 %, and it is withdrawn. What a 30 m DEM still cannot show "
+                f"is whether two gentle benches can be joined by a lift \u2014 a survey "
+                f"question, and it is in the handover table on slide 4.",
              M, y, 420, size=10.0, leading=13.4, color=INK)
 
-    img, ix, iy, iw, ih = fit(PNG / "05_sun_hours_project_scale.png", 480, 86, 446, 200)
+    img, ix, iy, iw, ih = fit(OA_PNG / "07_boundary_vs_reconstructions.png", 480, 86, 446, 200)
     c.drawImage(str(img), ix, iy, iw, ih, mask="auto")
-    caption(c, "Direct sunshine hours, November–April and December alone. Footprint A "
-               "outlined blue, footprint B orange.", 480, 78, 446)
+    caption(c, "Green is ground at green/blue gradients; the dark outline is the largest "
+               "unbroken piece. All three cover the same area, so only placement differs.",
+            480, 78, 446)
     c.showPage()
 
     # ---------------------------------------------------------------- slide 3
@@ -218,10 +243,13 @@ def build():
          f"of the top tenth of terrain is the same ground whichever DEM is used "
          f"(Spearman {ranks.spearman_rho.min():.3f}–{ranks.spearman_rho.max():.3f}). Screening survives; "
          f"a single site's number does not.")
-    stat(c, M + 692, sy, f"{100*dec_bias.qualifying_share:.0f} %",
-         f"of the window has four clear December observations, and that subset is "
-         f"{dec_bias['insolation__skew']:+.0f} kWh/m² sunnier and {dec_bias['slope__skew']:+.1f}° gentler "
-         f"than the terrain as a whole.", WARM)
+    dsnow = oasnow.loc["December"]
+    stat(c, M + 692, sy, f"{100*dsnow.qualifying_share:.0f} %",
+         f"of the operating area has four clear December observations, and that "
+         f"subset is {dsnow.dec_insolation_bias_kwh:+.0f} kWh/m² sunnier and "
+         f"{abs(dsnow.slope_bias_deg):.1f}° gentler than the site as a whole. "
+         f"March: {100*oasnow.loc['March'].qualifying_share:.0f} % on a median of "
+         f"{int(oasnow.loc['March'].median_valid_obs)} observations.", WARM)
 
     y = 300
     y = para(c, "Three things were run to try to break the results rather than to "

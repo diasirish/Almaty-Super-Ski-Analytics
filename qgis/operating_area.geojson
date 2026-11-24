@@ -13,10 +13,11 @@
    "properties": {
     "name": "Kok Zhailau operating area",
     "status": "digitised",
+    "revision": 2,
     "drawn_by": "the author",
     "tool": "Google Earth, hand-digitised over satellite imagery, exported as KML",
     "date": "2026-11-19",
-    "caution": "Not an official boundary. Kazakh Tourism Development has published a territory of 1,022 ha but no coordinates; this polygon is one informed reading of the site from imagery and the operator's general-plan sheet."
+    "caution": "Not an official boundary. Kazakh Tourism Development states a territory of 1,022 ha but has published no coordinates; this polygon is one informed reading of the operating area from imagery and the operator's general-plan sheet, and is larger than the stated territory."
    },
    "geometry": {
     "type": "Polygon",
@@ -55,28 +56,40 @@
        43.12968763919208
       ],
       [
-       77.01804574898284,
-       43.12816271287897
+       77.00911480260781,
+       43.1271214635816
       ],
       [
-       77.01948605220007,
-       43.12436556281836
+       77.00886638298672,
+       43.12421490630605
       ],
       [
-       77.0204271705042,
-       43.12048416245332
+       77.01077087920466,
+       43.12216012008844
       ],
       [
-       77.02079350021941,
-       43.11058511497274
+       76.99734311351023,
+       43.11979148812907
+      ],
+      [
+       77.00145217590034,
+       43.11049045856231
+      ],
+      [
+       77.01501731175085,
+       43.09895740164838
       ],
       [
        77.0284195942563,
        43.1043257288986
       ],
       [
-       77.0392070069934,
-       43.10538843457851
+       77.03931684462265,
+       43.09839120549931
+      ],
+      [
+       77.04079697948181,
+       43.09937536876944
       ],
       [
        77.03830019599123,

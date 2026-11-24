@@ -1,10 +1,10 @@
 assumed_mean_piste_width_m,piste_area_ha,green_blue_piste_ha,available_green_blue_ha,share_of_available_consumed,footprint
-30.0,180.0,126.0,901.6,0.14,project window (42 km2)
-40.0,240.0,168.0,901.6,0.186,project window (42 km2)
-50.0,300.0,210.0,901.6,0.233,project window (42 km2)
-30.0,180.0,126.0,208.1,0.605,footprint A: 1022 ha disc (r=1.80 km)
-40.0,240.0,168.0,208.1,0.807,footprint A: 1022 ha disc (r=1.80 km)
-50.0,300.0,210.0,208.1,1.009,footprint A: 1022 ha disc (r=1.80 km)
-30.0,180.0,126.0,476.3,0.265,footprint B: gentlest 1022 ha
-40.0,240.0,168.0,476.3,0.353,footprint B: gentlest 1022 ha
-50.0,300.0,210.0,476.3,0.441,footprint B: gentlest 1022 ha
+30.0,180.0,109.6,901.6,0.122,project window (42 km2)
+40.0,240.0,146.2,901.6,0.162,project window (42 km2)
+50.0,300.0,182.7,901.6,0.203,project window (42 km2)
+30.0,180.0,109.6,208.1,0.527,footprint A: 1022 ha disc (r=1.80 km)
+40.0,240.0,146.2,208.1,0.703,footprint A: 1022 ha disc (r=1.80 km)
+50.0,300.0,182.7,208.1,0.878,footprint A: 1022 ha disc (r=1.80 km)
+30.0,180.0,109.6,476.3,0.23,footprint B: gentlest 1022 ha
+40.0,240.0,146.2,476.3,0.307,footprint B: gentlest 1022 ha
+50.0,300.0,182.7,476.3,0.384,footprint B: gentlest 1022 ha

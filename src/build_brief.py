@@ -228,8 +228,10 @@ def build():
          f"Sentinel-2 L2A, tile 43TFH, 4 complete seasons 2022/23–2025/26, "
          f"0 download failures", color=WARM)
     caption(c, "Shaded relief, light from the NW. Perspective view — horizontal "
-               "scale varies with distance. The rectangle is the author's own study "
-               "area, not a resort boundary.", M - 6, 108, 560)
+               "scale varies with distance. The rectangle is the author's first study "
+               "area, not a resort boundary; it was later superseded by an extent "
+               "derived from the operator's published general plan (METHODS §29).",
+            M - 6, 108, 560)
     c.showPage()
 
     # ---------------- slide 2 ----------------

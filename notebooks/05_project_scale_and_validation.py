@@ -25,11 +25,17 @@
 # ### What the operator publishes, and what it does not
 #
 # From the 18 November 2026 board meeting of Kazakh Tourism Development, chaired
-# by the Prime Minister, and the company's own release: **60 km of runs, 17 lifts
-# of which 11 cableways are POMA's, about 70 % of the runs green and blue, up to
-# 10 000 skiers a day, 1 022 ha of territory with about 20 ha built on, launch in
+# by the Prime Minister, together with the company's own general plan: **60 km of
+# runs, 16 lifts of which 11 cableways are POMA's, 60.9 % of the runs green and
+# blue (10.6 % green + 50.3 % blue), 70 % of runs with snowmaking, up to 10 000
+# skiers a day, 1 022 ha of territory with about 20 ha built on, launch in
 # December 2028**, a mountain-village concept by BIG and timber base- and
 # top-station structures by Blumer-Lehmann, with Ecosign also engaged.
+#
+# Press reporting of the April 2026 statement instead gave **17 lifts** and "about
+# 70 % green and blue". The general plan attaches its own 70 % to *snowmaking*, so
+# the press figure is most likely a conflation; both are carried in `config.py`
+# and every table below names the source it used. See `METHODS.md` §28.
 #
 # What is **not** published: any boundary, any station coordinate, any lift
 # alignment, any run, any elevation, and any capacity in persons per hour. So
@@ -177,9 +183,10 @@ print()
 print(gb.to_string(index=False))
 
 # %% [markdown]
-# The operator publishes a **length** (60 km) and a **mix** (about 70 % green and
-# blue) but no **width**, and width is what turns a length into an area. Three
-# plausible mean widths are carried through instead of one assumed value.
+# The operator publishes a **length** (60 km) and a **mix** (60.9 % green and
+# blue on its own general plan; "about 70 %" in press reporting) but no **width**,
+# and width is what turns a length into an area. Three plausible mean widths are
+# carried through instead of one assumed value.
 
 # %%
 demand = ST.piste_area_demand(PROJECT_PISTE_KM, PROJECT_GREEN_BLUE_SHARE)
