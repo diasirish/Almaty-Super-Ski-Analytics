@@ -1,0 +1,4 @@
+footprint,area_ha,pieces,elev_min_m,elev_max_m,vertical_m,median_elev_m,median_slope_deg,green_blue_share,green_blue_ha,above_31deg_share
+Drawn boundary (Google Earth),1297.0,1,1775,3225,1450,2397,28.7,0.2223,288.3,0.3944
+A - disc of the same area at the plateau,1297.0,1,1613,2882,1269,2135,28.9,0.1958,253.9,0.3924
+B - gentlest ground of the same area within 3.5 km,1297.0,76,1334,3208,1874,1809,18.7,0.5329,691.2,0.0094

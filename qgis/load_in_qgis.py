@@ -55,7 +55,7 @@ add_vector("03_reference_extents.geojson", "reference extents",
 add_vector("02_masterplan_control_points.geojson", "general-plan control points",
            QgsMarkerSymbol.createSimple({"name": "circle", "color": "255,212,0,255",
                                          "outline_color": "0,0,0,255", "size": "3.4"}))
-edit = add_vector("01_EDIT_ME_operating_area.geojson", ">>> EDIT ME: operating area <<<",
+edit = add_vector("operating_area.geojson", ">>> EDIT ME: operating area <<<",
                   QgsFillSymbol.createSimple({"color": "204,34,0,40", "outline_color": "204,34,0,255",
                                               "outline_width": "1.0"}))
 

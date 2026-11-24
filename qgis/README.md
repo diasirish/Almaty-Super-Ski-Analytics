@@ -22,7 +22,7 @@ mask**; the rectangle stays the compute grid.
 | file | what it is |
 |---|---|
 | `00_same_view_as_the_plan.png` | the DEM rendered from the general plan's own viewpoint — looking south from Almaty, east on the left — so the sheet and the terrain can be compared feature by feature |
-| `01_EDIT_ME_operating_area.geojson` | the polygon to reshape. Eight vertices, EPSG:4326 |
+| `operating_area.geojson` | the operating-area boundary, 21 vertices, EPSG:4326. Reshape it here to change what every number is reported over |
 | `02_masterplan_control_points.geojson` | the seven labels, located in OSM |
 | `03_reference_extents.geojson` | the superseded `kok_zhailau` rectangle, the `kz_project` window and the proposed compute rectangle |
 | `04_osm_lifts_and_pistes.geojson` | existing lifts, pistes and stations (OpenStreetMap, ODbL) |
@@ -41,7 +41,7 @@ QGIS → `Plugins` → `Python Console` → paste `load_in_qgis.py` → Enter.
    Connection`, name `Esri satellite`, URL
    `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}`,
    then drag it to the bottom of the layer list.
-4. Select `01_EDIT_ME_operating_area` → `Layer` → `Toggle Editing`.
+4. Select `operating_area` → `Layer` → `Toggle Editing`.
 5. `Edit` → `Vertex Tool`. Drag vertices; double-click an edge to add one;
    right-click a vertex to remove it.
 6. `Layer` → `Save Layer Edits`, then `Toggle Editing` off.

@@ -1,0 +1,7 @@
+month,dates,qualifying_share,median_valid_obs,median_snow_freq,dec_kwh_bias,slope_bias_deg
+November,24,0.736,16,0.792,23.9,-3.2
+December,16,0.523,5,1.0,43.1,-5.3
+January,16,0.594,8,1.0,36.1,-4.6
+February,13,0.894,11,1.0,7.9,-1.0
+March,25,0.972,24,0.969,2.5,-0.3
+April,17,0.917,14,0.75,6.2,-0.8

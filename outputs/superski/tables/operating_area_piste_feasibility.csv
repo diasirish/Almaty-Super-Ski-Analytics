@@ -1,0 +1,4 @@
+assumed_mean_piste_width_m,piste_area_ha,green_blue_piste_ha,available_green_blue_ha,share_of_available_consumed,footprint
+30.0,180.0,126.0,288.3,0.437,drawn
+40.0,240.0,168.0,288.3,0.583,drawn
+50.0,300.0,210.0,288.3,0.728,drawn

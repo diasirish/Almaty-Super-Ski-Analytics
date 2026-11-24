@@ -24,7 +24,7 @@ from shapely.ops import transform as shp_transform
 
 from config import CRS_UTM, CRS_WGS84, ROOT
 
-PATH = ROOT / "qgis" / "01_EDIT_ME_operating_area.geojson"
+PATH = ROOT / "qgis" / "operating_area.geojson"
 DRAFT_MARK = "DRAFT"
 
 
@@ -51,14 +51,17 @@ def is_draft(props: dict) -> bool:
 
 
 def provenance(props: dict) -> str:
-    who = str(props.get("drawn_by") or "").strip()
+    """One sentence saying where the boundary came from. Quoted in every output."""
     if is_draft(props):
         return ("Envelope of the seven features named on the Kazakh Tourism Development "
                 "general-plan sheet, located independently in OpenStreetMap, plus a "
                 "1.5 km working buffer. Not traced from the render.")
-    return (f"Boundary digitised by {who or 'the author'} in QGIS against Copernicus DEM "
-            f"GLO-30 shaded relief and OpenStreetMap lift and piste lines, using the "
-            f"general-plan sheet as a visual reference. Not traced from the render.")
+    who = str(props.get("drawn_by") or "the author").strip()
+    tool = str(props.get("tool") or "hand-digitised over satellite imagery").strip()
+    date = str(props.get("date") or "").strip()
+    return (f"Boundary digitised by {who} ({tool}"
+            + (f", {date}" if date else "") + "). "
+            + str(props.get("caution") or "Not an official boundary."))
 
 
 def _to_utm(poly):

@@ -1,0 +1,19 @@
+area,gradient_class,slope_from_deg,slope_to_deg,grade_from_pct,grade_to_pct,area_ha,share,skiers_per_ha_low,skiers_per_ha_high
+Drawn boundary,Beginner,0.0,8.5,0.0,15.0,51.6,0.0398,35,75
+Drawn boundary,Novice,8.5,14.0,15.0,25.0,115.8,0.0893,30,60
+Drawn boundary,Low intermediate,14.0,19.3,25.0,35.0,120.9,0.0932,20,40
+Drawn boundary,Intermediate,19.3,21.8,35.0,40.0,80.8,0.0623,15,30
+Drawn boundary,Advanced intermediate,21.8,31.0,40.0,60.0,414.8,0.3198,10,20
+Drawn boundary,Expert,31.0,89.4,60.0,,513.1,0.3956,5,10
+"A - disc, same area",Beginner,0.0,8.5,0.0,15.0,41.7,0.0321,35,75
+"A - disc, same area",Novice,8.5,14.0,15.0,25.0,99.5,0.0767,30,60
+"A - disc, same area",Low intermediate,14.0,19.3,25.0,35.0,112.7,0.0869,20,40
+"A - disc, same area",Intermediate,19.3,21.8,35.0,40.0,78.4,0.0604,15,30
+"A - disc, same area",Advanced intermediate,21.8,31.0,40.0,60.0,453.4,0.3496,10,20
+"A - disc, same area",Expert,31.0,89.4,60.0,,511.3,0.3942,5,10
+"B - gentlest, same area",Beginner,0.0,8.5,0.0,15.0,104.7,0.0807,35,75
+"B - gentlest, same area",Novice,8.5,14.0,15.0,25.0,261.0,0.2012,30,60
+"B - gentlest, same area",Low intermediate,14.0,19.3,25.0,35.0,325.5,0.251,20,40
+"B - gentlest, same area",Intermediate,19.3,21.8,35.0,40.0,188.9,0.1457,15,30
+"B - gentlest, same area",Advanced intermediate,21.8,31.0,40.0,60.0,404.6,0.312,10,20
+"B - gentlest, same area",Expert,31.0,89.4,60.0,,12.2,0.0094,5,10
