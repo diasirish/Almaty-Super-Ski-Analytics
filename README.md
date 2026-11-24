@@ -21,7 +21,7 @@ Release date: 24 November 2026
 
 **→ [4-slide demo for engineering and GIS teams (PDF)](almaty-superski-gis-demo.pdf)** · **[6-slide brief (PDF)](kok-zhailau-brief.pdf)**
 
-*Coming back to this after a break, or reading it for the first time? **[ORIENTATION.md](ORIENTATION.md)** is the 30-minute route in: what is current, what was superseded, and every assumption in one table.*
+*Coming back to this after a break, or reading it for the first time? **[ORIENTATION.md](ORIENTATION.md)** is the 30-minute route in: what is current, what was superseded, and every assumption in one table. **[DATA.md](DATA.md)** is where every byte came from — endpoints, projections, datums, licences, and the five sources costed and not used.*
 
 ---
 
@@ -258,7 +258,9 @@ matched the sliced arrays on **0 differing pixels out of 174,800**.
 README.md                  this file
 ORIENTATION.md             the route back in: what is current, what was superseded,
                            every assumption in one table, and what was never done
-METHODS.md                 sources, formulas, masks, thresholds, validation, limits
+DATA.md                    provenance: every dataset, endpoint, projection, datum,
+                           licence and what it costs to rely on it
+METHODS.md                 formulas, masks, thresholds, validation, limits
 kok-zhailau-brief.pdf      6-slide brief
 almaty-superski-gis-demo.pdf  4-slide demo: operating area, validation, handover
 notebooks/                 01 terrain & insolation · 02 snow · 03 planning & 2027
@@ -363,5 +365,5 @@ aerial-imagery computer vision at MarineTech. Co-author,
 
 *Contains modified Copernicus Sentinel data 2022–2026, processed by ESA · Copernicus
 DEM GLO-30 © DLR/Airbus · Copernicus Climate Change Service information 2026 ·
-OpenStreetMap © contributors, ODbL · clear-sky model: pvlib. Full attribution in
-`METHODS.md` §19.*
+OpenStreetMap © contributors, ODbL · clear-sky model: pvlib. Every source, endpoint
+and licence is in [DATA.md](DATA.md).*

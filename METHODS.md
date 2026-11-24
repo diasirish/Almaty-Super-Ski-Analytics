@@ -8,6 +8,12 @@ Everything below is reproducible from the code in `src/` and the six notebooks.
 Every number quoted in `README.md` and in the two PDFs comes from a CSV written
 by that code into `outputs/superski/tables/` or `outputs/cluster/tables/`.
 
+This file is **what is done with the data**: formulas, thresholds, masks,
+validation and limits. **[`DATA.md`](DATA.md) is where the data came from** —
+every dataset with its endpoint, resolution, epoch, projection, datum, licence
+and the cost of relying on it. Each source is named below where it is used and
+documented in full there.
+
 ---
 
 ## 1. Scope and standing
@@ -792,6 +798,9 @@ protected-area geometry is carried in this release.
 ---
 
 ## 19. Attribution and licences
+
+Full provenance for every source — endpoint, access terms, epoch, projection and
+what it costs to rely on it — is in [`DATA.md`](DATA.md).
 
 * **Copernicus DEM GLO-30** — © DLR e.V. 2010–2014 and © Airbus Defence and Space
   GmbH 2014–2018, provided under the Copernicus DEM open licence; distributed via

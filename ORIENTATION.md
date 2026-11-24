@@ -32,6 +32,7 @@ Do these in order. Nothing here needs the pipeline to be re-run.
 | 2 | `README.md`, "Five measured results" + findings 6–12 | every conclusion, with its number | 10 min |
 | 3 | **`notebooks/06_operating_boundary.ipynb`** | the study area and the two rectangles it replaced; renders on GitHub | 10 min |
 | 4 | `METHODS.md` §9 and §18 | the two published figures that disagree, and what the study cannot tell you | 5 min |
+| 5 | `DATA.md` §1 and §8 | every source in one table, and the five that were costed and not used | 5 min |
 
 If you read only one thing after the demo, read `METHODS.md` §18. It is the list
 of questions this work does **not** answer, with the measurement each one needs —
@@ -115,11 +116,14 @@ every table names which one it used. `METHODS.md` §9.
 
 ```
 README.md          the results, written for a reader who will not run anything
-METHODS.md         every threshold, source, formula and limit, for the
-                   current study area only. 21 sections: §2 the boundary and
-                   the window, §3–7 how each layer is built, §8–12 what is
-                   measured and against what, §13–17 the outlook and the
-                   validation, §18 what it cannot tell you
+DATA.md            provenance: every dataset, endpoint, resolution, epoch,
+                   projection, datum and licence, plus the five sources that
+                   were costed and not used. The study area is its §10
+METHODS.md         every threshold, formula and limit, for the current study
+                   area only. 21 sections: §2 the boundary and the window,
+                   §3–7 how each layer is built, §8–12 what is measured and
+                   against what, §13–17 the outlook and the validation,
+                   §18 what it cannot tell you
 ORIENTATION.md     this file
 qgis/              the boundary, plus a layer pack and a one-paste QGIS loader
                      operating_area.geojson   <- the boundary. One file.
