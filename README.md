@@ -4,7 +4,7 @@
 persistence above Almaty: the Kok Zhailau site and the cluster around it.**
 
 Dias Irishev — Geo & Weather Data Scientist, Almaty · snowboarder
-Release date: 19 November 2026
+Release date: 24 November 2026
 
 ---
 
@@ -25,28 +25,28 @@ Release date: 19 November 2026
 
 ---
 
-## Five measured results across the cluster
+## Five measured results across the mountain
 
 **1. Exposure, not elevation, separates the snow.**
 In the 2200–2300 m band on 15–35° slopes, north-facing terrain receives a median
-**261.5 kWh/m²** of clear-sky insolation over March–April against **528.5 kWh/m²**
+**259.5 kWh/m²** of clear-sky insolation over March–April against **527.4 kWh/m²**
 on south-facing terrain — a factor of **2.0**. Over the four-season spring window
-those same north-facing slopes show snow on **93%** of usable satellite dates
-against **40%** on south-facing slopes. Splitting by insolation quartile *within*
+those same north-facing slopes show snow on **92%** of usable satellite dates
+against **35%** on south-facing slopes. Splitting by insolation quartile *within*
 each 100 m band, so elevation is held fixed, the contrast in that band is
-**93.3% vs 48.4%** (n = 1703 pixels per group; coverage 98% and 100%).
+**91.7% vs 40.1%** (n = 3063 pixels per group; coverage 97% and 100%).
 
 **2. Ten days of timing is worth more than a third of the spring snow signal.**
 Re-cutting the four-season spring record against windows ten days earlier and ten
-days later, compared on a fixed mask of **43.44 km²** observed in all three, the
-median snow detection frequency moves **0.83 → 0.75 → 0.50**. A ±10-day shift in
-timing is a **33-percentage-point** swing. Any plan with a date in it should be
+days later, compared on a fixed mask of **76.93 km²** observed in all three, the
+median snow detection frequency moves **0.90 → 0.85 → 0.68**. A ±10-day shift in
+timing is a **22-percentage-point** swing. Any plan with a date in it should be
 stress-tested against that.
 
 **3. December is a terrain-shading problem before it is a sun problem.**
-On the median pixel, **70% of December daylight half-hours are terrain-shaded**,
-against 28% in March. Median December clear-sky insolation is **21.6 kWh/m²**
-against **143.0** in March — a factor of 6.6, far steeper than the change in day
+On the median pixel, **63% of December daylight half-hours are terrain-shaded**,
+against 28% in March. Median December clear-sky insolation is **32.3 kWh/m²**
+against **155.8** in March — a factor of 4.8, far steeper than the change in day
 length alone.
 
 **4. Ranking terrain by solar *energy* and by *hours of sun* gives different answers.**
@@ -213,9 +213,9 @@ measurement would answer each question instead.
 | | |
 |---|---|
 | Operating boundary | 24 vertices · **1,776 ha** · 1775–3291 m · hand-drawn, not official |
-| SuperSki rectangle | 76.955–77.095° E, 43.078–43.172° N · **125 km²** · 1255–3893 m |
+| SuperSki rectangle | 76.955–77.095° E, 43.078–43.172° N · **125.34 km²** · 1255–3893 m · notebooks 01–03, 06 |
 | Cluster rectangle | **404.12 km²**, 857–4279 m, 647 × 694 @ 30 m |
-| Superseded rectangle | 76.960–77.065° E, 43.105–43.174° N · 69.12 km² · kept for provenance |
+| Superseded rectangle | 76.960–77.065° E, 43.105–43.174° N · 69.12 km² · no longer computed; see nb 06 §1 |
 | Terrain | Copernicus DEM GLO-30, 2 tiles → 30 m grid, EPSG:32643 |
 | Satellite | Sentinel-2 L2A, MGRS tile 43TFH, cloud < 15% |
 | Scenes | **115** (114 historical + 1 current season), **0 download failures** |
@@ -249,22 +249,20 @@ METHODS.md                 sources, formulas, masks, thresholds, validation, lim
 kok-zhailau-brief.pdf      6-slide brief
 almaty-superski-gis-demo.pdf  4-slide demo: operating area, validation, handover
 notebooks/                 01 terrain & insolation · 02 snow · 03 planning & 2027
-                             (01-03 run on the SUPERSEDED 69 km² rectangle)
                            04 cluster: lifts, radiation hours, timing, cross-checks
                            05 project scale, three-area comparison, DEM validation
                            06 the operating boundary: why the area moved, and
                               what is inside it  <- start here
+                           01-03 and 06 all run on the current 125 km² area
 src/                       the analysis library the notebooks call
   operating_area.py          reads the boundary, masks any grid, carries provenance
   pipeline_operating_area.py one command to rebuild everything the boundary decides
 qgis/                      layer pack to redraw the boundary: hillshade, slope,
                            control points, OSM lifts, and a one-paste QGIS loader
-outputs/geotiff/           47 GeoTIFFs + metadata JSON          (superseded 69 km²)
+outputs/superski/          the current area: notebooks 01-03 and 06 all write here
 outputs/cluster/           24 GeoTIFFs, 9 figures, 15 tables    (cluster 404 km²)
 outputs/kz_project/        11 GeoTIFFs, 3 figures, 20 tables    (project window 42 km²)
-outputs/superski/          2 figures, 9 tables                  (operating boundary)
-outputs/png/               15 maps and charts
-outputs/tables/            20 CSVs
+outputs/geotiff|png|tables/  the superseded 69 km² run, kept so the move is auditable
 docs/                      the extent review, and the published outlooks with URLs
 requirements.txt           pinned environment
 run_all.sh                 end-to-end reproduction

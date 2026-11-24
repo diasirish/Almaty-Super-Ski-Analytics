@@ -65,14 +65,16 @@ they never collide.
 
 | `KZ_AREA` | What | Used by | Status |
 |---|---|---|---|
-| `superski` | 125 km², derived from the operator's general plan | nb 06, `pipeline_operating_area.py` | **current** |
+| `superski` | 125 km², derived from the operator's general plan | **nb 01, 02, 03, 06** and `pipeline_operating_area.py` | **current** |
 | `cluster` | 404 km², the whole mountain cluster | nb 04 | current |
-| `kz_project` | 42 km² window around the plateau | nb 05 | current for validation only |
-| `kok_zhailau` | 69 km², the author's first guess | nb 01–03 | **superseded** — see nb 06 §1 |
+| `kz_project` | 42 km² window around the plateau | nb 05 | current, for the validation work only |
+| `kok_zhailau` | 69 km², the author's first guess | nothing | **retired** — see nb 06 §1 |
 
-Notebooks 01–03 are valid for what they measure, but the rectangle they measure
-it over is the one the project moved away from. Their *physics* carries; their
-*choice of ground* does not. Notebook 06 §7 is the table of what it supersedes.
+Every notebook now runs on a current area. Notebooks 01–03 were moved onto the
+125 km² extent and re-executed, so the numbers in README findings 1–3 are the
+ones this area produces, not the ones the first rectangle produced. The old run
+is still in `outputs/geotiff|png|tables/` so the move can be audited, but nothing
+regenerates it and notebook 06 §7 lists what it superseded.
 
 **The boundary is one file.** `qgis/operating_area.geojson` — 24 vertices, drawn
 by hand over imagery, **not official**. Redraw it and re-run one command; every

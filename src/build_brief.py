@@ -11,8 +11,9 @@ import sys
 from pathlib import Path
 
 # Slides 1-4 report the Kok Zhailau rectangle; slides 5-6 the cluster area.
-# Pin the area before config is imported so OUT_TAB resolves to the former.
-os.environ["KZ_AREA"] = "kok_zhailau"
+# Pin the area before config is imported so OUT_TAB and OUT_PNG resolve to it.
+# Notebooks 01-03 write here; the cluster figures are picked up by absolute path.
+os.environ["KZ_AREA"] = "superski"
 
 import pandas as pd
 from PIL import Image
@@ -21,7 +22,21 @@ from reportlab.lib.utils import simpleSplit
 from reportlab.pdfgen import canvas
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from config import OUT_PNG, OUT_TAB, ROOT
+from config import INTERIM, OUT_PNG, OUT_TAB, ROOT
+from grids import DEM_GRID
+
+
+def _grid_facts():
+    """Slide 1 describes whatever grid the pipeline actually ran on."""
+    import numpy as np
+    t = np.load(INTERIM / "terrain.npz")
+    return (float(np.nanmin(t["dem"])), float(np.nanmax(t["dem"])),
+            float(np.nanmedian(t["slope"])), float(np.nanmedian(t["svf"])),
+            (DEM_GRID.xmax - DEM_GRID.xmin) / 1000,
+            (DEM_GRID.ymax - DEM_GRID.ymin) / 1000)
+
+
+_ELO, _EHI, _SLOPE, _SVF, _KMW, _KMH = _grid_facts()
 
 W, H = 960.0, 540.0                       # 16:9 slide, points
 M = 34.0                                  # outer margin
@@ -35,7 +50,7 @@ RULE = HexColor("#d8d8d8")
 PANEL = HexColor("#f4f6f8")
 
 OUT_PDF = ROOT / "kok-zhailau-brief.pdf"
-RELEASE_DATE = "19 November 2026"
+RELEASE_DATE = "24 November 2026"
 
 
 CLUSTER_TAB = ROOT / "outputs" / "cluster" / "tables"
@@ -177,23 +192,25 @@ def build():
     N_SLIDES = 6
 
     c = canvas.Canvas(str(OUT_PDF), pagesize=(W, H))
-    c.setTitle("Kok Zhailau ski terrain analytics — 6-slide brief")
+    c.setTitle("Almaty SuperSki terrain analytics — 6-slide brief")
     c.setAuthor("Dias Irishev")
     c.setSubject("Independent open-data terrain, insolation and snow-persistence "
                  "case study, Almaty mountains")
 
     # ---------------- slide 1 ----------------
-    slide_frame(c, 1, N_SLIDES, "Kok Zhailau ski terrain analytics",
-                "Terrain, sun exposure and four seasons of snow over 69 km² above "
-                "Almaty — an independent open-data case study")
+    slide_frame(c, 1, N_SLIDES, "Almaty SuperSki terrain analytics",
+                f"Terrain, sun exposure and four seasons of snow over "
+                f"{DEM_GRID.area_km2:.0f} km² above Almaty — an independent "
+                f"open-data case study")
     c.setFont("Helvetica-Bold", 10.4)
     c.setFillColor(INK)
     c.drawString(M - 6, 448, "Study rectangle \u2014 Copernicus DEM GLO-30, 30 m grid")
     c.setFont("Helvetica", 9.0)
     c.setFillColor(MUTED)
-    c.drawString(M - 6, 435, "8.8 \u00d7 7.9 km \u00b7 69.12 km\u00b2 \u00b7 "
-                             "1271\u20133318 m \u00b7 median slope 29\u00b0 \u00b7 "
-                             "median sky view factor 0.89")
+    c.drawString(M - 6, 435,
+                 f"{_KMW:.1f} \u00d7 {_KMH:.1f} km \u00b7 {DEM_GRID.area_km2:.2f} km\u00b2 \u00b7 "
+                 f"{_ELO:.0f}\u2013{_EHI:.0f} m \u00b7 median slope {_SLOPE:.0f}\u00b0 \u00b7 "
+                 f"median sky view factor {_SVF:.2f}")
     p, x, y, w, h = fit(OUT_PNG / "01_terrain_3d_bare.png", M - 6, 122, 560, 302)
     c.drawImage(str(p), x, y, w, h, mask="auto")
 
@@ -222,15 +239,16 @@ def build():
 
     panel(c, tx - 8, 92, tw + 16, 132)
     sy = 200
-    stat(c, tx, sy, "69.12 km²", "study rectangle, 1271–3318 m, "
-                                      "EPSG:32643, 30 m / 20 m grids")
+    stat(c, tx, sy, f"{DEM_GRID.area_km2:.2f} km²",
+         f"study rectangle, {_ELO:.0f}–{_EHI:.0f} m, EPSG:32643, 30 m / 20 m grids")
     stat(c, tx, sy - 46, f"{n_hist} scenes",
          f"Sentinel-2 L2A, tile 43TFH, 4 complete seasons 2022/23–2025/26, "
          f"0 download failures", color=WARM)
     caption(c, "Shaded relief, light from the NW. Perspective view — horizontal "
-               "scale varies with distance. The rectangle is the author's first study "
-               "area, not a resort boundary; it was later superseded by an extent "
-               "derived from the operator's published general plan (METHODS §29).",
+               "scale varies with distance. The rectangle is the compute grid, derived "
+               "from control points on the operator's published general plan "
+               "(METHODS §29); it is not a resort boundary. The operating boundary "
+               "drawn inside it is not official either.",
             M - 6, 108, 560)
     c.showPage()
 

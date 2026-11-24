@@ -1,0 +1,13 @@
+test,expected,computed
+synthetic plane,"slope 20°, aspect 0°","slope 20.00°, aspect 0.00°"
+synthetic plane,"slope 20°, aspect 45°","slope 20.00°, aspect 45.00°"
+synthetic plane,"slope 20°, aspect 90°","slope 20.00°, aspect 90.00°"
+synthetic plane,"slope 20°, aspect 135°","slope 20.00°, aspect 135.00°"
+synthetic plane,"slope 20°, aspect 180°","slope 20.00°, aspect 180.00°"
+synthetic plane,"slope 20°, aspect 225°","slope 20.00°, aspect 225.00°"
+synthetic plane,"slope 20°, aspect 270°","slope 20.00°, aspect 270.00°"
+synthetic plane,"slope 20°, aspect 315°","slope 20.00°, aspect 315.00°"
+"sky view factor, unobstructed plane",(1+cos 0°)/2 = 1.0000,1.0000
+"sky view factor, unobstructed plane",(1+cos 20°)/2 = 0.9698,0.9698
+"sky view factor, unobstructed plane",(1+cos 40°)/2 = 0.8830,0.8830
+"sky view factor, flat pixel in a 30° skyline",cos²30° = 0.7500,0.7500

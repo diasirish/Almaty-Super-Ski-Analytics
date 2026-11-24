@@ -1,0 +1,4 @@
+aspect_sector,n_pixels,area_km2,median_insolation_kwh_m2,coverage,median_snow_freq
+north (315-45),4422,1.7688,259.5,0.974,0.917
+south (135-225),1877,0.7508,527.4,1.0,0.346
+east/west,5951,2.3804,398.8,0.992,0.741

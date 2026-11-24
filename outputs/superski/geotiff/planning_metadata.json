@@ -1,0 +1,103 @@
+{
+ "run_date": "2026-11-24",
+ "focus_band_m": [
+  2200.0,
+  2300.0
+ ],
+ "slope_window_deg": [
+  15.0,
+  35.0
+ ],
+ "field_priority": {
+  "insol_low_cut_kwh_m2": 291.6,
+  "insol_high_cut_kwh_m2": 461.5,
+  "freq_high_threshold": 0.75,
+  "freq_low_threshold": 0.4,
+  "slope_window_deg": [
+   15.0,
+   35.0
+  ],
+  "skiable_area_km2": 83.889,
+  "labels": {
+   "0": "outside the 15-35 deg slope window",
+   "1": "low exposure and frequent snow",
+   "2": "high exposure and infrequent snow",
+   "3": "other skiable terrain",
+   "4": "skiable, insufficient observation coverage"
+  },
+  "class_counts": {
+   "0": 103348,
+   "1": 34877,
+   "2": 21287,
+   "3": 151688,
+   "4": 1871
+  },
+  "class_area_km2": {
+   "0": 41.339,
+   "1": 13.951,
+   "2": 8.515,
+   "3": 60.675,
+   "4": 0.748
+  }
+ },
+ "steep_layer": {
+  "threshold_deg": 30.0,
+  "n_pixels": 156764,
+  "area_km2": 62.706,
+  "note": "Geometry only. Avalanche terrain classification needs snowpack, wind transport, start/runout zones and local expertise."
+ },
+ "spring_window": [
+  "03-11",
+  "04-20"
+ ],
+ "spring_shift_days": 10,
+ "spring_scenarios": [
+  {
+   "scenario": "10 days earlier (03-11 \u221210d)",
+   "n_dates": 33,
+   "n_seasons": 4,
+   "coverage_full_grid": 0.987,
+   "median_freq_common_mask": 0.898,
+   "p25": 0.562,
+   "p75": 1.0,
+   "area_freq_above_0.8_km2": 45.26,
+   "median_freq_2200_2300": 0.812
+  },
+  {
+   "scenario": "historical analogue (03-11\u219204-20)",
+   "n_dates": 31,
+   "n_seasons": 4,
+   "coverage_full_grid": 0.982,
+   "median_freq_common_mask": 0.85,
+   "p25": 0.458,
+   "p75": 1.0,
+   "area_freq_above_0.8_km2": 41.14,
+   "median_freq_2200_2300": 0.736
+  },
+  {
+   "scenario": "10 days later (04-20 +10d)",
+   "n_dates": 26,
+   "n_seasons": 4,
+   "coverage_full_grid": 0.915,
+   "median_freq_common_mask": 0.679,
+   "p25": 0.225,
+   "p75": 0.964,
+   "area_freq_above_0.8_km2": 32.35,
+   "median_freq_2200_2300": 0.521
+  }
+ ],
+ "common_mask_pixels": 192333,
+ "common_mask_km2": 76.933,
+ "seasonal_outlooks": {
+  "kazhydromet_winter_2026_27": {
+   "issuer": "RSE Kazhydromet, Hydrometeorological Centre (Ministry of Ecology and Natural Resources, Kazakhstan)",
+   "issued": "2026-11-16",
+   "url": "https://www.kazhydromet.kz/uploads/files_calendar/13401/file/6afacdf27e503sp-na-zimu-2026-2027-gg-ot-16-11-2026g.pdf"
+  },
+  "c3s_november_2026": {
+   "issuer": "Copernicus Climate Change Service (C3S) multi-system seasonal forecast",
+   "issued": "2026-11-10",
+   "url": "https://climate.copernicus.eu/seasonal-forecasts"
+  }
+ }
+}

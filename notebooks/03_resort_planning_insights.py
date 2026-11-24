@@ -16,7 +16,8 @@
 
 # %%
 import os
-os.environ["KZ_AREA"] = "kok_zhailau"   # this notebook reports the 69 km2 rectangle
+os.environ["KZ_AREA"] = "superski"   # the current study area, derived from the
+#                                      operator's general plan - see notebook 06
 
 import json
 import sys
@@ -144,7 +145,9 @@ print(aspect_tbl.to_string(index=False))
 # %%
 pilot = pd.DataFrame([
     {"quantity": "area of the study rectangle (km²)", "pilot": "69.1",
-     "this_run": "69.12", "agrees": "yes"},
+     "this_run": f"{DEM_GRID.area_km2:.2f}",
+     "agrees": ("yes" if abs(DEM_GRID.area_km2 - 69.1) < 0.5
+                else "no - the study area moved, see notebook 06")},
     {"quantity": "candidate dates, Mar–Apr 2023", "pilot": "12",
      "this_run": f"{marapr23['n_dates']}", "agrees": "within one date"},
     {"quantity": "coverage at ≥4 usable obs, Mar–Apr 2023", "pilot": "~74%",
@@ -161,7 +164,9 @@ print(pilot.to_string(index=False))
 print(f"""
 Reading of the differences, in order of likely size:
 
-1. The grid reproduces exactly (69.12 km² vs 69.1), so the geometry is not the issue.
+1. The pilot ran on the original 69.1 km² rectangle; this run covers
+   {DEM_GRID.area_km2:.2f} km². Where those differ, the rows below are comparing two
+   areas, not two methods — notebook 06 section 1 explains why the area moved.
 2. Coverage is {marapr23['coverage']*100:.0f}% here against ~74%. This run keeps a pixel whenever the
    SCL class permits a snow / no-snow decision; a stricter earlier mask would have
    dropped marginal pixels, and those sit mostly on shaded slopes.
@@ -374,8 +379,8 @@ print(f"  caveat   : {c3s['caveat']}")
 # ### What these outlooks can and cannot settle
 #
 # Both are warm-leaning for the coming winter at a scale of hundreds of kilometres.
-# Neither resolves 1271–3318 m of relief inside one rectangle, and neither forecasts
-# snow depth. The gap between an oblast-scale temperature anomaly and an operational
+# Neither resolves the two kilometres of relief inside one rectangle, and neither
+# forecasts snow depth. The gap between an oblast-scale temperature anomaly and an operational
 # answer is exactly the gap local measurement closes.
 
 # %%

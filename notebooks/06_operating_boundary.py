@@ -41,7 +41,7 @@ import operating_area as OA
 import pipeline_operating_area as PL
 import ski_terrain as ST
 import viz
-from config import (AREA_LABEL, AREA_NOTE, HORIZON_N_AZIMUTH, INTERIM,
+from config import (AREA_LABEL, AREA_NOTE, DATA, HORIZON_N_AZIMUTH, INTERIM,
                     MIN_VALID_OBS, OUT_PNG, OUT_TAB, PROJECT_AREA_HA,
                     PROJECT_GREEN_BLUE_SHARE, PROJECT_GREEN_BLUE_SHARE_PRESS,
                     PROJECT_LIFTS, PROJECT_LIFTS_PRESS, PROJECT_PISTE_KM,
@@ -91,7 +91,10 @@ print(f"\ncontrol points the superseded 69 km2 rectangle misses: "
 # **above** it.
 
 # %%
-dem_old = np.load(INTERIM.parent / "terrain.npz")["dem"]      # kok_zhailau cache
+# The superseded rectangle keeps the flat cache layout the first release shipped
+# with, so its terrain is data/interim/terrain.npz. Spelled out from DATA rather
+# than walked up from INTERIM, whose depth differs between areas.
+dem_old = np.load(DATA / "interim" / "terrain.npz")["dem"]
 dem_new = np.load(INTERIM / "terrain.npz")["dem"]
 BANDS = {"below the base village (<1,900 m)": (0, 1900),
          "the plan's operating band (1,900–3,400 m)": (1900, 3400),

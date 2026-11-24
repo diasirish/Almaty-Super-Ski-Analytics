@@ -2,7 +2,7 @@
 
 **Kok Zhailau ski terrain analytics — an independent open-data case study**
 Dias Irishev · Geo & Weather Data Scientist, Almaty
-Release date: 19 November 2026
+Release date: 24 November 2026
 
 Everything below is reproducible from the code in `src/` and the three notebooks.
 Every number quoted in `README.md` and in the PDF brief comes from a CSV in
@@ -753,7 +753,7 @@ December sun figure (section 25), mid-winter snow statistics on shaded ground
 
 ---
 
-# Part IV — the study area, re-derived and then hand-drawn
+# PART IV — The study area, re-derived and then hand-drawn (added 24 November 2026)
 
 Parts I–III ran on a rectangle the author chose. Part IV replaces it twice: once
 with a rectangle derived from the operator's own general plan, and once more with

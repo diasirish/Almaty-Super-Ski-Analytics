@@ -1,0 +1,2 @@
+query_date,acquisition_date,scene_ids,metadata_cloud_cover_pct,valid_pixel_fraction,snow_fraction_of_valid,platform
+2026-11-24,2026-11-07,S2B_43TFH_20261107_0_L2A,0.14,0.4332,0.3534,sentinel-2b

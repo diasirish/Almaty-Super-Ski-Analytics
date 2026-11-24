@@ -14,7 +14,8 @@
 
 # %%
 import os
-os.environ["KZ_AREA"] = "kok_zhailau"   # this notebook reports the 69 km2 rectangle
+os.environ["KZ_AREA"] = "superski"   # the current study area, derived from the
+#                                      operator's general plan - see notebook 06
 
 import json
 import sys

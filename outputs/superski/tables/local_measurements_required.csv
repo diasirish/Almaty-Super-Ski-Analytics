@@ -1,0 +1,6 @@
+question,needed_measurement,why_satellite_cannot
+snow depth and water equivalent,"automatic snow pillow or ultrasonic depth sensor plus manual density cores, on at least one shaded and one sunny plot","optical imagery sees the surface, not the depth below it"
+season opening date,"continuous depth record against an operating threshold, over several seasons",a 5-day revisit with cloud gaps cannot resolve a threshold crossing to the day
+snowmaking windows,"wet-bulb temperature at the gun line, wind speed and direction, water source yield and temperature, equipment curves, target depth",none of these quantities is observed from orbit
+avalanche terrain classification,"snowpack profiles, wind transport and loading patterns, mapped start and runout zones, local forecaster judgement",slope angle is geometry; release depends on the snowpack
+real (not clear-sky) irradiance,pyranometer pair on contrasting aspects,the model here is clear-sky by construction; cloud attenuation is unmeasured

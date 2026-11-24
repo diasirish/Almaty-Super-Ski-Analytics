@@ -19,7 +19,8 @@
 
 # %%
 import os
-os.environ["KZ_AREA"] = "kok_zhailau"   # this notebook reports the 69 km2 rectangle
+os.environ["KZ_AREA"] = "superski"   # the current study area, derived from the
+#                                      operator's general plan - see notebook 06
 
 import json
 import sys
@@ -51,7 +52,8 @@ print(f"WGS84 rectangle: {wgs84_rect_area_km2():.2f} km2 (geodesic, on the ellip
 # The grid is the axis-aligned UTM bounding box of the WGS84 rectangle, snapped
 # outward to whole 30 m cells. Meridian convergence at 77°E is about 1.4°, so the
 # projected rectangle is slightly rotated and its bounding box is larger than the
-# rectangle itself — that is the whole of the 69.12 vs 65.48 km² difference.
+# rectangle itself. That difference — printed above, grid area against geodesic
+# area — is entirely this effect, not a coordinate error.
 #
 # ### QA: the plateau reference point must fall inside the rectangle
 
@@ -145,7 +147,8 @@ ax.set_title("Study rectangle \u2014 Copernicus DEM GLO-30, 30 m grid",
              fontsize=13.5, pad=30)
 fig.text(0.5, 0.905,
          f"{km_w:.1f} \u00d7 {km_h:.1f} km \u00b7 {DEM_GRID.area_km2:.1f} km\u00b2 \u00b7 "
-         f"1271\u20133318 m \u00b7 median slope {np.nanmedian(slope):.0f}\u00b0 \u00b7 "
+         f"{np.nanmin(dem):.0f}\u2013{np.nanmax(dem):.0f} m \u00b7 "
+         f"median slope {np.nanmedian(slope):.0f}\u00b0 \u00b7 "
          f"median sky view factor {np.nanmedian(svf):.2f}",
          ha="center", fontsize=10, color="#444")
 fig.subplots_adjust(left=0.01, right=0.99, top=0.875, bottom=0.01)
