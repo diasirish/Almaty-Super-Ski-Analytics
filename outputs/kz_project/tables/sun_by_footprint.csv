@@ -1,0 +1,4 @@
+footprint,sun_hours_median,sun_hours_p10,sun_hours_p90,insolation_median,december_hours_median,december_hours_per_day,march_hours_median
+project window (42 km2),1061.2,564.7,1533.7,514.2,75.2,2.43,267.9
+footprint A: 1022 ha disc (r=1.80 km),982.5,546.9,1525.4,458.7,34.8,1.12,269.3
+footprint B: gentlest 1022 ha,1319.0,743.9,1586.4,622.8,135.0,4.35,293.3

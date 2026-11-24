@@ -1,0 +1,9 @@
+question,needed_measurement,why_satellite_cannot
+snow depth and water equivalent,"snow pillow or ultrasonic depth sensor plus manual density cores, on at least one shaded and one sunny plot in the same elevation band","optical imagery sees the surface, not the depth below it"
+real (not clear-sky) irradiance,two pyranometers on contrasting aspects inside the footprint,the model here is clear-sky by construction; cloud attenuation is unmeasured
+the December sun figure for one specific site,"a horizon survey from the site, or a short-baseline photogrammetric or lidar DEM",the three open DEMs disagree by 50-66 % at the 95th percentile on exactly this quantity (section 6)
+snowmaking windows,"wet-bulb temperature at the gun line, wind speed and direction, water yield and temperature, equipment curves",none of these quantities is observed from orbit
+season opening date,"a continuous depth record against an operating threshold, over several seasons",a 5-day revisit with cloud gaps cannot resolve a threshold crossing to the day
+avalanche terrain classification,"snowpack profiles, wind transport and loading patterns, mapped start and runout zones, local forecaster judgement",slope angle is geometry; release depends on the snowpack
+mid-winter snow statistics on shaded ground,"ground observation, or Sentinel-1 SAR wet-snow retrieval to see through cloud","in the thinnest month only 43 % of this window has four clear observations, and that subset is biased +285 kWh/m² sunnier (section 4)"
+where the beginner terrain can physically go,a design-grade survey of the gentle benches and of what can be linked by lift,"a 30 m DEM resolves that the gentle ground arrives in 67 pieces, not whether two of them can be joined"

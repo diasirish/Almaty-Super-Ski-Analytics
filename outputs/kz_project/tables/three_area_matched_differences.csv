@@ -1,0 +1,10 @@
+area,reference,layer,shared_bands,band_low_min_m,band_low_max_m,median_difference,min_difference,max_difference
+Kok Zhailau — footprint A (disc),Kok Zhailau — footprint B (gentlest),insolation_kwh_m2,6,1600,2600,-114.749,-285.531,-34.346
+Oi-Qaragai operating area,Kok Zhailau — footprint B (gentlest),insolation_kwh_m2,5,1400,2200,90.378,-63.995,202.069
+Shymbulak operating area,Kok Zhailau — footprint B (gentlest),insolation_kwh_m2,8,1600,3000,-134.203,-513.807,60.642
+Kok Zhailau — footprint A (disc),Kok Zhailau — footprint B (gentlest),sun_hours,6,1600,2600,-212.75,-562.5,-136.75
+Oi-Qaragai operating area,Kok Zhailau — footprint B (gentlest),sun_hours,5,1400,2200,107.0,-22.875,142.25
+Shymbulak operating area,Kok Zhailau — footprint B (gentlest),sun_hours,8,1600,3000,-281.062,-705.75,-80.0
+Kok Zhailau — footprint A (disc),Kok Zhailau — footprint B (gentlest),snow_freq_march,6,1600,2600,-0.01,-0.049,0.116
+Oi-Qaragai operating area,Kok Zhailau — footprint B (gentlest),snow_freq_march,5,1400,2200,0.182,-0.261,0.257
+Shymbulak operating area,Kok Zhailau — footprint B (gentlest),snow_freq_march,8,1600,3000,0.074,0.0,0.329

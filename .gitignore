@@ -1,0 +1,27 @@
+# Virtual environment
+.venv/
+
+# Source data and heavy intermediates. Everything here is downloaded or derived;
+# ./run_all.sh rebuilds it from scratch. Keeping it out is what makes the repo
+# clonable: data/ alone is 329 MB.
+data/
+
+# The Sentinel-2 / Landsat scene cache lives OUTSIDE this folder on purpose
+# (see config.SCENE_CACHE) so it can never be swept into a commit.
+
+# Release archive
+*.zip
+
+# Draft outreach letters: personal job-search material, not part of the study.
+OUTREACH.md
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/

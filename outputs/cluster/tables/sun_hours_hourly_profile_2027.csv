@@ -1,0 +1,433 @@
+zone,month,hour,sunlit_fraction,n_steps
+all terrain,11,6,0.0119,27
+all terrain,11,7,0.0883,120
+all terrain,11,8,0.3499,120
+all terrain,11,9,0.5826,120
+all terrain,11,10,0.7176,120
+all terrain,11,11,0.7721,120
+all terrain,11,12,0.7576,120
+all terrain,11,13,0.6765,120
+all terrain,11,14,0.5257,120
+all terrain,11,15,0.3249,120
+all terrain,11,16,0.1533,52
+skiable 15-35 deg,11,6,0.0104,27
+skiable 15-35 deg,11,7,0.0713,120
+skiable 15-35 deg,11,8,0.3166,120
+skiable 15-35 deg,11,9,0.5683,120
+skiable 15-35 deg,11,10,0.727,120
+skiable 15-35 deg,11,11,0.7909,120
+skiable 15-35 deg,11,12,0.7699,120
+skiable 15-35 deg,11,13,0.6698,120
+skiable 15-35 deg,11,14,0.5058,120
+skiable 15-35 deg,11,15,0.3124,120
+skiable 15-35 deg,11,16,0.1544,52
+existing lift corridors,11,6,0.0031,27
+existing lift corridors,11,7,0.0517,120
+existing lift corridors,11,8,0.2511,120
+existing lift corridors,11,9,0.5448,120
+existing lift corridors,11,10,0.764,120
+existing lift corridors,11,11,0.8489,120
+existing lift corridors,11,12,0.8414,120
+existing lift corridors,11,13,0.7385,120
+existing lift corridors,11,14,0.5027,120
+existing lift corridors,11,15,0.233,120
+existing lift corridors,11,16,0.1337,52
+mapped pistes,11,6,0.0,27
+mapped pistes,11,7,0.0031,120
+mapped pistes,11,8,0.1054,120
+mapped pistes,11,9,0.3917,120
+mapped pistes,11,10,0.7014,120
+mapped pistes,11,11,0.8344,120
+mapped pistes,11,12,0.8263,120
+mapped pistes,11,13,0.7072,120
+mapped pistes,11,14,0.4471,120
+mapped pistes,11,15,0.1525,120
+mapped pistes,11,16,0.0746,52
+Oi-Qaragai (OSM area),11,6,0.0,27
+Oi-Qaragai (OSM area),11,7,0.0073,120
+Oi-Qaragai (OSM area),11,8,0.3036,120
+Oi-Qaragai (OSM area),11,9,0.706,120
+Oi-Qaragai (OSM area),11,10,0.8572,120
+Oi-Qaragai (OSM area),11,11,0.9251,120
+Oi-Qaragai (OSM area),11,12,0.8978,120
+Oi-Qaragai (OSM area),11,13,0.6973,120
+Oi-Qaragai (OSM area),11,14,0.4898,120
+Oi-Qaragai (OSM area),11,15,0.331,120
+Oi-Qaragai (OSM area),11,16,0.2557,52
+Shymbulak (OSM area),11,6,0.0001,27
+Shymbulak (OSM area),11,7,0.0065,120
+Shymbulak (OSM area),11,8,0.0284,120
+Shymbulak (OSM area),11,9,0.276,120
+Shymbulak (OSM area),11,10,0.6492,120
+Shymbulak (OSM area),11,11,0.8034,120
+Shymbulak (OSM area),11,12,0.8233,120
+Shymbulak (OSM area),11,13,0.7675,120
+Shymbulak (OSM area),11,14,0.4542,120
+Shymbulak (OSM area),11,15,0.0751,120
+Shymbulak (OSM area),11,16,0.0051,52
+all terrain,12,7,0.0212,84
+all terrain,12,8,0.1682,124
+all terrain,12,9,0.4147,124
+all terrain,12,10,0.5803,124
+all terrain,12,11,0.6545,124
+all terrain,12,12,0.6541,124
+all terrain,12,13,0.5802,124
+all terrain,12,14,0.4333,124
+all terrain,12,15,0.2401,124
+all terrain,12,16,0.0865,32
+skiable 15-35 deg,12,7,0.0169,84
+skiable 15-35 deg,12,8,0.1375,124
+skiable 15-35 deg,12,9,0.3823,124
+skiable 15-35 deg,12,10,0.5633,124
+skiable 15-35 deg,12,11,0.6478,124
+skiable 15-35 deg,12,12,0.6447,124
+skiable 15-35 deg,12,13,0.5584,124
+skiable 15-35 deg,12,14,0.4102,124
+skiable 15-35 deg,12,15,0.2297,124
+skiable 15-35 deg,12,16,0.0878,32
+existing lift corridors,12,7,0.0027,84
+existing lift corridors,12,8,0.1121,124
+existing lift corridors,12,9,0.3065,124
+existing lift corridors,12,10,0.5602,124
+existing lift corridors,12,11,0.6828,124
+existing lift corridors,12,12,0.6883,124
+existing lift corridors,12,13,0.5849,124
+existing lift corridors,12,14,0.3428,124
+existing lift corridors,12,15,0.1761,124
+existing lift corridors,12,16,0.0928,32
+mapped pistes,12,7,0.0,84
+mapped pistes,12,8,0.0164,124
+mapped pistes,12,9,0.1536,124
+mapped pistes,12,10,0.4011,124
+mapped pistes,12,11,0.6168,124
+mapped pistes,12,12,0.6126,124
+mapped pistes,12,13,0.4987,124
+mapped pistes,12,14,0.2313,124
+mapped pistes,12,15,0.0829,124
+mapped pistes,12,16,0.052,32
+Oi-Qaragai (OSM area),12,7,0.0,84
+Oi-Qaragai (OSM area),12,8,0.0481,124
+Oi-Qaragai (OSM area),12,9,0.429,124
+Oi-Qaragai (OSM area),12,10,0.7292,124
+Oi-Qaragai (OSM area),12,11,0.8207,124
+Oi-Qaragai (OSM area),12,12,0.7796,124
+Oi-Qaragai (OSM area),12,13,0.5645,124
+Oi-Qaragai (OSM area),12,14,0.4049,124
+Oi-Qaragai (OSM area),12,15,0.2759,124
+Oi-Qaragai (OSM area),12,16,0.194,32
+Shymbulak (OSM area),12,7,0.0,84
+Shymbulak (OSM area),12,8,0.0,124
+Shymbulak (OSM area),12,9,0.0274,124
+Shymbulak (OSM area),12,10,0.283,124
+Shymbulak (OSM area),12,11,0.5497,124
+Shymbulak (OSM area),12,12,0.6096,124
+Shymbulak (OSM area),12,13,0.5411,124
+Shymbulak (OSM area),12,14,0.1592,124
+Shymbulak (OSM area),12,15,0.0011,124
+Shymbulak (OSM area),12,16,0.0,32
+all terrain,1,7,0.0197,77
+all terrain,1,8,0.1699,124
+all terrain,1,9,0.4331,124
+all terrain,1,10,0.6137,124
+all terrain,1,11,0.7035,124
+all terrain,1,12,0.7173,124
+all terrain,1,13,0.6624,124
+all terrain,1,14,0.5349,124
+all terrain,1,15,0.3509,124
+all terrain,1,16,0.1634,86
+skiable 15-35 deg,1,7,0.0166,77
+skiable 15-35 deg,1,8,0.1398,124
+skiable 15-35 deg,1,9,0.4023,124
+skiable 15-35 deg,1,10,0.6029,124
+skiable 15-35 deg,1,11,0.7081,124
+skiable 15-35 deg,1,12,0.7217,124
+skiable 15-35 deg,1,13,0.6534,124
+skiable 15-35 deg,1,14,0.5134,124
+skiable 15-35 deg,1,15,0.3353,124
+skiable 15-35 deg,1,16,0.1612,86
+existing lift corridors,1,7,0.0062,77
+existing lift corridors,1,8,0.106,124
+existing lift corridors,1,9,0.332,124
+existing lift corridors,1,10,0.6048,124
+existing lift corridors,1,11,0.7532,124
+existing lift corridors,1,12,0.7837,124
+existing lift corridors,1,13,0.7129,124
+existing lift corridors,1,14,0.5179,124
+existing lift corridors,1,15,0.2515,124
+existing lift corridors,1,16,0.1374,86
+mapped pistes,1,7,0.0,77
+mapped pistes,1,8,0.0165,124
+mapped pistes,1,9,0.1691,124
+mapped pistes,1,10,0.4527,124
+mapped pistes,1,11,0.7089,124
+mapped pistes,1,12,0.7534,124
+mapped pistes,1,13,0.6567,124
+mapped pistes,1,14,0.4433,124
+mapped pistes,1,15,0.1575,124
+mapped pistes,1,16,0.0726,86
+Oi-Qaragai (OSM area),1,7,0.0,77
+Oi-Qaragai (OSM area),1,8,0.0488,124
+Oi-Qaragai (OSM area),1,9,0.4645,124
+Oi-Qaragai (OSM area),1,10,0.759,124
+Oi-Qaragai (OSM area),1,11,0.8602,124
+Oi-Qaragai (OSM area),1,12,0.8747,124
+Oi-Qaragai (OSM area),1,13,0.7065,124
+Oi-Qaragai (OSM area),1,14,0.5052,124
+Oi-Qaragai (OSM area),1,15,0.3424,124
+Oi-Qaragai (OSM area),1,16,0.2457,86
+Shymbulak (OSM area),1,7,0.0002,77
+Shymbulak (OSM area),1,8,0.0016,124
+Shymbulak (OSM area),1,9,0.038,124
+Shymbulak (OSM area),1,10,0.3392,124
+Shymbulak (OSM area),1,11,0.6524,124
+Shymbulak (OSM area),1,12,0.7314,124
+Shymbulak (OSM area),1,13,0.7006,124
+Shymbulak (OSM area),1,14,0.4519,124
+Shymbulak (OSM area),1,15,0.0744,124
+Shymbulak (OSM area),1,16,0.0042,86
+all terrain,2,6,0.0098,16
+all terrain,2,7,0.0882,109
+all terrain,2,8,0.3679,112
+all terrain,2,9,0.629,112
+all terrain,2,10,0.7926,112
+all terrain,2,11,0.8718,112
+all terrain,2,12,0.8835,112
+all terrain,2,13,0.8393,112
+all terrain,2,14,0.7317,112
+all terrain,2,15,0.5627,112
+all terrain,2,16,0.3458,112
+all terrain,2,17,0.1933,33
+skiable 15-35 deg,2,6,0.0085,16
+skiable 15-35 deg,2,7,0.0743,109
+skiable 15-35 deg,2,8,0.336,112
+skiable 15-35 deg,2,9,0.6236,112
+skiable 15-35 deg,2,10,0.8195,112
+skiable 15-35 deg,2,11,0.9094,112
+skiable 15-35 deg,2,12,0.9201,112
+skiable 15-35 deg,2,13,0.8683,112
+skiable 15-35 deg,2,14,0.7365,112
+skiable 15-35 deg,2,15,0.5477,112
+skiable 15-35 deg,2,16,0.3357,112
+skiable 15-35 deg,2,17,0.1965,33
+existing lift corridors,2,6,0.003,16
+existing lift corridors,2,7,0.0616,109
+existing lift corridors,2,8,0.2772,112
+existing lift corridors,2,9,0.6419,112
+existing lift corridors,2,10,0.8571,112
+existing lift corridors,2,11,0.9478,112
+existing lift corridors,2,12,0.9621,112
+existing lift corridors,2,13,0.9249,112
+existing lift corridors,2,14,0.816,112
+existing lift corridors,2,15,0.5732,112
+existing lift corridors,2,16,0.2714,112
+existing lift corridors,2,17,0.155,33
+mapped pistes,2,6,0.003,16
+mapped pistes,2,7,0.0139,109
+mapped pistes,2,8,0.1606,112
+mapped pistes,2,9,0.5623,112
+mapped pistes,2,10,0.8586,112
+mapped pistes,2,11,0.9501,112
+mapped pistes,2,12,0.9628,112
+mapped pistes,2,13,0.9378,112
+mapped pistes,2,14,0.824,112
+mapped pistes,2,15,0.569,112
+mapped pistes,2,16,0.2336,112
+mapped pistes,2,17,0.1003,33
+Oi-Qaragai (OSM area),2,6,0.0,16
+Oi-Qaragai (OSM area),2,7,0.0053,109
+Oi-Qaragai (OSM area),2,8,0.3124,112
+Oi-Qaragai (OSM area),2,9,0.7446,112
+Oi-Qaragai (OSM area),2,10,0.911,112
+Oi-Qaragai (OSM area),2,11,0.9764,112
+Oi-Qaragai (OSM area),2,12,0.987,112
+Oi-Qaragai (OSM area),2,13,0.9477,112
+Oi-Qaragai (OSM area),2,14,0.7444,112
+Oi-Qaragai (OSM area),2,15,0.511,112
+Oi-Qaragai (OSM area),2,16,0.3556,112
+Oi-Qaragai (OSM area),2,17,0.2971,33
+Shymbulak (OSM area),2,6,0.0141,16
+Shymbulak (OSM area),2,7,0.0357,109
+Shymbulak (OSM area),2,8,0.1361,112
+Shymbulak (OSM area),2,9,0.5331,112
+Shymbulak (OSM area),2,10,0.8521,112
+Shymbulak (OSM area),2,11,0.9442,112
+Shymbulak (OSM area),2,12,0.9584,112
+Shymbulak (OSM area),2,13,0.952,112
+Shymbulak (OSM area),2,14,0.8988,112
+Shymbulak (OSM area),2,15,0.6147,112
+Shymbulak (OSM area),2,16,0.1843,112
+Shymbulak (OSM area),2,17,0.0271,33
+all terrain,3,5,0.0163,8
+all terrain,3,6,0.096,104
+all terrain,3,7,0.3653,124
+all terrain,3,8,0.6624,124
+all terrain,3,9,0.8672,124
+all terrain,3,10,0.959,124
+all terrain,3,11,0.981,124
+all terrain,3,12,0.9825,124
+all terrain,3,13,0.9672,124
+all terrain,3,14,0.9001,124
+all terrain,3,15,0.7548,124
+all terrain,3,16,0.566,124
+all terrain,3,17,0.3433,112
+all terrain,3,18,0.2184,6
+skiable 15-35 deg,3,5,0.0155,8
+skiable 15-35 deg,3,6,0.0856,104
+skiable 15-35 deg,3,7,0.3386,124
+skiable 15-35 deg,3,8,0.6653,124
+skiable 15-35 deg,3,9,0.9028,124
+skiable 15-35 deg,3,10,0.984,124
+skiable 15-35 deg,3,11,0.9954,124
+skiable 15-35 deg,3,12,0.9963,124
+skiable 15-35 deg,3,13,0.9894,124
+skiable 15-35 deg,3,14,0.932,124
+skiable 15-35 deg,3,15,0.7632,124
+skiable 15-35 deg,3,16,0.5537,124
+skiable 15-35 deg,3,17,0.3412,112
+skiable 15-35 deg,3,18,0.2291,6
+existing lift corridors,3,5,0.0214,8
+existing lift corridors,3,6,0.0927,104
+existing lift corridors,3,7,0.2858,124
+existing lift corridors,3,8,0.715,124
+existing lift corridors,3,9,0.9249,124
+existing lift corridors,3,10,0.9884,124
+existing lift corridors,3,11,0.9992,124
+existing lift corridors,3,12,0.9995,124
+existing lift corridors,3,13,0.995,124
+existing lift corridors,3,14,0.9576,124
+existing lift corridors,3,15,0.8473,124
+existing lift corridors,3,16,0.5938,124
+existing lift corridors,3,17,0.2924,112
+existing lift corridors,3,18,0.1569,6
+mapped pistes,3,5,0.0271,8
+mapped pistes,3,6,0.0844,104
+mapped pistes,3,7,0.2542,124
+mapped pistes,3,8,0.7497,124
+mapped pistes,3,9,0.9661,124
+mapped pistes,3,10,0.9979,124
+mapped pistes,3,11,0.9997,124
+mapped pistes,3,12,0.9998,124
+mapped pistes,3,13,0.9989,124
+mapped pistes,3,14,0.9787,124
+mapped pistes,3,15,0.8599,124
+mapped pistes,3,16,0.6256,124
+mapped pistes,3,17,0.2958,112
+mapped pistes,3,18,0.1234,6
+Oi-Qaragai (OSM area),3,5,0.0,8
+Oi-Qaragai (OSM area),3,6,0.0042,104
+Oi-Qaragai (OSM area),3,7,0.2756,124
+Oi-Qaragai (OSM area),3,8,0.751,124
+Oi-Qaragai (OSM area),3,9,0.9514,124
+Oi-Qaragai (OSM area),3,10,0.9987,124
+Oi-Qaragai (OSM area),3,11,0.9999,124
+Oi-Qaragai (OSM area),3,12,1.0,124
+Oi-Qaragai (OSM area),3,13,0.9995,124
+Oi-Qaragai (OSM area),3,14,0.9575,124
+Oi-Qaragai (OSM area),3,15,0.7269,124
+Oi-Qaragai (OSM area),3,16,0.4892,124
+Oi-Qaragai (OSM area),3,17,0.3749,112
+Oi-Qaragai (OSM area),3,18,0.2659,6
+Shymbulak (OSM area),3,5,0.0424,8
+Shymbulak (OSM area),3,6,0.14,104
+Shymbulak (OSM area),3,7,0.2446,124
+Shymbulak (OSM area),3,8,0.7795,124
+Shymbulak (OSM area),3,9,0.9825,124
+Shymbulak (OSM area),3,10,0.9986,124
+Shymbulak (OSM area),3,11,0.9996,124
+Shymbulak (OSM area),3,12,0.9999,124
+Shymbulak (OSM area),3,13,0.9996,124
+Shymbulak (OSM area),3,14,0.9966,124
+Shymbulak (OSM area),3,15,0.9533,124
+Shymbulak (OSM area),3,16,0.7009,124
+Shymbulak (OSM area),3,17,0.2659,112
+Shymbulak (OSM area),3,18,0.0728,6
+all terrain,4,4,0.0343,2
+all terrain,4,5,0.1076,93
+all terrain,4,6,0.3657,120
+all terrain,4,7,0.664,120
+all terrain,4,8,0.889,120
+all terrain,4,9,0.9818,120
+all terrain,4,10,0.9961,120
+all terrain,4,11,0.9986,120
+all terrain,4,12,0.9987,120
+all terrain,4,13,0.9961,120
+all terrain,4,14,0.9782,120
+all terrain,4,15,0.8862,120
+all terrain,4,16,0.7231,120
+all terrain,4,17,0.5341,120
+all terrain,4,18,0.3537,63
+skiable 15-35 deg,4,4,0.0371,2
+skiable 15-35 deg,4,5,0.1015,93
+skiable 15-35 deg,4,6,0.3413,120
+skiable 15-35 deg,4,7,0.6668,120
+skiable 15-35 deg,4,8,0.9257,120
+skiable 15-35 deg,4,9,0.9953,120
+skiable 15-35 deg,4,10,0.9995,120
+skiable 15-35 deg,4,11,1.0,120
+skiable 15-35 deg,4,12,1.0,120
+skiable 15-35 deg,4,13,0.9997,120
+skiable 15-35 deg,4,14,0.9941,120
+skiable 15-35 deg,4,15,0.914,120
+skiable 15-35 deg,4,16,0.7229,120
+skiable 15-35 deg,4,17,0.5243,120
+skiable 15-35 deg,4,18,0.355,63
+existing lift corridors,4,4,0.0243,2
+existing lift corridors,4,5,0.0961,93
+existing lift corridors,4,6,0.2888,120
+existing lift corridors,4,7,0.678,120
+existing lift corridors,4,8,0.935,120
+existing lift corridors,4,9,0.9939,120
+existing lift corridors,4,10,1.0,120
+existing lift corridors,4,11,1.0,120
+existing lift corridors,4,12,1.0,120
+existing lift corridors,4,13,1.0,120
+existing lift corridors,4,14,0.9936,120
+existing lift corridors,4,15,0.9463,120
+existing lift corridors,4,16,0.8174,120
+existing lift corridors,4,17,0.5766,120
+existing lift corridors,4,18,0.3469,63
+mapped pistes,4,4,0.0003,2
+mapped pistes,4,5,0.0888,93
+mapped pistes,4,6,0.2686,120
+mapped pistes,4,7,0.6918,120
+mapped pistes,4,8,0.9693,120
+mapped pistes,4,9,0.9989,120
+mapped pistes,4,10,1.0,120
+mapped pistes,4,11,1.0,120
+mapped pistes,4,12,1.0,120
+mapped pistes,4,13,1.0,120
+mapped pistes,4,14,0.9994,120
+mapped pistes,4,15,0.9645,120
+mapped pistes,4,16,0.8269,120
+mapped pistes,4,17,0.644,120
+mapped pistes,4,18,0.4499,63
+Oi-Qaragai (OSM area),4,4,0.0,2
+Oi-Qaragai (OSM area),4,5,0.0162,93
+Oi-Qaragai (OSM area),4,6,0.2754,120
+Oi-Qaragai (OSM area),4,7,0.7544,120
+Oi-Qaragai (OSM area),4,8,0.9628,120
+Oi-Qaragai (OSM area),4,9,1.0,120
+Oi-Qaragai (OSM area),4,10,1.0,120
+Oi-Qaragai (OSM area),4,11,1.0,120
+Oi-Qaragai (OSM area),4,12,1.0,120
+Oi-Qaragai (OSM area),4,13,1.0,120
+Oi-Qaragai (OSM area),4,14,0.9982,120
+Oi-Qaragai (OSM area),4,15,0.9116,120
+Oi-Qaragai (OSM area),4,16,0.6451,120
+Oi-Qaragai (OSM area),4,17,0.4645,120
+Oi-Qaragai (OSM area),4,18,0.3209,63
+Shymbulak (OSM area),4,4,0.0006,2
+Shymbulak (OSM area),4,5,0.1093,93
+Shymbulak (OSM area),4,6,0.2304,120
+Shymbulak (OSM area),4,7,0.6474,120
+Shymbulak (OSM area),4,8,0.9852,120
+Shymbulak (OSM area),4,9,0.9999,120
+Shymbulak (OSM area),4,10,1.0,120
+Shymbulak (OSM area),4,11,1.0,120
+Shymbulak (OSM area),4,12,1.0,120
+Shymbulak (OSM area),4,13,1.0,120
+Shymbulak (OSM area),4,14,1.0,120
+Shymbulak (OSM area),4,15,0.997,120
+Shymbulak (OSM area),4,16,0.9393,120
+Shymbulak (OSM area),4,17,0.7184,120
+Shymbulak (OSM area),4,18,0.4746,63

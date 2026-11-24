@@ -1,0 +1,59 @@
+{
+ "run_date": "2026-11-19",
+ "area": "cluster",
+ "bbox": [
+  76.95,
+  43.07,
+  77.2,
+  43.24
+ ],
+ "area_km2": 404.1,
+ "derivation": "Chosen to contain every place the government statements name for the cluster (Shymbulak, Kimasar, Butakovka, Pioneer, Oi-Qaragai) plus Kok Zhailau and Kumbel. No official project boundary has been published; this rectangle is derived, not given.",
+ "osm": {
+  "lifts_over_150m": 21,
+  "lift_km": 21.05,
+  "pistes": 32,
+  "licence": "ODbL, OpenStreetMap contributors"
+ },
+ "sentinel2_scenes": 115,
+ "landsat_scenes": 77,
+ "sun_hours_year": 2027,
+ "zones": [
+  "all terrain",
+  "skiable 15-35 deg",
+  "existing lift corridors",
+  "mapped pistes",
+  "Oi-Qaragai (OSM area)",
+  "Shymbulak (OSM area)"
+ ],
+ "cross_validation": {
+  "landsat_internal_r": 0.8794,
+  "landsat_vs_sentinel2_r_scene_aggregate": 0.8201,
+  "landsat_vs_sentinel2_r_pixel_matched": 0.9694,
+  "landsat_vs_sentinel2_bias_pixel_matched": 0.0965,
+  "dem": [
+   {
+    "dem": "NASADEM",
+    "n_valid_pixels": 449018,
+    "elev_mean_difference_m": 0.26,
+    "elev_median_difference_m": -0.09,
+    "elev_std_difference_m": 7.4,
+    "elev_p95_abs_difference_m": 13.97,
+    "slope_mean_difference_deg": -1.379,
+    "slope_std_difference_deg": 3.738,
+    "correlation": 0.999952
+   },
+   {
+    "dem": "ALOS AW3D30",
+    "n_valid_pixels": 449018,
+    "elev_mean_difference_m": 1.92,
+    "elev_median_difference_m": 1.59,
+    "elev_std_difference_m": 7.15,
+    "elev_p95_abs_difference_m": 12.68,
+    "slope_mean_difference_deg": 0.432,
+    "slope_std_difference_deg": 3.106,
+    "correlation": 0.999956
+   }
+  ]
+ }
+}

@@ -1,0 +1,7 @@
+month,month_name,days,median_all_terrain_kwh_m2,median_north_2200_2300,median_south_2200_2300,south_minus_north,south_over_north_ratio
+2027-01,January,31,34.8,10.9,144.5,133.7,13.32
+2027-02,February,28,71.5,31.5,177.5,146.0,5.63
+2027-03,March,31,142.8,96.4,250.6,154.2,2.6
+2027-04,April,30,203.8,165.4,278.1,112.7,1.68
+2027-11,November,30,45.6,14.2,154.1,139.9,10.89
+2027-12,December,31,22.4,8.5,126.6,118.0,14.84

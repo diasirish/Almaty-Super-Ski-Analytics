@@ -1,0 +1,7 @@
+year,month,month_name,days,median_sun_hours,mean_sun_hours,p95_sun_hours,max_sun_hours,median_hours_per_day,max_hours_per_day,median_h__all terrain,median_h__skiable 15-35 deg,median_h__existing lift corridors,median_h__mapped pistes,median_h__Oi-Qaragai (OSM area),median_h__Shymbulak (OSM area)
+2027,11,November,30,161.5,145.9,253.0,289.8,5.38,9.66,161.5,159.2,146.0,135.2,158.8,136.2
+2027,12,December,31,129.5,116.6,237.0,277.0,4.18,8.94,129.5,124.2,110.2,90.4,123.2,85.2
+2027,1,January,31,149.0,133.7,249.8,288.8,4.81,9.31,149.0,145.2,130.6,115.0,143.8,113.5
+2027,2,February,28,185.2,172.7,259.5,291.5,6.62,10.41,185.2,185.2,180.8,175.2,183.2,178.2
+2027,3,March,31,266.8,260.6,335.0,367.2,8.6,11.85,266.8,269.8,271.8,276.0,264.5,279.2
+2027,4,April,30,311.0,308.4,374.0,399.5,10.37,13.32,311.0,314.0,318.2,323.5,312.8,323.8

@@ -1,0 +1,3 @@
+dem,n_valid_pixels,elev_mean_difference_m,elev_median_difference_m,elev_std_difference_m,elev_p95_abs_difference_m,slope_mean_difference_deg,slope_std_difference_deg,correlation
+NASADEM,449018,0.26,-0.09,7.4,13.97,-1.379,3.738,0.999952
+ALOS AW3D30,449018,1.92,1.59,7.15,12.68,0.432,3.106,0.999956

@@ -1,0 +1,18 @@
+name,osm_kind,subkind,lon,lat,ele_m
+Pioneer,peak,peak,77.10478,43.08355,4031
+Shymbulak,peak,peak,77.11578,43.12434,3450
+Qumbeltau,peak,peak,77.04056,43.0849,3618
+Almaty,peak,peak,77.12012,43.08605,4330.9
+Qumbel,peak,peak,77.0313,43.11934,3221
+Medeu,peak,peak,77.09861,43.14929,2861
+Kokterek,peak,peak,77.01373,43.15189,2174
+Pioneer,saddle,saddle,77.10215,43.08306,3863
+Butakovskiy,saddle,saddle,77.1308,43.15642,2880
+Kimasar,saddle,saddle,77.08281,43.17116,2080
+Small Talgar,saddle,saddle,77.13901,43.12136,2760
+Talgar,saddle,saddle,77.11122,43.11309,3200
+Oi-Qaragai,place,allotments,77.14871,43.2231,1800
+Medeu,place,suburb,77.05757,43.15944,
+Oi-Qaragai,area,winter_sports,77.1431,43.22878,
+Shymbulak,area,winter_sports,77.09312,43.12275,
+Left Talgar,station,station,77.11075,43.11205,3200

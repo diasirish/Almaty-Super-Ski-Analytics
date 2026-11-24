@@ -1,0 +1,37 @@
+zone,month,month_name,peak_hour,peak_sunlit_fraction,hours_above_50pct_sunlit,window_start_hour,window_end_hour
+all terrain,11,November,11,0.772,6,9,15
+all terrain,12,December,11,0.654,4,10,14
+all terrain,1,January,12,0.717,5,10,15
+all terrain,2,February,12,0.883,7,9,16
+all terrain,3,March,12,0.983,9,8,17
+all terrain,4,April,12,0.999,11,7,18
+skiable 15-35 deg,11,November,11,0.791,6,9,15
+skiable 15-35 deg,12,December,11,0.648,4,10,14
+skiable 15-35 deg,1,January,12,0.722,5,10,15
+skiable 15-35 deg,2,February,12,0.92,7,9,16
+skiable 15-35 deg,3,March,12,0.996,9,8,17
+skiable 15-35 deg,4,April,11,1.0,11,7,18
+existing lift corridors,11,November,11,0.849,6,9,15
+existing lift corridors,12,December,12,0.688,4,10,14
+existing lift corridors,1,January,12,0.784,5,10,15
+existing lift corridors,2,February,12,0.962,7,9,16
+existing lift corridors,3,March,12,1.0,9,8,17
+existing lift corridors,4,April,10,1.0,11,7,18
+mapped pistes,11,November,11,0.834,4,10,14
+mapped pistes,12,December,11,0.617,2,11,13
+mapped pistes,1,January,12,0.753,3,11,14
+mapped pistes,2,February,12,0.963,7,9,16
+mapped pistes,3,March,12,1.0,9,8,17
+mapped pistes,4,April,10,1.0,11,7,18
+Oi-Qaragai (OSM area),11,November,11,0.925,5,9,14
+Oi-Qaragai (OSM area),12,December,11,0.821,4,10,14
+Oi-Qaragai (OSM area),1,January,12,0.875,5,10,15
+Oi-Qaragai (OSM area),2,February,12,0.987,7,9,16
+Oi-Qaragai (OSM area),3,March,12,1.0,8,8,16
+Oi-Qaragai (OSM area),4,April,9,1.0,10,7,17
+Shymbulak (OSM area),11,November,12,0.823,4,10,14
+Shymbulak (OSM area),12,December,12,0.61,3,11,14
+Shymbulak (OSM area),1,January,12,0.731,3,11,14
+Shymbulak (OSM area),2,February,12,0.958,7,9,16
+Shymbulak (OSM area),3,March,12,1.0,9,8,17
+Shymbulak (OSM area),4,April,10,1.0,11,7,18

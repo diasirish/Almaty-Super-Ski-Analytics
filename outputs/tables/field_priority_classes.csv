@@ -1,0 +1,6 @@
+class,label,pixels,area_km2
+0,outside the 15-35 deg slope window,50897,20.359
+1,low exposure and frequent snow,19180,7.672
+2,high exposure and infrequent snow,15708,6.283
+3,other skiable terrain,85454,34.182
+4,"skiable, insufficient observation coverage",1376,0.55

@@ -1,0 +1,117 @@
+{
+ "type": "FeatureCollection",
+ "name": "masterplan_control_points",
+ "crs": {
+  "type": "name",
+  "properties": {
+   "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+  }
+ },
+ "features": [
+  {
+   "type": "Feature",
+   "properties": {
+    "label": "Medeu base / gondola foot",
+    "ele_m": 1691,
+    "source": "label on the KTD general plan, located in OpenStreetMap"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.05757,
+     43.15944
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "label": "Kokgailau plateau 1951 m (base village)",
+    "ele_m": 1951,
+    "source": "label on the KTD general plan, located in OpenStreetMap"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.00433,
+     43.14239
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "label": "Three Brothers Rocks 2860 m",
+    "ele_m": 2860,
+    "source": "label on the KTD general plan, located in OpenStreetMap"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.01337,
+     43.12687
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "label": "Mountain Kumbel 3250 m",
+    "ele_m": 3221,
+    "source": "label on the KTD general plan, located in OpenStreetMap"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.0313,
+     43.11934
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "label": "Kumbeltau range 3500 m",
+    "ele_m": 3618,
+    "source": "label on the KTD general plan, located in OpenStreetMap"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.04056,
+     43.0849
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "label": "Kimasar saddle 2080 m",
+    "ele_m": 2080,
+    "source": "label on the KTD general plan, located in OpenStreetMap"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.08281,
+     43.17116
+    ]
+   }
+  },
+  {
+   "type": "Feature",
+   "properties": {
+    "label": "Shymbulak (existing resort)",
+    "ele_m": 2260,
+    "source": "label on the KTD general plan, located in OpenStreetMap"
+   },
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     77.09312,
+     43.12275
+    ]
+   }
+  }
+ ]
+}

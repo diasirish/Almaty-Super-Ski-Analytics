@@ -1,0 +1,145 @@
+{
+ "grid": {
+  "crs": "EPSG:32643",
+  "res_m": 30.0,
+  "shape": [
+   263,
+   292
+  ],
+  "bounds": [
+   659280.0,
+   4774320.0,
+   668040.0,
+   4782210.0
+  ],
+  "area_km2": 69.116
+ },
+ "aoi_bbox_wgs84": [
+  76.96,
+  43.105,
+  77.065,
+  43.174
+ ],
+ "wgs84_rect_area_km2": 65.483,
+ "dem": {
+  "source": "Copernicus DEM GLO-30 (AWS Open Data)",
+  "tiles": [
+   "Copernicus_DSM_COG_10_N43_00_E076_00_DEM",
+   "Copernicus_DSM_COG_10_N43_00_E077_00_DEM"
+  ],
+  "vertical_datum": "EGM2008 geoid",
+  "resampling": "bilinear",
+  "target_crs": "EPSG:32643",
+  "target_res_m": 30.0
+ },
+ "insolation": {
+  "dec": {
+   "start": "2022-12-01",
+   "end": "2022-12-31",
+   "step_min": 30,
+   "daylight_steps": 540,
+   "albedo": 0.5,
+   "linke_mean": 1.594,
+   "altitude_levels": [
+    1270.6,
+    1611.9,
+    1953.2,
+    2294.4,
+    2635.7,
+    2977.0,
+    3318.3
+   ],
+   "model": "pvlib Ineichen-Perez clear sky",
+   "centroid_lat": 43.13943,
+   "centroid_lon": 77.01242
+  },
+  "mar": {
+   "start": "2023-03-01",
+   "end": "2023-03-31",
+   "step_min": 30,
+   "daylight_steps": 725,
+   "albedo": 0.5,
+   "linke_mean": 1.6,
+   "altitude_levels": [
+    1270.6,
+    1611.9,
+    1953.2,
+    2294.4,
+    2635.7,
+    2977.0,
+    3318.3
+   ],
+   "model": "pvlib Ineichen-Perez clear sky",
+   "centroid_lat": 43.13943,
+   "centroid_lon": 77.01242
+  },
+  "nov_dec": {
+   "start": "2022-11-01",
+   "end": "2022-12-31",
+   "step_min": 30,
+   "daylight_steps": 1114,
+   "albedo": 0.5,
+   "linke_mean": 1.617,
+   "altitude_levels": [
+    1270.6,
+    1611.9,
+    1953.2,
+    2294.4,
+    2635.7,
+    2977.0,
+    3318.3
+   ],
+   "model": "pvlib Ineichen-Perez clear sky",
+   "centroid_lat": 43.13943,
+   "centroid_lon": 77.01242
+  },
+  "jan_feb": {
+   "start": "2023-01-01",
+   "end": "2023-02-28",
+   "step_min": 30,
+   "daylight_steps": 1149,
+   "albedo": 0.5,
+   "linke_mean": 1.556,
+   "altitude_levels": [
+    1270.6,
+    1611.9,
+    1953.2,
+    2294.4,
+    2635.7,
+    2977.0,
+    3318.3
+   ],
+   "model": "pvlib Ineichen-Perez clear sky",
+   "centroid_lat": 43.13943,
+   "centroid_lon": 77.01242
+  },
+  "mar_apr": {
+   "start": "2023-03-01",
+   "end": "2023-04-30",
+   "step_min": 30,
+   "daylight_steps": 1518,
+   "albedo": 0.5,
+   "linke_mean": 1.641,
+   "altitude_levels": [
+    1270.6,
+    1611.9,
+    1953.2,
+    2294.4,
+    2635.7,
+    2977.0,
+    3318.3
+   ],
+   "model": "pvlib Ineichen-Perez clear sky",
+   "centroid_lat": 43.13943,
+   "centroid_lon": 77.01242
+  }
+ },
+ "horizon": {
+  "n_azimuth": 36,
+  "buffer_m": 6000.0
+ },
+ "slope_window_deg": [
+  15.0,
+  35.0
+ ]
+}

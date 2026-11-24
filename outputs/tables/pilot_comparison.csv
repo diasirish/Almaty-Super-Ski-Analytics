@@ -1,0 +1,7 @@
+quantity,pilot,this_run,agrees
+area of the study rectangle (km²),69.1,69.12,yes
+"candidate dates, Mar–Apr 2023",12,13,within one date
+"coverage at ≥4 usable obs, Mar–Apr 2023",~74%,85%,higher here
+"2200–2300 m, low-insolation quartile",~94%,78%,lower here
+"2200–2300 m, high-insolation quartile",~23%,30%,close
+seasons processed,1 of 4 complete (41 of 112 scenes cached),4 of 4 complete (114 historical scenes),improved

@@ -1,0 +1,22 @@
+# Pinned environment for the Kok Zhailau ski terrain analytics release.
+# Python 3.12.10
+jupytext==1.19.6
+matplotlib==3.11.2
+nbclient==0.11.0
+nbconvert==7.17.2
+notebook==7.6.5
+numpy==2.5.5
+pandas==3.1.1
+planetary-computer==1.0.0
+pillow==13.0.0
+pvlib==0.16.1
+pypdf==7.1.1
+pyproj==3.8.0
+pystac-client==0.9.1
+rasterio==1.5.2
+reportlab==5.1.0
+requests==2.34.2
+scipy==1.18.1
+shapely==2.2.0
+tqdm==4.70.1
+pymupdf==2.1
