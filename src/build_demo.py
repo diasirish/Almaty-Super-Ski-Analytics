@@ -248,8 +248,9 @@ def build():
                 f"differing pixels out of {int(reuse.pixels_compared):,}.",
              M, y, 420, size=10.0, leading=14.6)
     y -= 8
-    y = para(c, f"Weather is the same story at coarser grain: ERA5-Land is ~9 km and "
-                f"ERA5 ~31 km against a 6 km window spanning 1,867 m of relief, so "
+    y = para(c, f"Weather is the same story at coarser grain: one ERA5-Land cell is "
+                f"~9 km across and one ERA5 cell ~31 km, against an operating area of "
+                f"{oa.area_km2:.1f} km\u00b2 spanning {D.vertical_m:,.0f} m of relief \u2014 so "
                 f"reanalysis here is a regional season descriptor, not a site record — "
                 f"and ERA5-Land returns no precipitation at this point, so snowfall is "
                 f"labelled as ERA5 rather than silently summed to zero. The published "
