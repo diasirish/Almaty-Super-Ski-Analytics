@@ -21,6 +21,8 @@ Release date: 19 November 2026
 
 **→ [4-slide demo for engineering and GIS teams (PDF)](almaty-superski-gis-demo.pdf)** · **[6-slide brief (PDF)](kok-zhailau-brief.pdf)**
 
+*Coming back to this after a break, or reading it for the first time? **[ORIENTATION.md](ORIENTATION.md)** is the 30-minute route in: what is current, what was superseded, and every assumption in one table.*
+
 ---
 
 ## Five measured results across the cluster
@@ -93,7 +95,7 @@ coordinate, any elevation, and any capacity in persons per hour.
 
 The release originally analysed a 69 km² rectangle the author chose around the
 plateau. Measured against the control points on the operator's general plan, that
-rectangle was in the wrong place: **37 %** of it lay below 1,900 m — the elevation
+rectangle was in the wrong place: **38 %** of it lay below 1,900 m — the elevation
 of the base village, where nothing is planned — and **none** of it reached above
 3,400 m, where the plan puts its top station. It ended 2.6 km north of the
 Kumbeltau range and so excluded the entire high half of the project.
@@ -103,9 +105,11 @@ so **nothing is traced from it**. What it carries is named features. Seven of th
 — Medeu, the Kokgailau plateau at 1,951 m, Three Brothers Rocks, Mountain Kumbel
 at 3,250 m, the Kumbeltau range, Kimasar saddle and Shymbulak — were located
 independently in OpenStreetMap, and the **125 km² `superski` compute rectangle**
-is their envelope plus a 1.5 km working buffer. It holds **8,847 ha** in the
-plan's 1,900–3,400 m operating band against 4,117 ha in the rectangle it replaced,
-while adding almost no new ground below the village. ([extent review](docs/extent_review.png))
+is their envelope plus a 1.5 km working buffer. It holds **9,187 ha** in the
+plan's 1,900–3,400 m operating band against 4,314 ha in the rectangle it replaced,
+while the ground below the village grows only from 2,598 to 2,810 ha, and it adds
+537 ha above 3,400 m where the old rectangle had none. Notebook 06 §1 recomputes
+this table. ([extent review](docs/extent_review.png))
 
 A rectangle is still a blunt instrument, so the **reporting** boundary is a
 polygon: 24 vertices, hand-digitised over satellite imagery in Google Earth and
@@ -239,12 +243,17 @@ matched the sliced arrays on **0 differing pixels out of 104,895**.
 
 ```
 README.md                  this file
+ORIENTATION.md             the route back in: what is current, what was superseded,
+                           every assumption in one table, and what was never done
 METHODS.md                 sources, formulas, masks, thresholds, validation, limits
 kok-zhailau-brief.pdf      6-slide brief
 almaty-superski-gis-demo.pdf  4-slide demo: operating area, validation, handover
 notebooks/                 01 terrain & insolation · 02 snow · 03 planning & 2027
+                             (01-03 run on the SUPERSEDED 69 km² rectangle)
                            04 cluster: lifts, radiation hours, timing, cross-checks
                            05 project scale, three-area comparison, DEM validation
+                           06 the operating boundary: why the area moved, and
+                              what is inside it  <- start here
 src/                       the analysis library the notebooks call
   operating_area.py          reads the boundary, masks any grid, carries provenance
   pipeline_operating_area.py one command to rebuild everything the boundary decides
@@ -253,7 +262,7 @@ qgis/                      layer pack to redraw the boundary: hillshade, slope,
 outputs/geotiff/           47 GeoTIFFs + metadata JSON          (superseded 69 km²)
 outputs/cluster/           24 GeoTIFFs, 9 figures, 15 tables    (cluster 404 km²)
 outputs/kz_project/        11 GeoTIFFs, 3 figures, 20 tables    (project window 42 km²)
-outputs/superski/          1 figure, 8 tables                   (operating boundary)
+outputs/superski/          2 figures, 9 tables                  (operating boundary)
 outputs/png/               15 maps and charts
 outputs/tables/            20 CSVs
 docs/                      the extent review, and the published outlooks with URLs
@@ -283,7 +292,7 @@ pip install -r requirements.txt
 ./run_all.sh
 ```
 
-`run_all.sh` builds four study areas and executes the five notebooks in order.
+`run_all.sh` builds four study areas and executes the six notebooks in order.
 Pick an area for any script with `KZ_AREA=` and one of `superski` (the operating
 area), `cluster`, `kz_project` or `kok_zhailau`; each writes to its own output
 subtree, so they never collide. Order matters once: `cluster` must be built before

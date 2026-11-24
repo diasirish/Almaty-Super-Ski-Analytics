@@ -26,19 +26,20 @@ echo "== 2/6  sunshine hours =="
 (cd src && KZ_AREA=superski   python pipeline_sun.py 2027)
 (cd src && KZ_AREA=kz_project python pipeline_sun.py 2027)
 
-echo "== 3/6  notebooks =="
+echo "== 3/6  the drawn operating boundary =="
+(cd src && KZ_AREA=superski python pipeline_operating_area.py)
+
+echo "== 4/6  notebooks =="
 for nb in 01_dem_terrain_and_insolation \
           02_sentinel2_snow_persistence \
           03_resort_planning_insights \
           04_cluster_radiation_and_timing \
-          05_project_scale_and_validation; do
+          05_project_scale_and_validation \
+          06_operating_boundary; do
   echo "   executing $nb"
   jupyter nbconvert --to notebook --execute --inplace \
     --ExecutePreprocessor.timeout=5400 "notebooks/$nb.ipynb"
 done
-
-echo "== 4/6  the drawn operating boundary =="
-(cd src && KZ_AREA=superski python pipeline_operating_area.py)
 
 echo "== 5/6  PDFs =="
 python src/build_brief.py

@@ -811,12 +811,16 @@ The `superski` rectangle is the envelope of those points plus a 1.5 km working
 buffer: 76.955–77.095° E, 43.078–43.172° N, 125 km², 389 × 358 at 30 m.
 
 The rectangle it replaces failed three tests against the same control points.
-Kumbeltau (3,618 m), Shymbulak and the Kimasar saddle all fell outside it; **37.1 %**
-of it lay below 1,900 m, the elevation of the base village on the plan; and
-**0 ha** of it reached above 3,400 m, where the plan puts a top station. In the
-plan's 1,900–3,400 m operating band the old rectangle held 4,117 ha against
-**8,847 ha** in the new one, while the ground below the village grew only from
-2,431 to 2,592 ha. The replacement adds relevant terrain, not margin.
+Kumbeltau (3,618 m), Shymbulak and the Kimasar saddle all fell outside it — three
+of the seven control points; **37.6 %** of it lay below 1,900 m, the elevation of
+the base village on the plan; and **0 ha** of it reached above 3,400 m, where the
+plan puts a top station. In the plan's 1,900–3,400 m operating band the old
+rectangle held 4,314 ha against **9,187 ha** in the new one, while the ground
+below the village grew only from 2,598 to 2,810 ha, and 537 ha appeared above
+3,400 m where there had been none. The replacement adds relevant terrain, not
+margin. Notebook 06 section 1 recomputes this on each area's own grid; earlier
+drafts of this section quoted a coarser estimate taken by lon/lat subsetting the
+cluster grid, and those figures are corrected here.
 
 Horizon sampling was raised to **72 azimuths** and sunshine duration to a
 **10-minute** step for this area, affordable because it is a third of the
