@@ -31,11 +31,11 @@ Do these in order. Nothing here needs the pipeline to be re-run.
 | 1 | `almaty-superski-gis-demo.pdf` | 4 slides, the whole argument | 5 min |
 | 2 | `README.md`, "Five measured results" + findings 6–12 | every conclusion, with its number | 10 min |
 | 3 | **`notebooks/06_operating_boundary.ipynb`** | the study area and the two rectangles it replaced; renders on GitHub | 10 min |
-| 4 | `METHODS.md` §31 and §33 | **what the project withdrew about itself** | 5 min |
+| 4 | `METHODS.md` §9 and §18 | the two published figures that disagree, and what the study cannot tell you | 5 min |
 
-If you read only two things, read those two sections. They are the list of claims
-earlier versions of this project made and later retracted, and the fastest way to
-know which of your own memories of this work are out of date.
+If you read only one thing after the demo, read `METHODS.md` §18. It is the list
+of questions this work does **not** answer, with the measurement each one needs —
+the fastest way to avoid quoting a number for something it was never measuring.
 
 ---
 
@@ -71,7 +71,7 @@ Two rectangles were retired on 24 November 2026 and are gone from `config.py`:
 the first release's 69 km² box around the plateau, and the second's 125 km²
 envelope of the general-plan control points. Both reached about 3 km north of the
 drawn boundary, over the dacha belt below 1,775 m, and only 14 % of the second
-one was the site. Their outputs are deleted; notebook 06 §1 and `METHODS.md` §33
+one was the site. Their outputs are deleted; notebook 06 §1 and `METHODS.md` §21
 keep the record of why.
 
 Deleted with them: `src/footprint.py` and the two synthetic 1,022 ha footprints
@@ -107,7 +107,7 @@ and each lives in `src/config.py`.
 the operator's general plan says **16 lifts** and **60.9 %** green and blue (its
 own 70 % is *snowmaking*); press reporting of the April 2026 statement said
 **17 lifts** and "about 70 %". Both are in `config.py`, both are reported, and
-every table names which one it used. `METHODS.md` §28.
+every table names which one it used. `METHODS.md` §9.
 
 ---
 
@@ -115,11 +115,11 @@ every table names which one it used. `METHODS.md` §28.
 
 ```
 README.md          the results, written for a reader who will not run anything
-METHODS.md         every threshold, source, formula and limit.
-                     Parts I–III = the original study; §19–23 are withdrawn
-                     Part IV §28–32 = the first extent correction
-                     Part V §33–34 = the narrowing to the polygon, and what
-                       it deleted
+METHODS.md         every threshold, source, formula and limit, for the
+                   current study area only. 21 sections: §2 the boundary and
+                   the window, §3–7 how each layer is built, §8–12 what is
+                   measured and against what, §13–17 the outlook and the
+                   validation, §18 what it cannot tell you
 ORIENTATION.md     this file
 qgis/              the boundary, plus a layer pack and a one-paste QGIS loader
                      operating_area.geojson   <- the boundary. One file.
@@ -199,8 +199,8 @@ Worth re-reading before quoting any of it to someone else.
 * Nothing addresses protected-area status. The site lies against Ile-Alatau
   National Park and no protected-area geometry is carried.
 
-`METHODS.md` §8 and §32 list what would have to be measured on the ground, and
-why orbit cannot supply it.
+`METHODS.md` §18 lists what would have to be measured on the ground, and why
+orbit cannot supply it.
 
 ---
 

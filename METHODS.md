@@ -1,79 +1,195 @@
 # METHODS
 
-**Kok Zhailau ski terrain analytics — an independent open-data case study**
+**Almaty SuperSki ski terrain analytics — an independent open-data case study**
 Dias Irishev · Geo & Weather Data Scientist, Almaty
 Release date: 24 November 2026
 
-Everything below is reproducible from the code in `src/` and the three notebooks.
-Every number quoted in `README.md` and in the PDF brief comes from a CSV in
-`outputs/tables/` written by those notebooks.
+Everything below is reproducible from the code in `src/` and the six notebooks.
+Every number quoted in `README.md` and in the two PDFs comes from a CSV written
+by that code into `outputs/superski/tables/` or `outputs/cluster/tables/`.
 
 ---
 
 ## 1. Scope and standing
 
-This is an independent study built from open data and the author's own code. It is
-not commissioned by, affiliated with, or endorsed by any resort operator, design
-office or public body, and it contains no commercial or NDA material.
+This is an independent study built from open data and the author's own code. It
+is not commissioned by, affiliated with, or endorsed by any resort operator,
+design office or public body, and it contains no commercial or NDA material.
 
-The official statement of 18 November 2026 on the Almaty SuperSki cluster
-([primeminister.kz](https://primeminister.kz/en/news/construction-of-almaty-superski-cluster-is-in-active-phase-32133))
-names no individual resort site. The rectangle analysed here is therefore the
-author's own choice of study area, not a project boundary, and nothing in this
-release should be read as describing a planned resort.
-
-**The study rectangle is not a resort boundary and not a trail plan.** Resort
-limits, lift alignments and designed pistes require official GIS layers.
+**No official boundary for this project has been published.** Kazakh Tourism
+Development states a territory of 1,022 ha and gives no coordinates; the
+government statements describe infrastructure in detail and give no geometry.
+The boundary analysed here is therefore the author's own reading of the
+operating area from imagery, and nothing in this release should be read as
+describing a planned resort. Resort limits, lift alignments and designed pistes
+require official GIS layers.
 
 ---
 
-## 2. Study area and grids
+## 2. The study area
+
+### 2.1 The boundary
+
+The study area is a polygon of **24 vertices**, digitised by hand over satellite
+imagery in Google Earth, exported as KML and held at
+`qgis/operating_area.geojson` in EPSG:4326. **Every figure reported for the
+operating area is masked to it.**
+
+| | |
+|---|---|
+| area | **1,776 ha** (1,775.5 ha rasterised at 30 m) |
+| perimeter | 23.19 km |
+| bounds (W, S, E, N) | 76.96202, 43.09839, 77.04080, 43.14586 |
+| elevation | 1,775 – 3,291 m, median 2,568 m |
+| vertical | 1,516 m |
+| median slope | 28.8° |
+| median sky view factor | 0.901 |
+| connected components | 1 |
+| share of the stated 1,022 ha | **174 %** |
+
+`src/operating_area.py` is the whole contract. It loads the polygon, repairs a
+self-intersection with a zero-width buffer if one is present and refuses
+anything that is not a single valid `Polygon`; derives a buffered,
+outward-snapped compute bbox from it; rasterises it onto any analysis grid with
+`rasterio.features`; and returns a provenance sentence that every figure caption
+and table carries, so a reader never has to ask which boundary a number came
+from. `is_draft()` distinguishes a machine-generated starting shape from one a
+human has drawn.
+
+`src/pipeline_operating_area.py` runs everything the boundary decides — shape
+and contiguity, gradient classes, piste feasibility under both published mixes,
+monthly sun, monthly snow with its coverage audit, and two figures — and
+rewrites six tables. **Redrawing the polygon and re-running that one script is
+the entire update path**; terrain, horizon, insolation and sunshine hours are not
+recomputed, because the boundary cannot change them. The boundary must therefore
+lie inside the compute window, and the script fails loudly if it does not.
+
+The 174 % gap against the stated territory is not an error in either number.
+1,022 ha is a stated territory with no published coordinates; this polygon is a
+reading of the *operating area*, which may legitimately extend beyond a land
+allocation. It is recorded as a difference, not reconciled away. **It is not an
+official boundary.**
+
+### 2.2 The working window and the grids
+
+Rasters need a margin: hillshade needs surroundings, the horizon needs terrain
+to hit, and a map needs context around its subject. The compute rectangle is
+therefore the boundary's own envelope plus the **1 km working margin** that
+`operating_area.bbox()` returns — nothing more, and never a reporting unit.
 
 | Item | Value |
 |---|---|
-| WGS84 bounding box (W, S, E, N) | 76.960, 43.105, 77.065, 43.174 |
+| WGS84 bounding box (W, S, E, N) | 76.950, 43.085, 77.055, 43.155 |
 | Working projection | EPSG:32643 (UTM zone 43N) |
-| Terrain / insolation grid | 263 × 292 cells at 30 m |
-| Sentinel-2 / snow grid | 395 × 437 cells at 20 m |
-| Grid extent | 659 280 – 668 040 E, 4 774 320 – 4 782 210 N |
-| Grid area | **69.12 km²** |
-| Geodesic area of the WGS84 rectangle | 65.48 km² |
-| Plateau reference point | 77.00433° E, 43.14239° N (inside the rectangle) |
-| Elevation range | 1271 – 3318 m |
+| Terrain / insolation grid | 292 × 267 cells at 30 m |
+| Sentinel-2 / snow grid | 437 × 400 cells at 20 m |
+| Grid extent | 658 530 – 667 290 E, 4 772 070 – 4 780 080 N |
+| Grid area | **70.17 km²** (8.8 × 8.0 km) |
+| Geodesic area of the WGS84 rectangle | 66.45 km² |
+| Elevation range | 1 382 – 3 627 m |
+| The boundary inside it | 17.8 km² = **25 %**, margins 1.0 – 1.7 km per side |
+| Plateau reference point | 77.00433° E, 43.14239° N (a QA landmark, not a centre) |
 
-### Why 69.12 km² and not 65.48 km²
+`boundary_vs_window.csv` states what is inside the boundary and what is only
+margin, so the distinction can be checked rather than trusted.
 
-The analysis grid is the **axis-aligned UTM bounding box of the WGS84 rectangle**,
-snapped outward to whole cells. Meridian convergence at 77° E (≈2° east of the
-zone's central meridian) is about 1.4°, so the projected rectangle is slightly
-rotated and its axis-aligned bounding box is larger than the rectangle itself. The
-whole 3.6 km² difference is that rotation plus the outward snap. Both figures are
-reported; statistics are computed on the grid.
+The west edge is clipped to the cluster rectangle's own west edge so that the
+two 20 m grids stay pixel-aligned and the Sentinel-2 cache can be sliced rather
+than re-downloaded (section 16).
 
-Edge densification: each edge of the WGS84 rectangle is sampled at 200 points
-before projection, so the bounding box captures the curved projected edges exactly
-rather than only the four corners.
+**Why 70.17 km² and not 66.45 km².** The analysis grid is the **axis-aligned UTM
+bounding box of the WGS84 rectangle**, snapped outward to whole cells. Meridian
+convergence at 77° E (≈2° east of the zone's central meridian) is about 1.4°, so
+the projected rectangle is slightly rotated and its axis-aligned bounding box is
+larger than the rectangle itself. The whole difference is that rotation plus the
+outward snap. Both figures are reported; statistics are computed on the grid.
+Each edge of the WGS84 rectangle is sampled at 200 points before projection, so
+the bounding box captures the curved projected edges exactly rather than only the
+four corners.
+
+### 2.3 How the operator's general plan was read
+
+Sheet 3 of the Kazakh Tourism Development general plan, *«Генеральный план
+горнолыжного курорта Almaty Superski»*, is a perspective panorama: no
+projection, no scale bar, no graticule. It cannot be georeferenced, because an
+affine or polynomial transform assumes a plan view. **Nothing in this release is
+traced from it.**
+
+What it does carry is named features, and those can be located independently.
+Seven labels were resolved against OpenStreetMap peaks, saddles and places:
+
+| sheet label | OSM feature | lon, lat | ele |
+|---|---|---|---|
+| MEDEU | place, suburb | 77.05757, 43.15944 | — |
+| KOKGAILAU PLATEAU 1951 m | project reference point | 77.00433, 43.14239 | — |
+| THREE BROTHERS ROCKS | peak «Три брата» | 77.01337, 43.12687 | 2860 |
+| MOUNTAIN KUMBEL 3250 m | peak «Qumbel» | 77.03130, 43.11934 | 3221 |
+| KUMBELTAU RANGE 3500 m | peak «Qumbeltau» | 77.04056, 43.08490 | 3618 |
+| KIMASAR | saddle «Кімасар» | 77.08281, 43.17116 | 2080 |
+| SHYMBULAK | landuse=winter_sports | 77.09312, 43.12275 | — |
+
+These located features are what the boundary was drawn against. They are not a
+boundary themselves: an envelope of them would reach to the city edge at Medeu
+and Kimasar, which is why the line was drawn by hand on imagery instead.
+Notebook 06 section 1 carries the table and the arithmetic.
+
+### 2.4 The cluster area
+
+Notebook 04 works on a second, wider area, for the questions that are about the
+mountain range rather than the site: where the radiation is, how the existing
+lift network sits in the terrain, and the cross-checks against Landsat and MODIS.
+
+`src/config.py` defines `STUDY_AREAS` and reads `KZ_AREA` from the environment
+before anything else is configured. Each area gets its own output subtree, so
+runs cannot overwrite one another:
+
+| `KZ_AREA` | bbox (W, S, E, N) | grid | area | outputs |
+|---|---|---|---|---|
+| `superski` | 76.950, 43.085, 77.055, 43.155 | 292 × 267 @ 30 m | 70.17 km² | `outputs/superski/` |
+| `cluster` | 76.950, 43.070, 77.200, 43.240 | 647 × 694 @ 30 m | 404.12 km² | `outputs/cluster/` |
+
+Notebooks 01, 02, 03, 05 and 06 pin `superski`; notebook 04 pins `cluster`. The
+Sentinel-2 window cache is keyed by a grid fingerprint
+(`<xmin>_<ymin>_<w>x<h>_<res>m`), so the two areas keep separate caches and
+neither invalidates the other.
+
+The cluster rectangle is the smallest round bounding box containing every place
+the government statements name for the cluster, as located in OpenStreetMap:
+
+| Place | Source | Stated role |
+|---|---|---|
+| Shymbulak | primeminister.kz, 24 Apr 2026 | modernisation, stage 1; first of seven cable car lines from May 2026 |
+| Butakovka gorge | primeminister.kz, 24 Apr 2026 | development, stage 1 |
+| Kimasar gorge | primeminister.kz, 24 Apr 2026 | development, stage 1 |
+| Pioneer | primeminister.kz, 24 Apr 2026 | stage 2 from 2027, to be linked by cable car |
+| Oi-Qaragai | primeminister.kz, 24 Apr 2026 | stage 2; gondola and chairlift already commissioned |
+| Kok Zhailau, Kumbel | the 18 Nov 2026 board release | 60 km of runs, 16 lifts, launch December 2028 |
+
+It is **derived, not given**, and it is not a resort boundary either.
 
 ---
 
 ## 3. Terrain
 
-**Source.** Copernicus DEM GLO-30, tiles `Copernicus_DSM_COG_10_N43_00_E076_00_DEM`
-and `...E077_00_DEM`, from the AWS Open Data registry
-(`https://copernicus-dem-30m.s3.amazonaws.com`). Vertical datum EGM2008. Licence:
-free use with attribution to the Copernicus Programme / ESA.
+**Source.** Copernicus DEM GLO-30, tiles
+`Copernicus_DSM_COG_10_N43_00_E076_00_DEM` and `...E077_00_DEM`, from the AWS
+Open Data registry (`https://copernicus-dem-30m.s3.amazonaws.com`). Vertical
+datum EGM2008. Licence: free use with attribution to the Copernicus Programme /
+ESA.
 
 **Processing.** Tiles merged, then reprojected to EPSG:32643 at 30 m by bilinear
-resampling. A second DEM is built on a grid buffered by 6 km for the horizon search.
+resampling. A second DEM is built on a grid buffered by 6 km for the horizon
+search.
 
 **Slope and aspect.** Horn (1981) 3 × 3 operator. Aspect is the direction of
-steepest descent, degrees clockwise from **true** north. Because aspect is computed
-after projection, the ~1.4° grid convergence is already removed.
+steepest descent, degrees clockwise from **true** north. Because aspect is
+computed after projection, the ~1.4° grid convergence is already removed.
 
-**Horizon.** For each of 36 azimuths (10° spacing) a ray is marched outward in 30 m
-steps to 6 km over the buffered DEM, sampling elevation by bilinear interpolation,
-and the maximum angular elevation is kept. Earth curvature is applied as a drop of
-d² / (2 R_eff) with R_eff = 7/6 × 6 371 km (standard atmospheric refraction).
+**Horizon.** For each of **72 azimuths (5° spacing)** a ray is marched outward to
+6 km over the buffered DEM, sampling elevation by bilinear interpolation, and the
+maximum angular elevation is kept. Earth curvature is applied as a drop of
+d² / (2 R_eff) with R_eff = 7/6 × 6 371 km (standard atmospheric refraction). The
+cluster area uses 36 azimuths, which is what its size affords.
 
 **Sky view factor.** Dozier & Frew (1990), for a tilted surface:
 
@@ -83,17 +199,26 @@ with β the slope, A the aspect, and **H_φ the horizon angle measured from the
 zenith**. In each azimuth H_φ is the smaller of the terrain horizon and the slope
 plane's own horizon, so a surface never sees sky below its own plane.
 
-### Validation (`outputs/tables/qa_terrain_validation.csv`)
+### Faster horizons
+
+The ray-march uses a geometrically growing step (30 m, ×1.02 per step, capped at
+120 m) instead of a uniform 30 m. The angular size of a terrain cell falls as
+1/distance, so uniform stepping heavily oversamples the far field. Validated
+against uniform 30 m stepping on real terrain: **2.4× fewer samples, mean
+difference −0.02°, p99 |Δ| 0.45°, max |Δ| 1.24°**. Setting
+`HORIZON_STEP_GROWTH = 1.0` restores uniform stepping exactly.
+
+### Validation (`outputs/superski/tables/qa_terrain_validation.csv`)
 
 | Test | Expected | Computed |
 |---|---|---|
 | Synthetic 20° planes, 8 aspects | slope 20.00°, aspect as constructed | exact to 0.01° in all 8 cases |
 | SVF, unobstructed plane, β = 0/20/40° | (1 + cos β)/2 = 1.0000 / 0.9698 / 0.8830 | 1.0000 / 0.9698 / 0.8830 |
 | SVF, flat pixel inside a uniform 30° skyline | cos²30° = 0.7500 | 0.7500 |
-| Horizon, 1000 m wall at 1980 m (grid-snapped) | atan(1000/1980) with curvature = 26.79° | 26.79° |
 
-**Resulting values.** Median slope 28.8°; median sky view factor 0.889 (range
-0.652 – 0.998); median horizon elevation across azimuths 14.5°.
+**Resulting values** over the window: median slope 31.0°; median sky view factor
+0.881 (range 0.577 – 0.999); median horizon elevation across azimuths 15.1°.
+Inside the boundary: median slope 28.8°, median sky view factor 0.901.
 
 ---
 
@@ -101,38 +226,42 @@ plane's own horizon, so a surface never sees sky below its own plane.
 
 **Model.** `pvlib` 0.16.1, Ineichen–Perez clear sky with the monthly Linke
 turbidity climatology bundled with pvlib. Solar position from
-`pvlib.solarposition.get_solarposition` at the rectangle centroid; the rectangle is
+`pvlib.solarposition.get_solarposition` at the window centroid; the window is
 8.8 km wide, so the within-grid variation in solar position is below 0.05° and is
 neglected.
 
 **Time stepping.** 30-minute intervals, evaluated at interval mid-points, in
-Asia/Almaty (UTC+5, no DST). Only steps with solar elevation above 0.5° contribute.
+Asia/Almaty (UTC+5, no DST). Only steps with solar elevation above 0.5°
+contribute.
 
-**Altitude.** Clear sky is computed at **seven altitude levels** spanning the grid's
-elevation range and interpolated per pixel by elevation, so the ~2 km of relief is
-not collapsed to a single atmosphere. Pressure from `pvlib.atmosphere.alt2pres`.
+**Altitude.** Clear sky is computed at **seven altitude levels** spanning the
+grid's elevation range and interpolated per pixel by elevation, so the 2.2 km of
+relief is not collapsed to a single atmosphere. Pressure from
+`pvlib.atmosphere.alt2pres`.
 
 **Plane-of-array components.**
 
 | Component | Formula | Assumption |
 |---|---|---|
-| Direct | DNI × cos(AOI), zeroed where the sun is below the ray-marched horizon or behind the slope | terrain shading resolved at 30 m and 10° azimuth |
+| Direct | DNI × cos(AOI), zeroed where the sun is below the ray-marched horizon or behind the slope | terrain shading resolved at 30 m and 5° azimuth |
 | Diffuse | DHI × SVF | **isotropic sky.** Real skies are brighter near the sun and near the horizon; an isotropic model under-estimates diffuse on slopes facing the sun and over-estimates it on slopes facing away |
 | Reflected | GHI × α × (1 − SVF) | **α = 0.50, fixed.** The terrain configuration factor is approximated by (1 − SVF), which assumes surrounding terrain is an isotropic reflector at the mean surface albedo |
 
-**Why α = 0.50.** The winter surface here ranges from fresh snow (≈0.8) through
-old snow, bare rock and conifer (≈0.1). A single seasonal value is a deliberate
-simplification. Its weight is small: in the 2200–2300 m band over March–April the
-median reflected term is 23.7 kWh/m² against 305.2 kWh/m² direct, under 7% of the
-total. **The exposure contrast reported in notebook 03 reproduces on direct beam
-alone** (low vs high quartile: 0.800 vs 0.300 on direct, 0.778 vs 0.300 on total,
-March–April 2023), so no conclusion in this release depends on the albedo choice.
+**Why α = 0.50, and why no conclusion depends on it.** The winter surface here
+ranges from fresh snow (≈0.8) through old snow, bare rock and conifer (≈0.1). A
+single seasonal value is a deliberate simplification. Its weight is small: in the
+2200–2300 m band over March–April the median reflected term is **25.0 kWh/m²**
+against **312.4 kWh/m²** direct, **7.0 %** of the total. More directly, the
+exposure contrast in that band is **identical whether it is computed on total
+insolation or on direct beam alone** — 0.750 against 0.100 either way (March–April
+2023, lowest against highest quartile, 1,846 pixels per group). The albedo cannot
+be carrying the result.
 
-**Reference periods.** The historical reference season is 2022-11-01 → 2023-04-30,
-matching the first fully covered snow season. Clear-sky totals vary year to year by
-well under 1%, so one reference season is used for the December / March /
-November–December / January–February / March–April rasters. The 2027 outlook is
-computed on 2027 calendar dates.
+**Reference periods.** The historical reference season is
+2022-11-01 → 2023-04-30, matching the first fully covered snow season. Clear-sky
+totals vary year to year by well under 1 %, so one reference season is used for
+the December / March / November–December / January–February / March–April
+rasters. The 2027 outlook is computed on 2027 calendar dates.
 
 **What these numbers are.** A clear-sky ceiling, in kWh/m², on the plane of each
 slope. Not expected irradiance: real cloud reduces them, and cloud attenuation is
@@ -140,286 +269,7 @@ not measured here.
 
 ---
 
-## 5. Sentinel-2 snow
-
-**Source.** Sentinel-2 L2A surface reflectance, searched through the Element 84
-Earth Search STAC API (`https://earth-search.aws.element84.com/v1`, collection
-`sentinel-2-l2a`), MGRS tile **43TFH**, metadata cloud cover < 15%.
-Copernicus Sentinel data, processed by ESA.
-
-A fallback to the Copernicus Data Space Ecosystem STAC was coded but **not needed**:
-every scene in this run came from Earth Search, so there is no collection change to
-declare. Had one occurred it would appear in the `collection` and `stac_url` columns
-of `outputs/tables/scene_manifest.csv`, which carry the provenance of every scene.
-
-**Reading.** Only the AOI window of each Cloud-Optimised GeoTIFF is read and
-reprojected onto the 20 m grid: B03 (green, 10 m, area-averaged), B08 (NIR, 10 m,
-area-averaged), B11 (SWIR, 20 m, bilinear), SCL (20 m, nearest). Each scene's window
-is cached as a small `.npz` outside the release folder, which makes the download
-resumable after a failure.
-
-**Radiometry.** Scale and offset are read from each item's `raster:bands` metadata
-and recorded per scene in the manifest. Every scene in this run uses scale 1e-4 and
-offset −0.1 (processing baselines 04.00 and 05.09 – 05.13), i.e. the post-baseline-04.00
-BOA offset is applied before any index is computed.
-
-**Snow rule.**
-
-> snow = NDSI > 0.40 **and** B08 > 0.11 (surface reflectance), with NDSI = (B03 − B11)/(B03 + B11)
-
-**Masking.** A pixel is a *usable observation* unless its SCL class is one of
-no-data (0), saturated (1), cast shadow (2), cloud shadow (3), unclassified (7),
-cloud medium (8), cloud high (9) or thin cirrus (10), or all three bands are fill.
-Water (6) is a usable observation but can never be classed as snow.
-
-**Threshold justification** (`outputs/tables/ndsi_threshold_sensitivity.csv`). The
-rule was re-run across NDSI ∈ {0.30, 0.40, 0.50} × B08 ∈ {0.07, 0.11, 0.15} on six
-March–April 2023 scenes. Mean snow fraction of usable pixels ranges 59.1% – 72.1%
-across that whole grid; the chosen rule gives 66.6%. The answer is therefore stable
-to about ±6 percentage points under reasonable threshold choices — a real
-uncertainty, and smaller than the exposure contrast the study reports.
-
-**Independent check.** Scene-level agreement between this rule and the Sen2Cor SCL
-snow class (11), which is produced independently by the L2A processor: r = 0.973
-over 115 scenes, with the NDSI rule running 0.109 lower on average.
-
-**Duplicate dates.** Scenes sharing an acquisition date are merged: a pixel is
-usable if usable in any scene of that date, and snow if flagged snow in any scene
-where it was usable. 115 scenes collapse to 112 unique dates.
-
-**Frequency.** For a period, each season contributes equally: the per-season ratio
-(snow dates / usable dates) is averaged over the seasons that have data, so a
-season with many clear dates cannot outvote a cloudy one. A value is published only
-where a pixel has **≥ 4 usable observations** in the period; multi-season maps
-additionally require **≥ 3 seasons** of support.
-
-**Melt-out.** The satellite brackets rather than dates the disappearance: the last
-date a pixel was seen with snow, and the first usable snow-free date after it. The
-midpoint is reported together with the width of the bracket. Pixels lacking either
-bound are left unestimated — 51% – 75% of pixels are estimable depending on season.
-
-### Known bias
-
-Cast shadow and cloud shadow are rejected before counting, so **shaded north slopes
-lose observations exactly where the snow signal matters most**. In the 2200–2300 m
-band over March–April 2023, coverage is 86% in the lowest insolation quartile
-against 100% in the highest. In deep shade NDSI is also weakest, so a snow-covered
-pixel there is more likely than average to be scored snow-free. Both effects push
-the measured low-exposure frequency **down**, which means the reported exposure
-contrast is, if anything, conservative.
-
----
-
-## 6. Joining terrain to snow
-
-Statistics that combine the two are computed on the **20 m Sentinel-2 grid**.
-Terrain and insolation are resampled from 30 m to 20 m bilinearly; **aspect is
-interpolated as a unit vector** (sin/cos components) rather than as degrees, to
-avoid the 0°/360° wrap, and is set undefined where the interpolated vector magnitude
-falls below 0.2 (opposing aspects averaging out). GeoTIFFs of terrain products are
-published at their native 30 m.
-
-**Exposure contrast.** Within each 100 m elevation band, on 15–35° slopes only,
-pixels are split at that band's own 25th and 75th insolation percentiles. Holding
-elevation fixed and taking quartiles within the band means the remaining difference
-is an exposure effect, not an elevation effect. Group sizes and per-group coverage
-are reported alongside every comparison.
-
----
-
-## 7. The 2027 outlook
-
-Three separate things, deliberately kept apart.
-
-**1. Clear-sky insolation for 2027.** Deterministic solar geometry with
-climatological turbidity, computed on 2027 calendar dates. This is the only part of
-the outlook that is a calculation rather than an analogue.
-
-**2. Spring timing scenarios.** No forecast of 2027 snow cover is made, because
-nothing in this data supports one. Instead the four-season spring record is re-cut
-against three calendar windows — 11 March → 20 April (the historical analogue),
-the same window ten days earlier, and ten days later — and the three maps are
-compared **on the pixels observed in all three** (43.44 km², 89.2% of skiable
-terrain). That isolates the effect of timing from the effect of coverage.
-**No probabilities are attached**: assigning one would need a calibrated and
-verified model, which this is not.
-
-**3. Published seasonal outlooks**, transcribed from the primary documents and
-stored in `docs/seasonal_outlooks.json`:
-
-* **Kazhydromet**, *Сезонный прогноз погоды, декабрь 2026 – февраль 2027*, issued
-  16 November 2026, retrieved 19 November 2026
-  ([PDF](https://www.kazhydromet.kz/uploads/files_calendar/13401/file/6afacdf27e503sp-na-zimu-2026-2027-gg-ot-16-11-2026g.pdf),
-  [landing page](https://www.kazhydromet.kz/ru/weather/konsultativnyy-prognoz-pogody-na-sezon)).
-  Advisory, issued for 17 oblasts, normals 1991–2020, analogue years December 2005
-  and January–February 2026. For the Almaty area: December temperature above normal
-  by 1–2 °C over most of the country (near normal in the east of Almaty oblast),
-  precipitation near normal nationwide; January temperature above normal by 1–2 °C,
-  precipitation below normal in the northern half of Almaty oblast; February
-  temperature above normal by 1–3 °C, precipitation above normal over most of the
-  country.
-* **C3S multi-system seasonal forecast**, November 2026 issue (1 November
-  initialisation, graphics published 10 November 2026 12 UTC), retrieved
-  19 November 2026. Published highlights: ENSO expected to peak around the end of
-  2026, with eastern Asia among the wetter-than-average regions. **The C3S anomaly
-  charts render client-side and no Central Asia value could be read
-  programmatically on the retrieval date**; the exact chart URLs are recorded in
-  `docs/seasonal_outlooks.json` so a reader can check them directly. No anomaly
-  value is invented here.
-
-**Scale caveat.** Both outlooks are warm-leaning at a scale of hundreds of
-kilometres. Almaty oblast spans roughly 500 – 5000 m; a single oblast statement
-cannot be read as a forecast for a rectangle that itself spans 1271 – 3318 m, and
-neither outlook forecasts snow depth.
-
-**Reanalysis context.** Daily ERA5-Land (≈9 km grid, cell elevation 2235 m) at the
-plateau point via the Open-Meteo Historical Weather API, for temperature.
-ERA5-Land returns no precipitation at this point through that API, so snowfall and
-precipitation fall back to **ERA5 at ≈31 km** and are labelled as such. Both grids
-smooth the orography heavily and ERA5 precipitation over complex terrain carries
-large errors; they say what kind of winter a season was, and are not evidence about
-any individual slope.
-
----
-
-## 8. What this study cannot tell you
-
-| Question | Why not | What would answer it |
-|---|---|---|
-| Number of ski days | A frequency is a share of **usable satellite dates**, not days of operation | continuous depth record against an operating threshold |
-| Snow depth or water equivalent | Optical imagery sees the surface, not what is under it | snow pillow or ultrasonic depth sensor plus density cores |
-| Season opening date | A 5-day revisit with cloud gaps cannot resolve a threshold crossing to the day | same as above, over several seasons |
-| Snowmaking feasibility or cost | None of the governing variables is observed from orbit | wet-bulb temperature at the gun line, wind, water yield and temperature, equipment curves, target depth |
-| Avalanche hazard | Slope angle is geometry; release depends on the snowpack | snowpack profiles, wind transport and loading, mapped start and runout zones, local forecaster judgement |
-| Real (not clear-sky) irradiance | The model is clear-sky by construction | pyranometer pair on contrasting aspects |
-| Resort boundaries or trail alignments | Not derivable from open terrain data | official GIS layers from the project |
-
-A four-season record is also far too short to support any statement about trend.
-
----
-
-## 9. Comparison with the earlier pilot run
-
-The earlier pilot had 41 of 112 planned scenes cached and one complete season. This
-run processed **114 historical scenes across all four seasons** plus one
-current-season scene. Full table: `outputs/tables/pilot_comparison.csv`.
-
-| Quantity | Pilot | This run | Reading |
-|---|---|---|---|
-| Area of the study rectangle | 69.1 km² | 69.12 km² | reproduces exactly |
-| Candidate dates, Mar–Apr 2023 | 12 | 13 | within one date |
-| Coverage at ≥4 usable obs, Mar–Apr 2023 | ~74% | 85% | higher here |
-| 2200–2300 m, low-insolation quartile | ~94% | 78% | lower here |
-| 2200–2300 m, high-insolation quartile | ~23% | 30% | close |
-
-The geometry reproduces exactly, so the grid is not the source of the difference.
-The most likely explanation for the remaining gap is the **valid-observation
-definition**: this run keeps a pixel whenever its SCL class permits a snow /
-no-snow decision, and the pixels thereby recovered sit disproportionately in deep
-shade, where NDSI is weakest. That raises coverage (74% → 85%) and lowers the
-measured low-exposure frequency at the same time, which is exactly the pattern
-observed. The high-exposure group — where no such recovery happens — agrees
-closely. Note also that over the **four-season** spring window the low-exposure
-figure in the same band is 93.3%, close to the pilot's single-season ~94%.
-
-Resolving this properly needs ground truth, not more processing. That is the
-purpose of the field pilot proposed in notebook 03.
-
----
-
-## 10. Attribution and licences
-
-* **Copernicus DEM GLO-30** — © DLR e.V. 2010–2014 and © Airbus Defence and Space
-  GmbH 2014–2018, provided under the Copernicus DEM open licence; distributed via
-  the AWS Open Data registry.
-* **Sentinel-2 L2A** — Copernicus Sentinel data 2022–2026, processed by ESA.
-  Contains modified Copernicus Sentinel data.
-* **ERA5 / ERA5-Land** — Copernicus Climate Change Service (C3S) information
-  2022–2026, accessed through the Open-Meteo Historical Weather API. Neither the
-  European Commission nor ECMWF is responsible for any use of this information.
-* **C3S seasonal forecasts** — Copernicus Climate Change Service information 2026.
-* **Kazhydromet seasonal forecast** — RSE Kazhydromet, Ministry of Ecology and
-  Natural Resources of the Republic of Kazakhstan.
-* **pvlib-python** — BSD-3-Clause.
-* Analysis code and figures in this release: Dias Irishev, 2026.
-
-## 11. Software
-
-Python 3.12.10. Pinned versions in `requirements.txt`; the key ones are
-numpy 2.5.5, rasterio 1.5.2, pvlib 0.16.1, pyproj, pystac-client, scipy, pandas,
-matplotlib, reportlab.
-
----
-
-# PART II — The cluster area (added 19 November 2026)
-
-Notebook 04 widens the analysis from the 69 km² Kok Zhailau rectangle to the
-whole area the Almaty SuperSki cluster is reported to touch, adds direct
-sunshine duration alongside energy, and cross-checks the snow record against a
-second satellite. Everything in Part I is unchanged.
-
-## 12. Study areas are now a parameter
-
-`src/config.py` defines `STUDY_AREAS` and reads `KZ_AREA` from the environment
-before anything else is configured. Each area gets its own output subtree, so
-runs cannot overwrite one another:
-
-| `KZ_AREA` | bbox (W, S, E, N) | grid | area | outputs |
-|---|---|---|---|---|
-| `kok_zhailau` | 76.960, 43.105, 77.065, 43.174 | 263 × 292 @ 30 m | 69.12 km² | `outputs/` |
-| `cluster` (default) | 76.950, 43.070, 77.200, 43.240 | 647 × 694 @ 30 m | 404.12 km² | `outputs/cluster/` |
-
-> As of Part V, `kok_zhailau` no longer exists. The two areas in `config.py` are
-> `superski` — the drawn boundary and the 70 km² working window around it,
-> 76.950, 43.085, 77.055, 43.155, 292 × 267 @ 30 m — and `cluster`, unchanged.
-> Notebooks 01–03, 05 and 06 pin `superski`.
-
-Notebooks 01–03 pinned `kok_zhailau` on their first line; notebook 04 pins
-`cluster`. The Sentinel-2 window cache is keyed by a grid fingerprint
-(`<xmin>_<ymin>_<w>x<h>_<res>m`), so the two areas keep separate caches and
-neither invalidates the other.
-
-### How the cluster rectangle was derived
-
-**No official project boundary has been published.** The government statements
-read for this release describe infrastructure in detail — 11 POMA cableways,
-3S gondolas, 10-seat gondolas and chairlifts, base and upper stations, a
-mountain village concept by BIG, an architectural concept by Foster + Partners,
-a 6 km access road, a resort launch in December 2028 — but give no coordinate,
-no station location and no boundary.
-
-The places they do name are:
-
-| Place | Source | Stated role |
-|---|---|---|
-| Shymbulak | primeminister.kz, 24 Apr 2026 | modernisation, stage 1; first of seven cable car lines from May 2026 |
-| Butakovka gorge | primeminister.kz, 24 Apr 2026 | development, stage 1 |
-| Kimasar gorge | primeminister.kz, 24 Apr 2026 | development, stage 1 |
-| Pioneer | primeminister.kz, 24 Apr 2026 | stage 2 from 2027, to be linked by cable car |
-| Oi-Qaragai | primeminister.kz, 24 Apr 2026 | stage 2; gondola and chairlift already commissioned |
-| Kok Zhailau, Kumbel | Wikipedia (citing AnewZ, 2025) | reported as combined into the cluster; **not** in the statements read here |
-
-The rectangle is the smallest round bounding box containing all of them, as
-located in OpenStreetMap. It is **derived, not given**, and it is not a resort
-boundary.
-
-## 13. OpenStreetMap reference layers
-
-Queried once through the Overpass API over 76.85–77.30 E, 43.00–43.25 N and
-cached in `data/raw/osm/`. Licence: ODbL, © OpenStreetMap contributors.
-
-Inside the cluster rectangle: **21 aerialway lines longer than 150 m totalling
-21.1 km**, 23 lift stations, 32 mapped downhill pistes totalling 24.4 km, 63
-named peaks, 36 named saddles, and the Shymbulak and Oi-Qaragai
-`landuse=winter_sports` polygons. Exported to
-`outputs/cluster/osm_reference_layers.geojson`.
-
-**These are the lifts that exist today.** No planned alignment is drawn anywhere
-in this release, because none has been published. Zones used for reporting are
-built from these features: lift corridors are everything within 150 m of an
-existing line (7.36 km²), piste corridors within 100 m (3.00 km²).
-
-## 14. Direct sunshine duration
+## 5. Direct sunshine duration
 
 Energy and duration answer different questions, so both are computed. A pixel
 counts as sunlit at an instant when **all three** hold:
@@ -428,180 +278,150 @@ counts as sunlit at an instant when **all three** hold:
 2. the sun is above the ray-marched terrain horizon at its azimuth,
 3. the slope faces the sun (cos of the incidence angle > 0).
 
-Stepped at **15 minutes** (finer than the 30-minute energy integration, because
-a duration is more sensitive to the step), in Asia/Almaty. Output per pixel per
-month, plus a month × hour-of-day table of the sunlit fraction of each zone.
+Stepped at **10 minutes** on the study window and 15 minutes on the cluster —
+finer than the 30-minute energy integration in both cases, because a duration is
+more sensitive to the step. Output per pixel per month, plus a month ×
+hour-of-day table of the sunlit fraction of each zone.
 
-The two measures rank terrain differently: over November–April 2027 the
-correlation between the sunshine-hours raster and the energy raster is
+The two measures rank terrain differently. Over the cluster in November–April
+2027 the correlation between the sunshine-hours raster and the energy raster is
 **r = 0.73**, and the top-10 skiable sites by each measure share **no points at
-all**. Energy maxima sit on steep (≈34°) south faces near 4000 m, where high
-sun angles on a steep plane maximise irradiance; duration maxima sit on gentler
-15–20° south slopes that clear their own horizon earlier and hold the sun
-longer.
-
-### Faster horizons
-
-The ray-march now uses a geometrically growing step (30 m, ×1.02 per step,
-capped at 120 m) instead of a uniform 30 m. The angular size of a terrain cell
-falls as 1/distance, so uniform stepping heavily oversamples the far field.
-Validated against uniform 30 m stepping on real terrain: **2.4× fewer samples,
-mean difference −0.02°, p99 |Δ| 0.45°, max |Δ| 1.24°**. Setting
-`HORIZON_STEP_GROWTH = 1.0` restores uniform stepping exactly.
-
-## 15. The sun-and-snow index
-
-`sunlit fraction × snow detection frequency` for the month — the share of a zone
-that is, at that hour, both in the sun and (on four seasons of satellite record)
-usually snow-covered. **A screening index, not a forecast.** It multiplies a
-clear-sky geometric quantity by an empirical frequency; it says nothing about
-whether a given day will be clear, and nothing about snow depth.
-
-On the existing lift corridors the daily window with over half the corridor in
-sun runs **10:00–14:00 in December** (peak 69% sunlit at noon) and
-**08:00–17:00 in March** (100% at midday). The index peaks in **February around
-12:00**, where 96% sunlit meets a 100% snow-detection frequency.
-
-## 16. Cross-validation against independent sources
-
-### Elevation — three DEMs
-
-| DEM | sensor and epoch | mean Δ | median Δ | σ | p95 \|Δ\| | correlation |
-|---|---|---|---|---|---|---|
-| NASADEM | radar, SRTM 2000, EGM96 | +0.26 m | −0.09 m | 7.40 m | 13.97 m | 0.999952 |
-| ALOS AW3D30 | optical stereo 2006–2011, EGM96 | +1.92 m | +1.59 m | 7.15 m | 12.68 m | 0.999956 |
-
-Against Copernicus GLO-30 (radar, TanDEM-X 2010–2015, EGM2008) on the 449 018
-cluster pixels. The three have largely independent error sources, so agreement
-to a few metres is meaningful. NASADEM reads 1.4° flatter in slope on average,
-consistent with SRTM's coarser effective resolution.
-
-### Snow — Landsat 8/9 against Sentinel-2
-
-77 Landsat 8/9 Collection 2 Level-2 scenes (cloud < 20%) over the four seasons,
-read through the Microsoft Planetary Computer and reduced with the **same**
-NDSI > 0.40 and NIR > 0.11 rule, masked with `QA_PIXEL` (fill, dilated cloud,
-cirrus, cloud, cloud shadow). Landsat 7 is excluded: its scan-line corrector
-failed in 2003 and the striping corrupts area statistics.
-
-* Within Landsat, our rule against the USGS `QA_PIXEL` snow flag: **r = 0.879**.
-* Against Sentinel-2, **scene-aggregate**, same date ±1 day: r = 0.820, mean
-  difference +0.353.
-* Against Sentinel-2, **same date and restricted to pixels both call usable**:
-  **r = 0.969**, mean difference **+0.096**, per-pixel agreement **86.8%**, over
-  25 dates and 8.5 M common pixels.
-
-The scene-aggregate comparison is unfair, and the gap between the two rows is
-the lesson: each sensor was averaging over *its own* valid pixels, and Landsat's
-`dilated_cloud` bit deliberately removes a wide halo. Almost all of the apparent
-disagreement was the two masks covering different ground.
-
-What remains is one-sided — Sentinel-2 calls snow on 11.4% of common pixels
-where Landsat does not, against 1.8% the other way — which is the direction a
-30 m sensor resampled to a 20 m grid should err in, since a part-snow pixel
-averages below the NDSI threshold at the coarser footprint. Landsat also crosses
-roughly half an hour earlier. The two records are consistent.
-
-### MODIS daily snow cover
-
-MOD10A1 and MYD10A1 v061 `NDSI_Snow_Cover`, 500 m, read over the cluster area
-for February–April 2023. Granules with less than half the area unclouded are
-dropped. The result adds **36 days on which Sentinel-2 has no usable scene** in
-that window, against 14 Sentinel-2 dates — the melt-timing signal between clear
-optical dates. At 500 m over 2 km of relief this is regional context and never
-an answer about an individual slope.
-
-### A bug this found
-
-Windowed COG reads originally computed the read window from the AOI bounds in
-the **target** CRS against the **source** transform. That is correct only while
-the two CRSs match — which they did for Sentinel-2 and Landsat, both EPSG:32643
-— and silently read the wrong place otherwise. MODIS is in a sinusoidal
-projection, and the first MODIS run returned exactly zero snow everywhere with a
-valid fraction of 1.0. The read now transforms the bounds into the source CRS
-first (densified at 21 points per edge). Sentinel-2 and Landsat results are
-unaffected; this was verified by checking the CRS of every Landsat scene used.
-
-## 17. Additional attribution
-
-* **OpenStreetMap** — © OpenStreetMap contributors, ODbL 1.0, via the Overpass API.
-* **Landsat 8/9 Collection 2 Level-2** — courtesy of the U.S. Geological Survey,
-  accessed through the Microsoft Planetary Computer.
-* **MODIS MOD10A1 / MYD10A1 v061** — NSIDC DAAC / NASA, via the Microsoft
-  Planetary Computer.
-* **NASADEM** — NASA JPL, via the Microsoft Planetary Computer.
-* **ALOS World 3D-30m (AW3D30)** — © JAXA, via the Microsoft Planetary Computer.
-* **Microsoft Planetary Computer** — STAC API with anonymous asset signing.
-
-The full list of sources used and of further sources worth reaching for, with
-endpoints, access cost, what each adds and what it costs, is in
-`outputs/cluster/tables/data_source_registry.csv`: **12 sources, 7 used here.**
+all**. Energy maxima sit on steep (≈34°) south faces near 4 000 m, where high sun
+angles on a steep plane maximise irradiance; duration maxima sit on gentler
+15–20° south slopes that clear their own horizon earlier and hold the sun longer.
 
 ---
 
-# PART III — Project scale and engineering validation (added 19 November 2026)
+## 6. Sentinel-2 snow
 
-Part III is the demo layer: the same machinery pointed at the scale the project
-is being built at, then deliberately stress-tested. Notebook
-`05_project_scale_and_validation.ipynb`.
+**Source.** Sentinel-2 L2A surface reflectance, searched through the Element 84
+Earth Search STAC API (`https://earth-search.aws.element84.com/v1`, collection
+`sentinel-2-l2a`), MGRS tile **43TFH**, metadata cloud cover < 15 %.
+Copernicus Sentinel data, processed by ESA.
 
-> **Read Part V first.** Part III ran on a 42 km² window centred on the plateau
-> and reported every project-scale number against two synthetic 1,022 ha
-> footprints. The window reached about 3 km north of where any skiing is
-> planned, and neither footprint was the operating area. Sections 19, 20, 21 and
-> 23 are **withdrawn**; `src/footprint.py` is deleted. Sections 22, 24, 25, 26
-> and 27 survive, recomputed on the drawn boundary and its window. The numbers
-> below are kept so the retraction can be checked, not because they are current.
+A fallback to the Copernicus Data Space Ecosystem STAC was coded but **not
+needed**: every scene in this run came from Earth Search, so there is no
+collection change to declare. Had one occurred it would appear in the
+`collection` and `stac_url` columns of `scene_manifest.csv`, which carry the
+provenance of every scene.
 
-## 18. A correction to Part II
+**What was read.** 115 scenes — 114 across the four complete seasons (30 / 28 /
+25 / 31) plus one current-season scene — collapsing to 112 unique dates, with
+**0 download failures**.
 
-Part II said that Kok Zhailau "appears in the cluster plan as reported on
-Wikipedia, not in the statements read here". That was true of the single
-primeminister.kz statement of 24 April 2026 that had been fetched, and wrong as
-a claim about the record. Almaty SuperSki **is** the Kok Zhailau project: Kazakh
-Tourism Development's own release from the board meeting of 18 November 2026,
-chaired by the Prime Minister, describes 60 km of runs and 17 lifts *on Kok
-Zhailau*, with POMA building 11 cableways, about 70 % of runs green and blue, up
-to 10 000 skiers a day, a territory of 1 022 ha of which about 20 ha is built
-on, and a launch in December 2028. Part II's cluster rectangle is unaffected —
-it still contains every named place — but its framing of Kok Zhailau was too
-narrow and is withdrawn.
+**Reading.** Only the AOI window of each Cloud-Optimised GeoTIFF is read and
+reprojected onto the 20 m grid: B03 (green, 10 m, area-averaged), B08 (NIR, 10 m,
+area-averaged), B11 (SWIR, 20 m, bilinear), SCL (20 m, nearest). Each scene's
+window is cached as a small `.npz` outside the release folder, which makes the
+download resumable after a failure.
 
-Still unpublished, and therefore still absent from this release: any boundary,
-any lift alignment, any station coordinate, any elevation, any capacity in
-persons per hour, and any breakdown of the 60 km by difficulty.
+**Radiometry.** Scale and offset are read from each item's `raster:bands`
+metadata and recorded per scene in the manifest. Every scene in this run uses
+scale 1e-4 and offset −0.1 (processing baselines 04.00 and 05.09 – 05.13), i.e.
+the post-baseline-04.00 BOA offset is applied before any index is computed.
 
-## 19. Reconstructing the 1,022 ha — WITHDRAWN
+**Snow rule.**
 
-> Withdrawn in full on 24 November 2026, and `src/footprint.py` is deleted. See
-> Part V, section 33. What follows is the retracted method.
+> snow = NDSI > 0.40 **and** B08 > 0.11 (surface reflectance),
+> with NDSI = (B03 − B11)/(B03 + B11)
 
-`src/footprint.py`. The stated area is used; the stated shape does not exist, so
-two footprints of exactly 1 022 ha are derived inside a 42 km² window centred on
-the plateau reference point, and every project-scale number is reported against
-both:
+**Masking.** A pixel is a *usable observation* unless its SCL class is one of
+no-data (0), saturated (1), cast shadow (2), cloud shadow (3), unclassified (7),
+cloud medium (8), cloud high (9) or thin cirrus (10), or all three bands are
+fill. Water (6) is a usable observation but can never be classed as snow.
 
-* **A — disc.** The 1 022 ha closest to the point, i.e. the pixels with the
-  smallest centre-to-centre distance. It uses no terrain information, so it
-  cannot flatter the ground. One connected piece.
-* **B — gentlest.** The 1 022 ha of lowest slope within 3 km of the same point,
-  slope first mean-filtered over 150 m so that a single flat pixel inside a cliff
-  band cannot outrank a real bench. This is the most favourable territory a
-  planner could choose, which makes it the right adversarial reference: a
-  gradient conclusion that survives on B is not an artefact of the boundary.
+**Threshold justification** (`ndsi_threshold_sensitivity.csv`). The rule was
+re-run across NDSI ∈ {0.30, 0.40, 0.50} × B08 ∈ {0.07, 0.11, 0.15} on six
+March–April 2023 scenes. Mean snow fraction of usable pixels ranges
+**64.4 % – 74.6 %** across that grid; the chosen rule gives **70.2 %**. The answer
+is therefore stable to about ±5 percentage points under reasonable threshold
+choices — a real uncertainty, and smaller than the exposure contrast the study
+reports.
 
-Contiguity is reported with `scipy.ndimage.label` because it turned out to be
-the result, not a diagnostic: footprint B is **67 separate pieces**, the largest
-455 ha (44 % of the footprint).
+**Independent check.** Scene-level agreement between this rule and the Sen2Cor
+SCL snow class (11), which is produced independently by the L2A processor:
+**r = 0.970** over 115 scenes, with the NDSI rule running 0.117 lower on average.
 
-## 20. Gradient classes
+**Duplicate dates.** Scenes sharing an acquisition date are merged: a pixel is
+usable if usable in any scene of that date, and snow if flagged snow in any scene
+where it was usable.
+
+**Frequency.** For a period, each season contributes equally: the per-season
+ratio (snow dates / usable dates) is averaged over the seasons that have data, so
+a season with many clear dates cannot outvote a cloudy one. A value is published
+only where a pixel has **≥ 4 usable observations** in the period; multi-season
+maps additionally require **≥ 3 seasons** of support. Over all four seasons
+**99.3 %** of the window qualifies; over the spring window, 97.4 %.
+
+**Melt-out.** The satellite brackets rather than dates the disappearance: the
+last date a pixel was seen with snow, and the first usable snow-free date after
+it. The midpoint is reported together with the width of the bracket. Pixels
+lacking either bound are left unestimated — **37 % – 66 %** of pixels are
+estimable depending on season, with median bracket widths of 5 – 12 days.
+
+### The coverage bias, measured rather than caveated
+
+A pixel enters a monthly map only once it has four cloud- and shadow-free
+observations. Cast shadow and cloud shadow are rejected before counting, so
+**shaded, steep ground loses observations exactly where the snow signal matters
+most** — and in deep shade NDSI is also weakest, so a snow-covered pixel there is
+more likely than average to be scored snow-free. Both effects push the measured
+low-exposure frequency **down**, which means the reported exposure contrast is,
+if anything, conservative.
+
+`snow.coverage_bias` measures the skew instead of leaving it to a sentence.
+Inside the boundary (`operating_area_snow_by_month.csv`):
+
+| month | qualifying share | median valid obs | insolation skew | slope skew |
+|---|---|---|---|---|
+| November | 76.8 % | 17 | +19.9 kWh/m² | −2.4° |
+| **December** | **51.9 %** | **5** | **+42.5 kWh/m²** | **−4.0°** |
+| January | 59.6 % | 9 | +34.9 kWh/m² | −3.6° |
+| February | 92.2 % | 11 | +5.1 kWh/m² | −0.7° |
+| March | 97.9 % | 24 | +1.4 kWh/m² | −0.2° |
+| April | 94.0 % | 14 | +3.9 kWh/m² | −0.5° |
+
+A December snow figure here is a statement about the sunnier, gentler ~half of
+the site, and is labelled as such everywhere it appears. February through April
+are sound. **This applies to the sun-and-snow index in section 12 as well**: its
+December and January entries carry the same skew and should be read as indicative
+only.
+
+Within March, where coverage is not the issue, the pale ground on the map is real
+rather than missing: of the 1,776 ha, **37 ha (2.1 %)** lack four clear looks,
+while **224 ha (12.6 %)** have data and carried snow on half the dates or fewer.
+That low-frequency ground sits at a median 2,119 m against the site's 2,568 m —
+it is the lower, sunnier part of the site, not a gap in the record.
+
+---
+
+## 7. Joining terrain to snow
+
+Statistics that combine the two are computed on the **20 m Sentinel-2 grid**.
+Terrain and insolation are resampled from 30 m to 20 m bilinearly; **aspect is
+interpolated as a unit vector** (sin/cos components) rather than as degrees, to
+avoid the 0°/360° wrap, and is set undefined where the interpolated vector
+magnitude falls below 0.2 (opposing aspects averaging out). GeoTIFFs of terrain
+products are published at their native 30 m.
+
+**Exposure contrast.** Within each 100 m elevation band, on 15–35° slopes only,
+pixels are split at that band's own 25th and 75th insolation percentiles. Holding
+elevation fixed and taking quartiles within the band means the remaining
+difference is an exposure effect, not an elevation effect. Group sizes and
+per-group coverage are reported alongside every comparison; in the 2200–2300 m
+band over the four-season spring window, coverage is 97 % in the low-insolation
+quartile against 100 % in the high.
+
+---
+
+## 8. Gradient classes and the piste arithmetic
 
 `src/ski_terrain.py`. Class boundaries are the percent grades of the **British
-Columbia All Season Resort Guidelines, Chapter II (Mountain Resorts)**,
-converted to degrees: beginner 0–15 % (0–8.5°), novice 15–25 % (8.5–14.0°), low
+Columbia All Season Resort Guidelines, Chapter II (Mountain Resorts)**, converted
+to degrees: beginner 0–15 % (0–8.5°), novice 15–25 % (8.5–14.0°), low
 intermediate 25–35 % (14.0–19.3°), intermediate 35–40 % (19.3–21.8°), advanced
-intermediate 40–60 % (21.8–31.0°), expert above 60 % (31.0°+). Skier densities
-in the same table are that document's per-hectare ranges.
+intermediate 40–60 % (21.8–31.0°), expert above 60 % (31.0°+). Skier densities in
+the same table are that document's per-hectare ranges.
 
 This is a published planning convention from the jurisdiction the named planners
 work in. **It is not a Kazakh standard and not this project's design criteria.**
@@ -609,185 +429,31 @@ It is used only to ask whether a published mix of runs is consistent with the
 ground. "Green and blue" is read as beginner through low intermediate, i.e.
 grades up to 35 %.
 
-The class boundaries themselves are current. The table that used to stand here —
-green/blue shares for footprints A and B and for the 42 km² window — is
-**withdrawn** with section 19. The current figures are in section 30 and in
-`outputs/superski/tables/operating_area_gradient_classes.csv`.
-
-### The arithmetic, and its one assumption
-
-The operator publishes a length (60 km) and a mix (about 70 % green and blue)
-but no width, and width is what turns a length into an area. Three mean widths
-are carried through rather than one: 30 m gives 126 ha of green/blue runs, 40 m
-gives 168 ha, 50 m gives 210 ha. Against 208 ha available on footprint A that is
-61 %, 81 % and 101 % — at 50 m the arithmetic does not close. On footprint B,
-476 ha available, it is 26 %, 35 % and 44 %.
-
-So the binding constraint is not the quantity of gentle ground but its
-connectivity, and a 30 m DEM can show that it fragments without showing whether
-two benches can be joined by a lift. That is a survey question and it is listed
-as one.
-
-## 21. Finer sampling at project scale
-
-At 42 km² the horizon is sampled over **72 azimuths (5°)** instead of 36, and
-direct-sunshine duration is stepped every **5 minutes** instead of 15. Both are
-per-area overrides in `STUDY_AREAS` rather than global changes, so the cluster
-products are unchanged and comparable with Part II.
-
-The 3.9× December spread this section used to report between footprints A and B
-is **withdrawn**: it measured the gap between two inventions. The boundary's own
-December figures are in section 30.
-
-## 22. Reusing the scene cache instead of re-downloading
-
-`src/reuse_cache.py`. The 20 m project grid is a pixel-aligned subset of the
-20 m cluster grid, so the 115 Sentinel-2 windows already read for Part II
-contain every observation this window needs. The module asserts equal
-resolution, equal CRS, integer pixel offsets and containment, then slices. **No
-pixel is resampled.**
-
-Verified rather than asserted: one scene (`S2B_43TFH_20231126_0_L2A`) was
-re-read from the COGs onto the project grid and compared with the sliced arrays
-— **0 differing pixels out of 104 895** in both the snow and the validity plane.
-
-## 23. A bias this release used to leave implicit
-
-A pixel enters a monthly snow map only once it has four cloud- and shadow-free
-observations (`MIN_VALID_OBS`). Steep shaded ground fails that test more often
-than open sunlit ground, so the qualifying pixels are not a fair sample of the
-terrain — and in mid-winter, when valid observations are scarcest, the skew
-falls on exactly the quantity being measured. `snow.coverage_bias` measures
-it. The table below is the retracted 42 km² window; the boundary's own audit is
-in section 31 and in `operating_area_snow_by_month.csv`:
-
-| month | qualifying share | median valid obs | insolation skew | slope skew |
-|---|---|---|---|---|
-| November | 70.9 % | 11 | +128 kWh/m² | −3.0° |
-| **December** | **43.2 %** | **1** | **+285 kWh/m²** | **−4.5°** |
-| January | 52.8 % | 5 | +231 kWh/m² | −4.2° |
-| February | 82.7 % | 8 | +58 kWh/m² | −1.2° |
-| March | 97.9 % | 21 | +8 kWh/m² | −0.2° |
-| April | 87.4 % | 11 | +45 kWh/m² | −0.8° |
-
-A December snow figure here is a statement about the sunnier, gentler 43 % of
-the terrain. February through April are sound. **This applies to the Part II
-sun-and-snow index as well**: its December and January entries carry the same
-skew, and should be read as indicative only. The index was not recomputed, but
-the caveat is now explicit rather than absent.
-
-## 24. Comparable operating areas
-
-`src/resorts.py`. Part II compared Kok Zhailau against the OSM
-`landuse=winter_sports` polygons for Shymbulak and Oi-Qaragai, which are 2.2 and
-1.0 km² — far smaller than either resort operates. That comparison is
-**superseded**. One rule is now applied to every place: an operating area is the
-ground within 150 m of its lift lines unioned with the ground within 100 m of
-its pistes, with lines assigned to the nearest named place within 3.5 km.
-
-| place | lifts | lift km | pistes | piste km |
-|---|---|---|---|---|
-| Shymbulak | 7 | 10.73 | 24 | 18.6 |
-| Oi-Qaragai | 8 | 6.51 | 6 | 4.7 |
-| unassigned | 6 | 3.81 | 2 | 1.1 |
-
-Seven lifts at Shymbulak is an independent match to the "7 lines" in the
-April 2026 statement.
-
-Kok Zhailau has neither lifts nor pistes, so it enters as the **drawn operating
-boundary**, cut to the same 15–35° gradients as every other area. That asymmetry
-is real and cannot be removed: a working resort's corridors are *where planners
-already chose to build*, which is a selected sample of good terrain, while the
-drawn boundary is a line round a whole mountainside. Cutting all three to the
-same gradients and comparing band by band is what keeps the comparison honest.
-Earlier releases used footprint B here instead; see Part V, section 33.
-
-### Holding altitude and gradient constant
-
-Every area is restricted to 15–35° and compared band by 200 m elevation band,
-with a band reported only where that area holds at least 50 pixels in it. Against
-footprint B:
-
-* Shymbulak's corridors: **−134 kWh/m²** of November–April energy over 8 shared
-  bands, and snow detected **+0.074** more often in March. They trade sun for
-  snow.
-* Oi-Qaragai: **+90 kWh/m²** and **+0.182**. But Oi-Qaragai sits at 1 520–2 280 m
-  under forest, and NDSI beneath canopy is a known weak point, so this is the
-  least comparable number in the table and is labelled as such.
-
-Sun and snow do not rank these places the same way — the same result Part II
-found *within* one area, reappearing *between* areas.
-
-## 25. Does the DEM choice change the answer?
-
-`src/dem_validation.py`. Comparing elevations is the half of a DEM check that
-flatters every product. The planning reads slope, horizon, insolation and
-sunshine hours, so the **whole chain** — slope, aspect, ray-marched horizon, sky
-view factor, clear-sky insolation, direct-sunshine duration — was rebuilt on
-NASADEM and ALOS World 3D-30m and the *products* compared, on skiable gradients
-only (49 883 pixels of the 70 km² window). Recomputed for Part V; the figures
-below supersede the 42 km² window's.
-
-| layer | min correlation vs GLO-30 | p95 abs difference (NASADEM / ALOS) |
-|---|---|---|
-| elevation | 0.99992 | 13.4 / 11.1 m |
-| slope | 0.827 | 7.5 / 5.9° |
-| sky view factor | 0.905 | 0.047 / 0.034 |
-| insolation Nov–Apr | 0.981 | 123 / 78 kWh/m² (23 / 17 %) |
-| insolation December | 0.982 | 19.8 / 10.6 kWh/m² (59 / 37 %) |
-| direct sun hours Nov–Apr | 0.970 | 202 / 148 h (27 / 18 %) |
-
-Two findings, and they point in opposite directions:
-
-1. **Agreement does not survive differentiation.** Elevation correlates at
-   0.99992 and slope, built from those same pixels, at 0.827.
-2. **Bias is negligible, spread is not.** The December median difference is at
-   worst 0.2 kWh/m², but at the 95th percentile the December figure moves by
-   37–59 % of its own value depending on which open DEM was used.
-3. **The ranking survives.** 84–94 % of the top tenth of terrain is the same
-   ground whichever DEM is used (Spearman 0.969–0.988).
-
-Operationally: screen sites with this, on any of the three DEMs. Do not sign off
-one site's December number on it without a horizon survey or a local DEM.
-
-## 26. Weather at this scale
-
-ERA5-Land is ~9 km and ERA5 ~31 km against a 6 km window spanning 1 867 m of
-relief, so reanalysis here is a regional season descriptor, not a site record.
-ERA5-Land returns no precipitation at this point through the archive API, so
-snowfall and precipitation come from ERA5 and are labelled separately rather
-than silently summed to zero. The published Kazhydromet seasonal outlook
-(issued 16 November 2026) is oblast-level with no mountain zone.
-
-## 27. What Part III still cannot settle
-
-`outputs/superski/tables/local_measurements_required.csv` lists eight
-quantities with the measurement each needs and why orbit cannot supply it,
-including the three that Part III itself created the case for: a site-specific
-December sun figure (section 25), mid-winter snow statistics on shaded ground
-(section 23), and whether two gentle benches can be joined by a lift
-(section 19).
+**The arithmetic, and its one assumption.** The operator publishes a length
+(60 km) and a mix but no width, and width is what turns a length into an area.
+Three mean widths are carried through rather than one: 30, 40 and 50 m. Both
+published mixes (section 9) are reported side by side, and
+`operating_area_piste_feasibility.csv` names the source in a column. Nothing
+downstream picks silently.
 
 ---
 
-# PART IV — The study area, re-derived and then hand-drawn (added 24 November 2026)
+## 9. What the operator publishes, and two sources that disagree
 
-Parts I–III ran on a rectangle the author chose. Part IV replaces it twice: once
-with a rectangle derived from the operator's own general plan, and once more with
-a boundary drawn over imagery. Several Part III numbers do not survive that, and
-section 31 lists each one that is withdrawn.
+From the board meeting of Kazakh Tourism Development on 18 November 2026, chaired
+by the Prime Minister, together with the company's general-plan sheet: **60 km of
+runs, 16 lifts of which 11 cableways are POMA's, a difficulty split of 10.6 %
+green / 50.3 % blue / 22.7 % red / 16.4 % black, 70 % of runs equipped with
+snowmaking, up to 10 000 skiers a day, 9 000 000 tourists a year, 1 022 ha of
+territory with about 20 ha built on, and a launch in December 2028**, with a
+mountain-village concept by BIG, timber base- and top-station structures by
+Blumer-Lehmann, and Ecosign also engaged.
 
-## 28. Two published sources, and the 70 % that belongs to snowmaking
-
-Sheet 3 of the Kazakh Tourism Development general plan, *«Генеральный план
-горнолыжного курорта Almaty Superski»*, states **16 lifts**, a difficulty split
-of **10.6 % green / 50.3 % blue / 22.7 % red / 16.4 % black**, 60 km of runs,
-10,000 skiers a day, 9,000,000 tourists a year, and that **70 % of runs will be
-equipped with snowmaking**. Press reporting of the April 2026 statement gave
-**17 lifts** and "about 70 % of runs green and blue", which Parts II and III used.
+Press reporting of the April 2026 statement instead gave **17 lifts** and "about
+70 % of runs green and blue".
 
 Green and blue on the operator's own sheet sum to **60.9 %**, not 70 %. The same
-70 % appearing in the sheet against snowmaking makes a conflation the most
+70 % appearing in the sheet against *snowmaking* makes a conflation the most
 economical explanation, but the April text was not re-read for this release — a
 search of the primeminister.kz archive reached only as far back as October 2026 —
 so the press figure is **not disproved, only contradicted by a later and more
@@ -801,246 +467,375 @@ PROJECT_LIFTS = 16 ; PROJECT_LIFTS_PRESS = 17
 PROJECT_SNOWMAKING_SHARE = 0.70
 ```
 
-`operating_area_piste_feasibility.csv` reports every demand figure twice, once
-per source, and names the source in a column. Nothing downstream picks silently.
-
-## 29. Re-deriving the rectangle from control points
-
-The general-plan sheet is a perspective panorama: no projection, no scale bar, no
-graticule. It cannot be georeferenced, because an affine or polynomial transform
-assumes a plan view. **Nothing in this release is traced from it.**
-
-What it does carry is named features, and those can be located independently.
-Seven labels on the sheet were resolved against OpenStreetMap peaks, saddles and
-places, plus this project's own plateau reference point:
-
-| sheet label | OSM feature | lon, lat | ele |
-|---|---|---|---|
-| MEDEU | place, suburb | 77.05757, 43.15944 | — |
-| KOKGAILAU PLATEAU 1951 m | project reference point | 77.00433, 43.14239 | — |
-| THREE BROTHERS ROCKS | peak «Три брата» | 77.01337, 43.12687 | 2860 |
-| MOUNTAIN KUMBEL 3250 m | peak «Qumbel» | 77.03130, 43.11934 | 3221 |
-| KUMBELTAU RANGE 3500 m | peak «Qumbeltau» | 77.04056, 43.08490 | 3618 |
-| KIMASAR | saddle «Кімасар» | 77.08281, 43.17116 | 2080 |
-| SHYMBULAK | landuse=winter_sports | 77.09312, 43.12275 | — |
-
-The `superski` rectangle was the envelope of those points plus a 1.5 km working
-buffer: 76.955–77.095° E, 43.078–43.172° N, 125 km², 389 × 358 at 30 m. **That
-rectangle is itself retired** — see Part V, section 33 — because the control
-points include Medeu and the Kimasar saddle at the city edge, so the envelope had
-to stretch about 3 km north of anywhere skiing is planned. The control-point
-table above is kept because it is the evidence that moved the study area.
-
-The rectangle it replaces failed three tests against the same control points.
-Kumbeltau (3,618 m), Shymbulak and the Kimasar saddle all fell outside it — three
-of the seven control points; **37.6 %** of it lay below 1,900 m, the elevation of
-the base village on the plan; and **0 ha** of it reached above 3,400 m, where the
-plan puts a top station. In the plan's 1,900–3,400 m operating band the old
-rectangle held 4,314 ha against **9,187 ha** in the new one, while the ground
-below the village grew only from 2,598 to 2,810 ha, and 537 ha appeared above
-3,400 m where there had been none. The replacement adds relevant terrain, not
-margin. Notebook 06 section 1 recomputes this on each area's own grid; earlier
-drafts of this section quoted a coarser estimate taken by lon/lat subsetting the
-cluster grid, and those figures are corrected here.
-
-Horizon sampling was raised to **72 azimuths** and sunshine duration to a
-**10-minute** step for this area, affordable because it is a third of the
-cluster's size.
-
-## 30. The hand-drawn operating boundary
-
-A rectangle is a compute grid, not a site. The reporting boundary is a polygon of
-**24 vertices** digitised over satellite imagery in Google Earth and exported as
-KML, held at `qgis/operating_area.geojson` in EPSG:4326.
-
-`src/operating_area.py` is the whole contract. It loads the polygon, repairs a
-self-intersection with a zero-width buffer if one is present and refuses anything
-that is not a single valid `Polygon`; derives a buffered, outward-snapped compute
-bbox from it; rasterises it onto any analysis grid with `rasterio.features`; and
-returns a provenance sentence that every figure caption and table carries, so a
-reader never has to ask which boundary a number came from. `is_draft()`
-distinguishes a machine-generated starting shape from one a human has drawn.
-
-`src/pipeline_operating_area.py` runs everything the boundary decides — shape and
-contiguity, gradient classes, piste feasibility under both published mixes,
-monthly sun, monthly snow with its coverage audit, and two figures — and rewrites
-six tables. Redrawing
-the polygon and re-running that one script is the entire update path; terrain,
-horizon, insolation and sunshine hours are not recomputed, because the boundary
-cannot change them. The boundary must therefore lie inside the compute rectangle,
-and the script fails loudly if it does not.
-
-The boundary encloses **1,776 ha**, which is **174 %** of the 1,022 ha the
-operator states. That gap is not an error in either number: 1,022 ha is a stated
-territory with no published coordinates, and this polygon is a reading of the
-*operating area*, which may legitimately extend beyond a land allocation. It is
-recorded as a difference, not reconciled away. **It is not an official boundary.**
-
-### What the boundary is worth — WITHDRAWN
-
-> This subsection reported the boundary against two reconstructions of exactly
-> the same area: **A**, a disc on the plateau, and **B**, the gentlest ground
-> within 3.5 km. Both are withdrawn and `src/footprint.py` is deleted. See
-> Part V, section 33. The boundary's own figures are unchanged:
-
-| | drawn boundary |
-|---|---|
-| pieces | 1 |
-| elevation | 1775–3291 m |
-| vertical | 1516 m |
-| median slope | 28.8° |
-| green/blue | 364 ha (20.5 %) |
-| green/blue pieces | 133 |
-| largest gentle field | **182 ha (50 %)** |
-
-Half of the gentle ground is one unbroken field. Connectivity is the quantity
-that matters for a lift network, and it is the one a 30 m DEM can measure.
-
-## 31. What Part III claimed that Part IV withdraws
-
-* **"The implied green/blue area is up to 101 % of the gentle ground that exists."**
-  Withdrawn. It combined the superseded footprint A with the conflated 70 %. On
-  the drawn boundary and the operator's own 60.9 %, the same arithmetic gives
-  **30–50 %** depending on assumed piste width, and **35–58 %** on the press
-  figure. The easy-terrain budget is not the binding constraint.
-* **"The gentle ground exists; it is not in one place."**
-  Withdrawn as stated. Inside the drawn boundary half of the gentle ground is a
-  single 182 ha field. Fragmentation is a property of the slope-optimised
-  placement, not of the site.
-* **"Where the 1,022 ha is placed moves mid-winter sun by 3.9×."**
-  Withdrawn: it measured the gap between two inventions. The drawn boundary's
-  December median is 110 h with **168 h on its green/blue ground** — the gentle
-  shelves are sunnier than the site average, not darker.
-* **"In December only 43.2 % of the window qualifies, median one valid
-  observation."** Superseded by the boundary's own audit: **51.9 %** on a median
-  of **5**, biased **+42.5 kWh/m²** sunnier and **4.0°** gentler. March is sound at
-  97.9 % on a median of 24, bias +1.3 kWh/m² and −0.2°.
-* **17 lifts and about 70 % green and blue.** Superseded by the general plan; see
-  section 28. Both figures remain in `config.py` under their source.
-
-Sections 24 (comparable operating areas) and 25 (DEM propagation) survive, but
-both were recomputed in Part V on the drawn boundary and its window, and their
-numbers moved. See section 33.
-
-## 32. What Part IV still cannot settle
-
-The boundary is one person's reading of imagery. It is not surveyed, not official,
-and 174 % of the stated territory; a published GIS layer would replace it in one
-file. Neither it nor any rectangle here establishes where a lift may legally be
-built: the site lies against Ile-Alatau National Park, and no protected-area
-geometry is carried in this release. Whether the 182 ha gentle field can actually
-be served by the same lift that serves the upper mountain is a question about
-alignment and vertical, not about the terrain statistics computed here, and
-section 27's list of measurements that orbit cannot supply still stands in full.
+Still unpublished, and therefore still absent from this release: any boundary,
+any lift alignment, any station coordinate, any elevation, any capacity in
+persons per hour, and any breakdown of the 60 km by difficulty.
 
 ---
 
-# PART V — One study area: the polygon (added 24 November 2026)
+## 10. What is inside the boundary
 
-Part IV replaced an author-chosen rectangle with a derived one and then drew a
-boundary inside it. It stopped one step short: the derived rectangle stayed the
-reporting unit for notebooks 01–03, and notebook 05 went on reporting project
-scale over two synthetic footprints. Part V finishes the job. **The study area is
-the drawn polygon. Everything else is a margin.**
+`operating_area_terrain.csv`, `operating_area_gradient_classes.csv`,
+`operating_area_piste_feasibility.csv`, `operating_area_sun_by_month.csv`,
+`operating_area_snow_by_month.csv`. Notebook 06 is the narrative.
 
-## 33. What was removed, and the measurement that forced it
+**Gradient and contiguity.**
 
-### The rectangles
-
-The `superski` rectangle of Part IV is the envelope of seven control points the
-general-plan sheet names. Those points include Medeu and the Kimasar saddle, both
-at the city edge, so the envelope had to reach about **3 km north** of anywhere
-skiing is planned, down to **1,255 m** — the dacha belt below the plateau. On its
-own grid:
-
-| | value |
+| | |
 |---|---|
-| rectangle | 125.3 km² |
-| drawn boundary inside it | 17.8 km² = **14 %** |
-| ground below the boundary's floor (1,775 m) | 19.9 km² = 16 % of the rectangle |
-| strip north of the boundary | 36.4 km², median elevation 1,773 m |
+| ground at green/blue gradients (≤ 19.3°) | **364 ha**, 20.5 % of the boundary |
+| in how many pieces | 133 |
+| largest unbroken piece | **182 ha = 50 %** of all the gentle ground |
+| above 31° | 39.1 % |
 
-Every median notebooks 01–03 reported was therefore a median over ground that is
-86 % not the site, and a sixth of it lower than anything the boundary touches.
-The first release's 69 km² rectangle had the same fault in the other direction.
+Contiguity is reported with `scipy.ndimage.label` because it is the result, not a
+diagnostic. Quantity is not the constraint here; connectivity is, and
+connectivity is what a lift network consumes. What a 30 m DEM cannot show is
+whether two separate benches can be joined by a lift — a survey question, listed
+as one in section 18.
 
-Both are deleted from `config.py`, and so are their output subtrees. `superski`
-now means the boundary plus the **1 km working margin** that
-`operating_area.bbox()` returns: 76.950–77.055° E, 43.085–43.155° N, **70.2 km²**,
-292 × 267 at 30 m, margins of 1.0–1.7 km on each side. The boundary is 25 % of it.
-The west edge is clipped to the cluster rectangle's own west edge so the 20 m
-grids stay pixel-aligned and the Sentinel-2 cache can still be sliced rather than
-re-downloaded.
+**The piste arithmetic closes with room.** 60 km of runs at the general plan's
+60.9 % green and blue implies 110 ha of easy piste at a 30 m mean width, 146 ha
+at 40 m and 183 ha at 50 m — **30 %, 40 % and 50 %** of the 364 ha available. On
+the press figure of 70 % it is **35 %, 46 % and 58 %**.
 
-The margin is not a reporting unit and never appears as one. `boundary_vs_window.csv`
-states what is inside and what is not, so the distinction can be checked rather
-than trusted.
+**Sun.** Median direct sun across the whole of December is **110 h** inside the
+boundary, 3.6 h a day, and the bottom tenth of pixels sees **none at all**. On the
+green/blue ground it is **168 h, 5.4 h a day**. The plateau faces the city, which
+is north — but the gentle shelves that would carry beginner runs are not the
+north-facing part of it. By March the site median is 274 h, 8.8 h a day.
 
-### The footprints
+**Snow.** March median detection frequency inside the boundary is **1.00** on a
+median of 24 usable observations; December is 1.00 on a median of 5, over the
+51.9 % of the site that qualifies at all (section 6).
 
-`src/footprint.py` is **deleted**, with the two 1,022 ha reconstructions it built
-and every number derived from them. The reasons, in order of weight:
+---
 
-1. **Neither was the operating area.** They were machine guesses at where a
-   resort might be put, and the prose carried their figures as if they described
-   the project.
-2. **The disc sat over the dacha belt.** Centred on the plateau reference point,
-   it covered ground about 3 km north of the drawn boundary where nothing is
-   planned and where private plots sit.
-3. **"Gentlest ground within 3.5 km" is by construction the most flattering
-   placement available.** Using it as the adversarial reference was defensible
-   while there was no boundary; once there is one, reporting against it inflates
-   what the site is credited with and depresses what its gentle ground is
-   credited with holding together.
+## 11. Comparable operating areas
 
-Nothing replaces them. `pipeline_operating_area.terrain_inside()` reports one
-row for one boundary, and the figure that used to show three placements
-(`07_boundary_vs_reconstructions.png`) is replaced by `07_gentle_ground.png`,
-which shows the gentle ground inside the boundary and the same ground by December
-sun.
+`src/resorts.py`. Comparing the site against the OSM `landuse=winter_sports`
+polygons for Shymbulak and Oi-Qaragai would be unfair: those are 2.2 and 1.0 km²,
+far smaller than either resort operates. One rule is applied to every place
+instead: **an operating area is the ground within 150 m of its lift lines unioned
+with the ground within 100 m of its pistes**, with lines assigned to the nearest
+named place within 3.5 km.
 
-### Consequences in Parts I–IV
+| place | lifts | lift km | pistes | piste km |
+|---|---|---|---|---|
+| Shymbulak | 7 | 10.73 | 24 | 18.6 |
+| Oi-Qaragai | 8 | 6.51 | 6 | 4.7 |
+| unassigned | 6 | 3.81 | 2 | 1.1 |
 
-* **Sections 19, 20 (its footprint table), 21 (its 3.9× sun claim) and 23 (its
-  bias table) are withdrawn.** They are left in place, marked, so the retraction
-  can be checked.
-* **Section 24 survives with new numbers.** Kok Zhailau now enters the
-  three-place comparison as the drawn boundary cut to 15–35°, not as footprint B.
-  Against that reference Shymbulak's corridors take **−62 kWh/m²** of winter
-  energy and **−224 h** of direct sun over 8 shared bands and hold March snow
-  **+0.018** more often; Oi-Qaragai takes **+95 kWh/m²**, **+89 h** and
-  **+0.301** over 3 bands at 1,800–2,200 m, under canopy where NDSI is weakest.
-  Shymbulak's snow advantage was +0.074 against footprint B and is +0.018 against
-  the whole boundary: the earlier figure compared a corridor with a hand-picked
-  best patch, and the smaller number is the honest one.
-* **Section 25 survives, recomputed** on the 292 × 267 window; its table in that
-  section is the current one.
-* **Section 22 survives unchanged in method.** The window still slices the
-  cluster's scene cache: 115 scenes at offset (row 487, col 11), and one scene
-  re-read from the COGs matched the sliced arrays on **0 differing pixels out of
-  174,800** in both planes.
-* **Notebook 04 is untouched.** The cluster never depended on where this boundary
-  is drawn.
+Seven lifts at Shymbulak is an independent match to the "7 lines" in the
+April 2026 statement.
 
-### What moved in notebooks 01–03
+Kok Zhailau has neither lifts nor pistes, because nothing is built there, so it
+enters as the **drawn boundary**, rasterised onto the cluster grid. That asymmetry
+is real and cannot be removed: a working resort's corridors are *where planners
+already chose to build*, which is a selected sample of good terrain, while the
+drawn boundary is a line round a whole mountainside.
 
-Moving from 125 km² to 70 km² changed the area-wide statistics, as it must. The
-direction of every finding held:
+**Holding altitude and gradient constant.** Every area is restricted to 15–35° and
+compared band by 200 m elevation band, with a band reported only where that area
+holds at least 50 pixels in it. Against the drawn boundary:
 
-| | on 125 km² | on 70 km² |
+* **Shymbulak's corridors**: **−62 kWh/m²** of November–April energy and **−224 h**
+  of direct sun over 8 shared 200 m bands spanning 1 800 – 3 400 m, and March snow detected
+  **+0.018** more often. They trade sun for snow — they sit in the shade of Talgar.
+* **Oi-Qaragai**: **+95 kWh/m²**, **+89 h** and **+0.301**, over only 3 shared
+  bands spanning 1 800 – 2 400 m, and it sits under forest where NDSI beneath canopy is a
+  known weak point. This is the least comparable number in the table and is
+  labelled as such.
+
+The median difference understates where the action is. Shymbulak's March snow
+advantage is +0.018 over eight bands because five of them have both areas at
+1.00; below 2 400 m the gap is large — 0.83 against 0.46 at 1 800 – 2 000 m, 0.89
+against 0.65 at 2 000 – 2 200 m. The band table
+(`three_area_elevation_bands.csv`) is the thing to read, not the summary.
+
+Sun and snow do not rank these places the same way — the same result notebook 04
+finds *within* one area, reappearing *between* areas.
+
+---
+
+## 12. The sun-and-snow index
+
+`sunlit fraction × snow detection frequency` for the month — the share of a zone
+that is, at that hour, both in the sun and (on four seasons of satellite record)
+usually snow-covered. **A screening index, not a forecast.** It multiplies a
+clear-sky geometric quantity by an empirical frequency; it says nothing about
+whether a given day will be clear, and nothing about snow depth.
+
+On the existing lift corridors in the cluster the daily window with over half the
+corridor in sun runs **10:00–14:00 in December** (peak 69 % sunlit at noon) and
+**08:00–17:00 in March** (100 % at midday). The index peaks in **February around
+12:00**, where 96 % sunlit meets a 100 % snow-detection frequency.
+
+---
+
+## 13. The 2027 outlook
+
+Three separate things, deliberately kept apart.
+
+**1. Clear-sky insolation for 2027.** Deterministic solar geometry with
+climatological turbidity, computed on 2027 calendar dates. This is the only part
+of the outlook that is a calculation rather than an analogue.
+
+**2. Spring timing scenarios.** No forecast of 2027 snow cover is made, because
+nothing in this data supports one. Instead the four-season spring record is
+re-cut against three calendar windows — 11 March → 20 April (the historical
+analogue), the same window ten days earlier, and ten days later — and the three
+maps are compared **on the pixels observed in all three** (40.38 km², 87.2 % of
+skiable terrain). That isolates the effect of timing from the effect of coverage.
+The median detection frequency moves 0.93 → 0.89 → 0.74 across the range, an
+18-percentage-point swing. **No probabilities are attached**: assigning one would
+need a calibrated and verified model, which this is not.
+
+**3. Published seasonal outlooks**, transcribed from the primary documents and
+stored in `docs/seasonal_outlooks.json`:
+
+* **Kazhydromet**, *Сезонный прогноз погоды, декабрь 2026 – февраль 2027*, issued
+  16 November 2026, retrieved 19 November 2026
+  ([PDF](https://www.kazhydromet.kz/uploads/files_calendar/13401/file/6afacdf27e503sp-na-zimu-2026-2027-gg-ot-16-11-2026g.pdf),
+  [landing page](https://www.kazhydromet.kz/ru/weather/konsultativnyy-prognoz-pogody-na-sezon)).
+  Advisory, issued for 17 oblasts, normals 1991–2020, analogue years December 2005
+  and January–February 2026. For the Almaty area: December temperature above
+  normal by 1–2 °C over most of the country (near normal in the east of Almaty
+  oblast), precipitation near normal nationwide; January temperature above normal
+  by 1–2 °C, precipitation below normal in the northern half of Almaty oblast;
+  February temperature above normal by 1–3 °C, precipitation above normal over
+  most of the country.
+* **C3S multi-system seasonal forecast**, November 2026 issue (1 November
+  initialisation, graphics published 10 November 2026 12 UTC), retrieved
+  19 November 2026. Published highlights: ENSO expected to peak around the end of
+  2026, with eastern Asia among the wetter-than-average regions. **The C3S anomaly
+  charts render client-side and no Central Asia value could be read
+  programmatically on the retrieval date**; the exact chart URLs are recorded in
+  `docs/seasonal_outlooks.json` so a reader can check them directly. No anomaly
+  value is invented here.
+
+**Scale caveat.** Both outlooks are warm-leaning at a scale of hundreds of
+kilometres. Almaty oblast spans roughly 500 – 5 000 m; a single oblast statement
+cannot be read as a forecast for a site that itself spans 1 775 – 3 291 m, and
+neither outlook forecasts snow depth.
+
+---
+
+## 14. Validation: does the DEM choice change the answer?
+
+`src/dem_validation.py`. Comparing elevations is the half of a DEM check that
+flatters every product. The planning reads slope, horizon, insolation and
+sunshine hours, so the **whole chain** — slope, aspect, ray-marched horizon, sky
+view factor, clear-sky insolation, direct-sunshine duration — was rebuilt on
+NASADEM and ALOS World 3D-30m and the *products* compared, on skiable gradients
+only (**49 883 pixels** of the window).
+
+| layer | min correlation vs GLO-30 | p95 abs difference (NASADEM / ALOS) |
 |---|---|---|
-| north vs south insolation, 2200–2300 m band | 259.5 / 527.4 kWh/m² | **263.2 / 528.8** |
-| spring snow, north vs south in that band | 92 % / 35 % | **87.5 % / 32.5 %** |
-| by insolation quartile, elevation held fixed | 91.7 % / 40.1 % | **85.7 % / 38.7 %** |
-| ±10-day timing swing (common mask) | 22 pp on 76.93 km² | **18 pp on 40.38 km²** |
-| December shaded fraction | 63 % | **63 %** |
-| December vs March insolation | 32.3 / 155.8 kWh/m² | **31.1 / 157.3** |
+| elevation | 0.99992 | 13.4 / 11.1 m |
+| slope | 0.827 | 7.5 / 5.9° |
+| sky view factor | 0.905 | 0.047 / 0.034 |
+| insolation Nov–Apr | 0.981 | 123 / 78 kWh/m² (23 / 17 %) |
+| insolation December | 0.982 | 19.8 / 10.6 kWh/m² (59 / 37 %) |
+| direct sun hours Nov–Apr | 0.970 | 202 / 148 h (27 / 18 %) |
 
-## 34. What Part V still cannot settle
+Three findings, and they do not point the same way:
 
-Narrowing the window does not make the boundary official, surveyed or correct.
-It is still one person's reading of imagery, still 174 % of the stated territory,
-and still replaceable in one file the day the operator publishes a GIS layer.
-What has changed is only that no number in this release is now an average over
-ground nobody intends to ski on. Section 32's limits stand in full, and so does
-section 27's list of measurements that orbit cannot supply.
+1. **Agreement does not survive differentiation.** Elevation correlates at
+   0.99992 and slope, built from those same pixels, at 0.827.
+2. **Bias is negligible, spread is not.** The December median difference is at
+   worst 0.2 kWh/m², but at the 95th percentile the December figure moves by
+   **37–59 %** of its own value depending on which open DEM was used.
+3. **The ranking survives.** **84–94 %** of the top tenth of terrain is the same
+   ground whichever DEM is used (Spearman 0.969–0.988).
+
+Operationally: screen sites with this, on any of the three DEMs. Do not sign off
+one site's December number on it without a horizon survey or a local DEM.
+
+---
+
+## 15. Cross-validation against independent sources
+
+Nothing here rests on a single sensor. These checks run on the cluster area,
+where the samples are largest.
+
+### Elevation — three DEMs
+
+| DEM | sensor and epoch | mean Δ | median Δ | σ | p95 \|Δ\| | correlation |
+|---|---|---|---|---|---|---|
+| NASADEM | radar, SRTM 2000, EGM96 | +0.26 m | −0.09 m | 7.40 m | 13.97 m | 0.999952 |
+| ALOS AW3D30 | optical stereo 2006–2011, EGM96 | +1.92 m | +1.59 m | 7.15 m | 12.68 m | 0.999956 |
+
+Against Copernicus GLO-30 (radar, TanDEM-X 2010–2015, EGM2008) on 449 018 cluster
+pixels. The three have largely independent error sources, so agreement to a few
+metres is meaningful. NASADEM reads 1.4° flatter in slope on average, consistent
+with SRTM's coarser effective resolution.
+
+### Snow — Landsat 8/9 against Sentinel-2
+
+77 Landsat 8/9 Collection 2 Level-2 scenes (cloud < 20 %) over the four seasons,
+read through the Microsoft Planetary Computer and reduced with the **same**
+NDSI > 0.40 and NIR > 0.11 rule, masked with `QA_PIXEL` (fill, dilated cloud,
+cirrus, cloud, cloud shadow). Landsat 7 is excluded: its scan-line corrector
+failed in 2003 and the striping corrupts area statistics.
+
+* Within Landsat, our rule against the USGS `QA_PIXEL` snow flag: **r = 0.879**.
+* Against Sentinel-2, **scene-aggregate**, same date ±1 day: r = 0.820, mean
+  difference +0.353.
+* Against Sentinel-2, **same date and restricted to pixels both call usable**:
+  **r = 0.969**, mean difference **+0.096**, per-pixel agreement **86.8 %**, over
+  25 dates and 8.5 M common pixels.
+
+The scene-aggregate comparison is unfair, and the gap between the two rows is the
+lesson: each sensor was averaging over *its own* valid pixels, and Landsat's
+`dilated_cloud` bit deliberately removes a wide halo. Almost all of the apparent
+disagreement was the two masks covering different ground.
+
+What remains is one-sided — Sentinel-2 calls snow on 11.4 % of common pixels where
+Landsat does not, against 1.8 % the other way — which is the direction a 30 m
+sensor resampled to a 20 m grid should err in, since a part-snow pixel averages
+below the NDSI threshold at the coarser footprint. Landsat also crosses roughly
+half an hour earlier. The two records are consistent.
+
+### MODIS daily snow cover
+
+MOD10A1 and MYD10A1 v061 `NDSI_Snow_Cover`, 500 m, read over the cluster area for
+February–April 2023. Granules with less than half the area unclouded are dropped.
+The result adds **36 days on which Sentinel-2 has no usable scene** in that
+window, against 14 Sentinel-2 dates — the melt-timing signal between clear optical
+dates. At 500 m over 2 km of relief this is regional context and never an answer
+about an individual slope.
+
+### A bug this found
+
+Windowed COG reads originally computed the read window from the AOI bounds in the
+**target** CRS against the **source** transform. That is correct only while the
+two CRSs match — which they did for Sentinel-2 and Landsat, both EPSG:32643 — and
+silently read the wrong place otherwise. MODIS is in a sinusoidal projection, and
+the first MODIS run returned exactly zero snow everywhere with a valid fraction of
+1.0. The read now transforms the bounds into the source CRS first (densified at
+21 points per edge). Sentinel-2 and Landsat results are unaffected; this was
+verified by checking the CRS of every Landsat scene used.
+
+---
+
+## 16. OpenStreetMap reference layers, and reusing the scene cache
+
+**OSM.** Queried once through the Overpass API over 76.85–77.30 E, 43.00–43.25 N
+and cached in `data/raw/osm/`. Licence: ODbL, © OpenStreetMap contributors.
+Inside the cluster rectangle: **21 aerialway lines longer than 150 m totalling
+21.1 km**, 23 lift stations, 32 mapped downhill pistes totalling 24.4 km, 63 named
+peaks, 36 named saddles, and the Shymbulak and Oi-Qaragai `landuse=winter_sports`
+polygons. Lift corridors are everything within 150 m of an existing line
+(7.36 km²), piste corridors within 100 m (3.00 km²).
+
+**These are the lifts that exist today.** No planned alignment is drawn anywhere
+in this release, because none has been published.
+
+**Scene cache.** `src/reuse_cache.py`, driven by `src/slice_window_cache.py`. The
+20 m study window is a pixel-aligned subset of the 20 m cluster grid, so the 115
+Sentinel-2 windows already read for the cluster contain every observation the
+window needs. The module asserts equal resolution, equal CRS, integer pixel
+offsets and containment, then slices at offset (row 487, col 11). **No pixel is
+resampled.**
+
+Verified rather than asserted: one scene (`S2B_43TFH_20231126_0_L2A`) was re-read
+from the COGs onto the window grid and compared with the sliced arrays — **0
+differing pixels out of 174 800** in both the snow and the validity plane.
+
+---
+
+## 17. Weather at this scale
+
+One ERA5-Land cell is ~9 km across and one ERA5 cell ~31 km, against an operating
+area of 17.8 km² spanning 1 516 m of relief. Reanalysis here is a regional season
+descriptor, not a site record.
+
+Daily ERA5-Land (cell elevation 2 235 m) at the plateau point via the Open-Meteo
+Historical Weather API, for temperature. **ERA5-Land returns no precipitation at
+this point through that API**, so snowfall and precipitation fall back to ERA5 at
+~31 km and are labelled as such rather than silently summed to zero. Both grids
+smooth the orography heavily and ERA5 precipitation over complex terrain carries
+large errors; they say what kind of winter a season was, and are not evidence
+about any individual slope.
+
+The published Kazhydromet seasonal outlook is oblast-level with no mountain zone.
+
+---
+
+## 18. What this study cannot tell you
+
+| Question | Why not | What would answer it |
+|---|---|---|
+| Number of ski days | A frequency is a share of **usable satellite dates**, not days of operation | continuous depth record against an operating threshold |
+| Snow depth or water equivalent | Optical imagery sees the surface, not what is under it | snow pillow or ultrasonic depth sensor plus density cores, on at least one shaded and one sunny plot in the same elevation band |
+| Season opening date | A 5-day revisit with cloud gaps cannot resolve a threshold crossing to the day | the same record, over several seasons |
+| Mid-winter snow on shaded ground | In December only 51.9 % of the site has four clear looks, and that subset is +42.5 kWh/m² sunnier | ground observation, or Sentinel-1 SAR wet-snow retrieval to see through cloud |
+| The December sun figure for one specific site | Open DEMs disagree by 37–59 % at the 95th percentile on exactly this quantity | a horizon survey from the site, or a short-baseline photogrammetric or lidar DEM |
+| Real (not clear-sky) irradiance | The model is clear-sky by construction; cloud attenuation is unmeasured | two pyranometers on contrasting aspects inside the boundary |
+| Snowmaking feasibility or cost | None of the governing variables is observed from orbit | wet-bulb temperature at the gun line, wind speed and direction, water yield and temperature, equipment curves |
+| Avalanche hazard | Slope angle is geometry; release depends on the snowpack | snowpack profiles, wind transport and loading, mapped start and runout zones, local forecaster judgement |
+| Where the beginner terrain can physically go | A 30 m DEM resolves that the gentle ground arrives in 133 pieces, not whether two of them can be joined | a design-grade survey of the gentle benches and of what can be linked by lift |
+| Resort boundaries or trail alignments | Not derivable from open terrain data | official GIS layers from the project |
+
+The full table, with why orbit cannot supply each quantity, is in
+`outputs/superski/tables/local_measurements_required.csv`.
+
+A four-season record is also far too short to support any statement about trend.
+
+**Two further limits.** The boundary is one person's reading of imagery: not
+surveyed, not official, 174 % of the stated territory, and replaceable in one file
+the day the operator publishes a GIS layer. And nothing here establishes where a
+lift may legally be built — the site lies against Ile-Alatau National Park, and no
+protected-area geometry is carried in this release.
+
+---
+
+## 19. Attribution and licences
+
+* **Copernicus DEM GLO-30** — © DLR e.V. 2010–2014 and © Airbus Defence and Space
+  GmbH 2014–2018, provided under the Copernicus DEM open licence; distributed via
+  the AWS Open Data registry.
+* **Sentinel-2 L2A** — Copernicus Sentinel data 2022–2026, processed by ESA.
+  Contains modified Copernicus Sentinel data.
+* **ERA5 / ERA5-Land** — Copernicus Climate Change Service (C3S) information
+  2022–2026, accessed through the Open-Meteo Historical Weather API. Neither the
+  European Commission nor ECMWF is responsible for any use of this information.
+* **C3S seasonal forecasts** — Copernicus Climate Change Service information 2026.
+* **Kazhydromet seasonal forecast** — RSE Kazhydromet, Ministry of Ecology and
+  Natural Resources of the Republic of Kazakhstan.
+* **OpenStreetMap** — © OpenStreetMap contributors, ODbL 1.0, via the Overpass API.
+* **Landsat 8/9 Collection 2 Level-2** — courtesy of the U.S. Geological Survey,
+  accessed through the Microsoft Planetary Computer.
+* **MODIS MOD10A1 / MYD10A1 v061** — NSIDC DAAC / NASA, via the Microsoft
+  Planetary Computer.
+* **NASADEM** — NASA JPL, via the Microsoft Planetary Computer.
+* **ALOS World 3D-30m (AW3D30)** — © JAXA, via the Microsoft Planetary Computer.
+* **Microsoft Planetary Computer** — STAC API with anonymous asset signing.
+* **pvlib-python** — BSD-3-Clause.
+* Analysis code and figures in this release: Dias Irishev, 2026.
+
+The full list of sources used and of further sources worth reaching for, with
+endpoints, access cost, what each adds and what it costs, is in
+`outputs/cluster/tables/data_source_registry.csv`: **12 sources, 7 used here.**
+
+## 20. Software
+
+Python 3.12.10. Pinned versions in `requirements.txt`; the key ones are
+numpy 2.5.5, rasterio 1.5.2, pvlib 0.16.1, pyproj, pystac-client, scipy, pandas,
+matplotlib, reportlab.
+
+---
+
+## 21. Provenance of this document
+
+This release reports one study area, the drawn polygon, and nothing else. It did
+not start there. Two earlier releases reported over author-chosen rectangles —
+69 km² and then 125 km² — and over two synthetic 1,022 ha footprints built by a
+module that no longer exists. All of them covered ground well outside anywhere
+skiing is planned, and every figure derived from them is withdrawn. Notebook 06
+section 1 holds the measurement that forced the change, and the git history holds
+the rest.
+
+Nothing above is inherited from those releases without being recomputed on the
+current window and masked to the current boundary.

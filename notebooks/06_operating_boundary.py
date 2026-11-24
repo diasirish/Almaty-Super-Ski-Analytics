@@ -176,7 +176,7 @@ print(cmp_df.T.to_string(header=False))
 #
 # Earlier releases reported this row against two synthetic footprints of the same
 # area — a disc on the plateau, and the gentlest ground within 3.5 km. Both are
-# **withdrawn** (`METHODS.md` §31): neither was the operating area, the disc sat
+# **withdrawn** (`METHODS.md` §21): neither was the operating area, the disc sat
 # over the dacha belt, and "gentlest ground" is by construction the most
 # flattering placement available.
 
@@ -219,7 +219,7 @@ print(feas[["green_blue_source", "assumed_mean_piste_width_m", "green_blue_piste
 # An earlier draft of this project put the same arithmetic at up to **101 %** and
 # concluded that easy terrain was the binding constraint. That figure combined the
 # superseded footprint with the conflated 70 %, and it is **withdrawn**
-# (`METHODS.md` §31). What a 30 m DEM still cannot show is whether two gentle
+# (`METHODS.md` §21). What a 30 m DEM still cannot show is whether two gentle
 # benches can be joined by a lift. That is a survey question.
 
 # %% [markdown]

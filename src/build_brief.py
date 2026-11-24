@@ -245,10 +245,10 @@ def build():
          f"Sentinel-2 L2A, tile 43TFH, 4 complete seasons 2022/23–2025/26, "
          f"0 download failures", color=WARM)
     caption(c, "Shaded relief, light from the NW. Perspective view — horizontal "
-               "scale varies with distance. The rectangle is the compute grid, derived "
-               "from control points on the operator's published general plan "
-               "(METHODS §29); it is not a resort boundary. The operating boundary "
-               "drawn inside it is not official either.",
+               "scale varies with distance. The rectangle is only the working window "
+               "around the drawn operating boundary \u2014 the boundary's own envelope plus "
+               "a 1 km margin (METHODS \u00a72). Neither the window nor the boundary is an "
+               "official resort boundary.",
             M - 6, 108, 560)
     c.showPage()
 

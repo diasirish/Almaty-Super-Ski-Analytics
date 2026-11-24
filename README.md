@@ -86,7 +86,7 @@ default here; `config.py` holds both and every affected table is reported twice.
 
 *(An earlier version of this file said Kok Zhailau was not named in the
 statements, and used 17 lifts and 70 % green-and-blue throughout. Both are
-corrected here and in METHODS §18 and §28.)*
+corrected here and in `METHODS.md` §9.)*
 
 What is still **not** published: any boundary, any lift alignment, any station
 coordinate, any elevation, and any capacity in persons per hour.
@@ -216,7 +216,7 @@ and every figure caption says which boundary it was computed over.
 
 A snow frequency here is *the share of usable satellite dates on which a pixel
 looked like snow*. It is **not** ski days, **not** snow depth, and **not** a
-snowmaking cost. `METHODS.md` §8 lists what this study cannot tell you and what
+snowmaking cost. `METHODS.md` §18 lists what this study cannot tell you and what
 measurement would answer each question instead.
 
 ---
@@ -337,7 +337,7 @@ Nothing here rests on a single sensor.
 Chasing the Landsat comparison also found a real bug: windowed reads computed
 the window in the target CRS against the source transform, which is correct only
 when the two match. MODIS is sinusoidal and returned zero snow everywhere.
-`METHODS.md` §16 has the detail and the fix.
+`METHODS.md` §15 has the detail and the fix.
 
 ## Where it could go next
 
@@ -364,4 +364,4 @@ aerial-imagery computer vision at MarineTech. Co-author,
 *Contains modified Copernicus Sentinel data 2022–2026, processed by ESA · Copernicus
 DEM GLO-30 © DLR/Airbus · Copernicus Climate Change Service information 2026 ·
 OpenStreetMap © contributors, ODbL · clear-sky model: pvlib. Full attribution in
-`METHODS.md` §10 and §17.*
+`METHODS.md` §19.*

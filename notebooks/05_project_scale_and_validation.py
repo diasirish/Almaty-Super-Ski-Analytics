@@ -31,7 +31,7 @@
 # Press reporting of the April 2026 statement instead gave **17 lifts** and "about
 # 70 % green and blue". The general plan attaches its own 70 % to *snowmaking*, so
 # the press figure is most likely a conflation; both are carried in `config.py`
-# and every table below names the source it used. See `METHODS.md` §28.
+# and every table below names the source it used. See `METHODS.md` §9.
 #
 # What is **not** published: any boundary, any station coordinate, any lift
 # alignment, any run, any elevation, and any capacity in persons per hour. So

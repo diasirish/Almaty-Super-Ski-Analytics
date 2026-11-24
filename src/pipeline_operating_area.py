@@ -252,7 +252,7 @@ def published_parameters() -> pd.DataFrame:
     """What the operator has published, with the source of each figure named.
 
     Two sources disagree on the lift count and on the green/blue share; both are
-    listed rather than silently reconciled. See METHODS section 28.
+    listed rather than silently reconciled. See METHODS section 9.
     """
     from config import (PROJECT_BUILT_HA, PROJECT_CABLEWAYS_POMA,
                         PROJECT_DIFFICULTY_PLAN, PROJECT_LAUNCH, PROJECT_LIFTS,
