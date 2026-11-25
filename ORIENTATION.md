@@ -35,7 +35,7 @@ Do these in order. Nothing here needs the pipeline to be re-run.
 | 3 | **`notebooks/06_operating_boundary.ipynb`** | the study area and the two rectangles it replaced; renders on GitHub | 10 min |
 | 4 | `METHODS.md` §9 and §18 | the two published figures that disagree, and what the study cannot tell you | 5 min |
 | 5 | `DATA.md` §1 and §8 | every source in one table, and the five that were costed and not used | 5 min |
-| 6 | `METHODS.md` §22 | the newest chapter: is there enough snow on the pistes, and what can be made | 10 min |
+| 6 | **`notebooks/07_snow_sufficiency.ipynb`** | the newest chapter: is there enough snow on the pistes, and what can be made. Renders on GitHub | 10 min |
 
 If you read only one thing after the demo, read `METHODS.md` §18. It is the list
 of questions this work does **not** answer, with the measurement each one needs —
@@ -58,10 +58,10 @@ the fastest way to avoid quoting a number for something it was never measuring.
 | **December snow map covers only 52 % of the site** | **`06` §6** | `operating_area_snow_by_month.csv` |
 | DEM agreement does not survive differentiation | `05` §4 | `dem_propagation.csv` |
 | Kok Zhailau vs Shymbulak vs Oi-Qaragai | `05` §3 | `three_area_matched_differences.csv` |
-| **Gentle ground keeps snow; the descent routes do not** | METHODS §22 | `piste_snow_sufficiency.csv` |
-| **Season 93–167 days low, unmeasurable above 2,200 m** | METHODS §22.2 | `piste_snow_season_summary.csv` |
-| **Cover never seen to break, but 57 % of days thaw** | METHODS §22.3, §22.5 | `thaw_and_rain_on_snow_by_band.csv` |
-| **270 h below −4 °C wet bulb in November at 1,900 m** | METHODS §22.4 | `snowmaking_hours_by_band_month.csv` |
+| **Gentle ground keeps snow; the descent routes do not** | **`07` §4** | `piste_snow_sufficiency.csv` |
+| **Season 93–167 days low, unmeasurable above 2,200 m** | **`07` §2** | `piste_snow_season_summary.csv` |
+| **Cover never seen to break, but 57 % of days thaw** | **`07` §3, §7** | `thaw_and_rain_on_snow_by_band.csv` |
+| **270 h below −4 °C wet bulb in November at 1,900 m** | **`07` §5–6** | `snowmaking_hours_by_band_month.csv` |
 
 ---
 
@@ -72,7 +72,7 @@ the working window around it or the wider cluster.
 
 | `KZ_AREA` | What | Used by | Status |
 |---|---|---|---|
-| `superski` | the drawn boundary (17.8 km²) and the 70 km² working window round it | **nb 01, 02, 03, 05, 06** and `pipeline_operating_area.py` | **current** |
+| `superski` | the drawn boundary (17.8 km²) and the 70 km² working window round it | **nb 01, 02, 03, 05, 06, 07** and `pipeline_operating_area.py` | **current** |
 | `cluster` | 404 km², the whole mountain cluster | nb 04 | current |
 
 Two rectangles were retired on 24 November 2026 and are gone from `config.py`:
@@ -227,7 +227,7 @@ orbit cannot supply it.
 
 **Done on 25 November 2026, and no longer on this list:** snow sufficiency on
 the pistes — season length, continuity, thaw and rain-on-snow, and the
-snowmaking window (`METHODS.md` §22). It was the piece the demand work below
+snowmaking window (notebook 07, `METHODS.md` §22). It was the piece the demand work below
 depends on, since ski days start with whether there is snow to ski on.
 
 Three pieces of work remain scoped and deliberately set aside:

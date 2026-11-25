@@ -193,7 +193,8 @@ above 2,362 m, lifting the top from 3,225 m to 3,291 m.
 
 ## Will there be enough snow on the pistes?
 
-*Added 25 November 2026. `METHODS.md` §22; sources in `DATA.md` §6.1. Snow
+*Added 25 November 2026. Notebook `07_snow_sufficiency.ipynb` is the narrative,
+`METHODS.md` §22 the method, `DATA.md` §6.1 the sources. Snow
 frequency says whether a pixel looked like snow on a date. It does not say
 whether the ground that carries pistes holds snow long enough, without
 breaking, or what can be made where it does not. These four findings are that
@@ -355,6 +356,8 @@ notebooks/                 01 terrain & insolation · 02 snow · 03 planning & 2
                            05 project scale, three-area comparison, DEM validation
                            06 the operating boundary: why the area moved, and
                               what is inside it  <- start here
+                           07 enough snow on the pistes: season length,
+                              continuity, and the snowmaking window
                            every notebook but 04 runs on the drawn boundary
                            and the 70 km² window around it
 src/                       the analysis library the notebooks call, and the
@@ -401,7 +404,7 @@ pip install -r requirements.txt
 ./run_all.sh
 ```
 
-`run_all.sh` builds two areas and executes the six notebooks in order. Pick an
+`run_all.sh` builds two areas and executes the seven notebooks in order. Pick an
 area for any script with `KZ_AREA=` and one of `superski` (the drawn boundary and
 its working window) or `cluster`; each writes to its own output subtree, so they
 never collide. Order matters once: `cluster` must be built before `superski`,

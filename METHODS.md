@@ -865,7 +865,9 @@ will not, can the missing snow be made? This section is that question, measured
 three ways.
 
 Code: `src/snow_sufficiency.py` and `src/snow.season_span`, run by
-`KZ_AREA=superski python src/pipeline_snow_sufficiency.py`.
+`KZ_AREA=superski python src/pipeline_snow_sufficiency.py`. The narrative, with
+every table printed and the reasoning in between, is
+`notebooks/07_snow_sufficiency.ipynb`.
 
 ### 22.1 Where it is measured
 

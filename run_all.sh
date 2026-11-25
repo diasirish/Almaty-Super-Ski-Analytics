@@ -38,7 +38,8 @@ for nb in 01_dem_terrain_and_insolation \
           03_resort_planning_insights \
           04_cluster_radiation_and_timing \
           05_project_scale_and_validation \
-          06_operating_boundary; do
+          06_operating_boundary \
+          07_snow_sufficiency; do
   echo "   executing $nb"
   jupyter nbconvert --to notebook --execute --inplace \
     --ExecutePreprocessor.timeout=5400 "notebooks/$nb.ipynb"
