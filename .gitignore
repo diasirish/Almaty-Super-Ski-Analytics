@@ -15,6 +15,9 @@ data/
 # Draft outreach letters: personal job-search material, not part of the study.
 OUTREACH.md
 
+# Interview prep: personal, same reason.
+INTERVIEW_PREP.md
+
 # Python
 __pycache__/
 *.py[cod]
