@@ -13,7 +13,7 @@ data stand on their own, and the boundary can be redrawn without touching any of
 them.
 
 Everything here is open. **No account, no licence fee and no commercial data are
-used anywhere in this release.** Two of the eleven sources need a free
+used anywhere in this release.** Two of the twelve sources need a free
 registration and were catalogued rather than used (section 8); the rest are
 anonymous.
 
@@ -382,7 +382,7 @@ this polygon is one informed reading of the operating area, and it is 174 % of
 the stated territory. Redraw it and one command re-derives every table, figure
 and PDF number that depends on it.
 
-Two rasters grids exist, and neither is a reporting unit on its own:
+Two raster grids exist, and neither is a reporting unit on its own:
 
 | `KZ_AREA` | bbox (W, S, E, N) | grid | area | what it is |
 |---|---|---|---|---|

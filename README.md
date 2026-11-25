@@ -21,11 +21,26 @@ Release date: 24 November 2026
 
 **→ [4-slide demo for engineering and GIS teams (PDF)](almaty-superski-gis-demo.pdf)** · **[6-slide brief (PDF)](kok-zhailau-brief.pdf)**
 
-*Coming back to this after a break, or reading it for the first time? **[ORIENTATION.md](ORIENTATION.md)** is the 30-minute route in: what is current, what was superseded, and every assumption in one table. **[DATA.md](DATA.md)** is where every byte came from — endpoints, projections, datums, licences, and the five sources costed and not used.*
+### Four files, one job each
+
+| | |
+|---|---|
+| **`README.md`** | this file. **The results** — every conclusion with the number behind it |
+| **[`DATA.md`](DATA.md)** | **where every byte came from** — each dataset with its endpoint, resolution, epoch, projection, datum and licence, and the five sources costed and not used. The study area is its §10, deliberately last |
+| **[`METHODS.md`](METHODS.md)** | **what is done with the data** — every formula, threshold, mask, validation and limit, in 21 sections |
+| **[`ORIENTATION.md`](ORIENTATION.md)** | **the 30-minute route back in** — what is current, what was retracted, every assumption in one table, and what was never done |
+
+First time here: the demo, then the findings below. Coming back after a break:
+`ORIENTATION.md`. Deciding whether to trust a number: `METHODS.md` for how it
+was computed, `DATA.md` for what it was computed from.
 
 ---
 
 ## Five measured results across the mountain
+
+*How each was computed: `METHODS.md` §4 (insolation), §5 (sunshine duration),
+§7 (joining terrain to snow), §12 (the sun-and-snow index), §13 (the 2027
+windows). What each was computed from: `DATA.md` §3 and §4.*
 
 **1. Exposure, not elevation, separates the snow.**
 In the 2200–2300 m band on 15–35° slopes, north-facing terrain receives a median
@@ -66,6 +81,9 @@ noon**, where 96% sunlit meets a 100% snow-detection frequency.
 
 ## What the operator has published, and what it has not
 
+*Every published figure, transcribed with its source: `DATA.md` §7. The conflict
+between two of them: `METHODS.md` §9.*
+
 Almaty SuperSki **is** the Kok Zhailau project. Kazakh Tourism Development's
 release from the board meeting of 18 November 2026, chaired by the Prime
 Minister, gives **60 km of runs**, 11 cableways built by **POMA**, up to
@@ -92,6 +110,10 @@ What is still **not** published: any boundary, any lift alignment, any station
 coordinate, any elevation, and any capacity in persons per hour.
 
 ## Fixing the study area, twice
+
+*The geometry, the grids and the contract that enforces them: `METHODS.md` §2.
+The same boundary described as data: `DATA.md` §10. The evidence that moved it:
+notebook 06 §1.*
 
 The study area is a polygon of **24 vertices**, hand-digitised over satellite
 imagery in Google Earth and held in one file, `qgis/operating_area.geojson`.
@@ -133,6 +155,8 @@ contains by elevation are drawn together in
 
 ## Inside the operating boundary
 
+*`METHODS.md` §10, with the gradient classes and the piste arithmetic in §8.*
+
 Earlier releases reported these numbers against two synthetic 1,022 ha footprints
 — a disc on the plateau and the gentlest ground within 3.5 km. Neither was the
 operating area, the disc sat over the dacha belt, and "gentlest ground" is by
@@ -168,6 +192,9 @@ published 60 km of runs. The second revision of the boundary added 479 ha entire
 above 2,362 m, lifting the top from 3,225 m to 3,291 m.
 
 ## What survives being stress-tested
+
+*`METHODS.md` §14 (does the DEM choice change the answer), §6 (the coverage
+bias) and §11 (one comparison rule for three places).*
 
 **10. Agreement between DEMs does not survive differentiation.**
 The whole chain — slope, aspect, horizon, sky view factor, insolation, sunshine
@@ -221,7 +248,11 @@ measurement would answer each question instead.
 
 ---
 
-## Data actually processed
+## How much was processed
+
+*How much ground and how many scenes. Where each dataset came from — endpoint,
+resolution, epoch, projection, datum, licence — is [`DATA.md`](DATA.md) §1 to §6;
+the five sources catalogued, costed and not used are its §8.*
 
 | | |
 |---|---|
@@ -229,38 +260,41 @@ measurement would answer each question instead.
 | Working window | 76.950–77.055° E, 43.085–43.155° N · **70.17 km²** · 1382–3627 m · 292 × 267 @ 30 m |
 | Cluster rectangle | **404.12 km²**, 857–4279 m, 647 × 694 @ 30 m |
 | Retired rectangles | 69.12 km² (1st release) and 125.34 km² (2nd); no longer computed, see nb 06 §1 |
-| Terrain | Copernicus DEM GLO-30, 2 tiles → 30 m grid, EPSG:32643 |
-| Satellite | Sentinel-2 L2A, MGRS tile 43TFH, cloud < 15% |
-| Scenes | **115** (114 historical + 1 current season), **0 download failures** |
-| Unique dates | 112 after merging same-date scenes |
-| Seasons | **4 complete**: 2022/23, 2023/24, 2024/25, 2025/26 (Nov–Apr) |
+| Terrain | Copernicus DEM GLO-30, 2 tiles → one 30 m grid in EPSG:32643 |
+| Sentinel-2 | **115 scenes** on MGRS tile 43TFH, cloud < 15%, 112 unique dates, **0 download failures** |
+| Seasons | **4 complete**: 2022/23, 2023/24, 2024/25, 2025/26 (Nov–Apr) · 30 / 28 / 25 / 31 scenes |
 | Freshest scene | 2026-11-07 (`S2B_43TFH_20261107_0_L2A`), 33% usable pixels, 25% of those snow |
-| Weather context | ERA5-Land (temperature, ≈9 km) and ERA5 (precipitation, ≈31 km) |
-| Seasonal outlooks | Kazhydromet winter 2026/27 (issued 16 Nov 2026) and C3S November 2026 issue |
-| Cross-checks | **77 Landsat 8/9** scenes · **NASADEM** and **ALOS AW3D30** · **MODIS** daily snow |
+| Cross-checks | **77 Landsat 8/9** scenes · **NASADEM** and **ALOS AW3D30** · **MODIS** 46 usable days |
 | Reference vectors | OpenStreetMap: 21 lift lines (21.1 km), 32 pistes (24.4 km), 23 stations |
-| Data sources | **12 catalogued, 7 used**, each with endpoint and access cost |
+| Weather context | ERA5-Land and ERA5, daily, 2022-11-01 → 2026-04-30 |
+| Published outlooks | Kazhydromet winter 2026/27 and C3S November 2026 — transcribed, not modelled |
+| Sources in all | **12 catalogued, 7 used** |
 
-Per-season scene counts: 30 / 28 / 25 / 31. The 2026/27 season is in progress and
-is kept out of every historical comparison; `outputs/superski/tables/current_season_gap.json`
-records what is still to come so a later run can resume incrementally.
+The 2026/27 season is in progress and is kept out of every historical comparison;
+`outputs/superski/tables/current_season_gap.json` records what is still to come so
+a later run can resume incrementally.
 
 The working window reuses the cluster's Sentinel-2 cache rather than
 re-downloading it: both 20 m grids are snapped to the same multiples of 20 m in
 EPSG:32643, so the 115 scene windows are **sliced, not resampled**. One scene re-read from the COGs
-matched the sliced arrays on **0 differing pixels out of 174,800**.
+matched the sliced arrays on **0 differing pixels out of 174,800**. How the cache
+is keyed, and why it sits outside the project folder, is `DATA.md` §9.
 
 ---
 
 ## What is in the release
 
 ```
-README.md                  this file
-ORIENTATION.md             the route back in: what is current, what was superseded,
+README.md                  this file: the results
+DATA.md                    where every byte came from — dataset, endpoint,
+                           resolution, epoch, projection, datum, licence, and the
+                           five sources costed and not used. Study area in §10
+METHODS.md                 what is done with it — formulas, masks, thresholds,
+                           validation and limits, in 21 sections
+ORIENTATION.md             the route back in: what is current, what was retracted,
                            every assumption in one table, and what was never done
-DATA.md                    provenance: every dataset, endpoint, projection, datum,
-                           licence and what it costs to rely on it
-METHODS.md                 formulas, masks, thresholds, validation, limits
+LICENSE                    MIT for the code and figures; the data carry their own
+                           terms, listed in DATA.md §11
 kok-zhailau-brief.pdf      6-slide brief
 almaty-superski-gis-demo.pdf  4-slide demo: operating area, validation, handover
 notebooks/                 01 terrain & insolation · 02 snow · 03 planning & 2027
@@ -270,22 +304,30 @@ notebooks/                 01 terrain & insolation · 02 snow · 03 planning & 2
                               what is inside it  <- start here
                            every notebook but 04 runs on the drawn boundary
                            and the 70 km² window around it
-src/                       the analysis library the notebooks call
+src/                       the analysis library the notebooks call, and the
+                           entry points that write every output:
   operating_area.py          reads the boundary, masks any grid, carries provenance
+  pipeline_terrain.py        terrain, horizon, sky view factor, insolation
+  pipeline_snow.py           the Sentinel-2 snow record
+  pipeline_sun.py            hours of direct sun
+  slice_window_cache.py      hands the window the cluster's scenes, unresampled
   pipeline_operating_area.py one command to rebuild everything the boundary decides
+  build_qgis_pack.py         rebuilds qgis/ on the current analysis grid
+  build_extent_review.py     all three study areas in one figure
+  build_brief.py, build_demo.py   the two PDFs
 qgis/                      layer pack to redraw the boundary: hillshade, slope,
                            control points, OSM lifts, and a one-paste QGIS loader
-outputs/superski/          the study area: notebooks 01-03, 05 and 06 write here
+outputs/superski/          50 GeoTIFFs, 19 figures, 40 tables  (the study area:
+                           notebooks 01-03, 05 and 06 write here)
 outputs/cluster/           24 GeoTIFFs, 9 figures, 15 tables    (cluster 404 km²)
 docs/                      the extent review, and the published outlooks with URLs
 requirements.txt           pinned environment
-run_all.sh                 end-to-end reproduction
+run_all.sh                 end-to-end reproduction: two areas, seven steps
 ```
 
-Not committed, because the code regenerates them: the two Copernicus DEM tiles
-(`data/raw`, ~70 MB), the cached terrain, insolation and sunshine arrays
-(`data/interim`), and the Sentinel-2 scene-window cache, which is kept outside the
-project folder so it can never be swept into a commit.
+Nothing under `data/` is committed, and neither is the Sentinel-2 scene cache,
+which sits outside the project folder so it can never be swept into a commit.
+`run_all.sh` regenerates both; `DATA.md` §9 is the layout and the sizes.
 
 Key rasters: `elevation_m`, `slope_deg`, `aspect_deg`, `sky_view_factor`,
 `insolation_{dec,mar,nov_dec,jan_feb,mar_apr}_kwh_m2` (+ direct-beam components),
@@ -323,6 +365,9 @@ Override the cache location with `KZ_SCENE_CACHE=/path/to/cache`.
 ---
 
 ## Cross-validation
+
+*The sources: `DATA.md` §3.2 (the two other DEMs), §4.2 (Landsat), §4.3 (MODIS).
+The method and the thresholds: `METHODS.md` §15.*
 
 Nothing here rests on a single sensor.
 

@@ -4,7 +4,7 @@ The input data carries its own terms, and those terms travel with any
 redistribution: Copernicus DEM GLO-30, Copernicus Sentinel-2, ERA5 / ERA5-Land,
 Landsat Collection 2 (USGS), MODIS (NASA/NSIDC), NASADEM, ALOS AW3D30 (JAXA),
 and OpenStreetMap, which is ODbL 1.0 and share-alike. The full list, with the
-attribution each one requires, is in METHODS.md sections 10 and 17. Files under
+attribution each one requires, is in DATA.md section 11. Files under
 qgis/ that derive from OpenStreetMap are ODbL, not MIT.
 
 ---
