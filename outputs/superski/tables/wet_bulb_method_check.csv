@@ -1,0 +1,3 @@
+band_mid_m,n_hours,compared_with,median_difference_C,p05_difference_C,p95_difference_C,hours_below_minus4_this,hours_below_minus4_other
+1900.0,17400,"Stull (2011) closed form, sea-level fit",0.278,-0.693,0.491,8447,8708
+1900.0,17400,same solver at sea-level pressure,-0.301,-0.655,-0.061,8447,8023

@@ -30,7 +30,7 @@ anonymous.
 | **NASADEM** | elevation cross-check | 30 m | whole chain rebuilt on it |
 | **ALOS World 3D-30m** | elevation cross-check | 30 m | whole chain rebuilt on it |
 | **OpenStreetMap** | existing lifts, pistes, place names | vector | 642 elements, one Overpass query |
-| **ERA5-Land / ERA5** | meteorological context | ~9 km / ~31 km | daily, 2022-11-01 → 2026-04-30 |
+| **ERA5-Land / ERA5** | meteorological context; wet-bulb and the snowmaking window | ~9 km / ~31 km | daily **and hourly**, 2022-11-01 → 2026-04-30 |
 | Kazhydromet seasonal outlook | published forecast, transcribed | oblast | 1 bulletin |
 | C3S seasonal forecast | published forecast, transcribed | global | 1 issue |
 | Kazakh Tourism Development | the operator's own published figures | — | board release + general-plan sheet |
@@ -257,15 +257,32 @@ the analysis code.
 | Alternative | Copernicus Climate Data Store, which does need one |
 | Point | 77.00433 E, 43.14239 N |
 | Model cell elevation | **2 235 m** |
-| Period | 2022-11-01 → 2026-04-30, daily |
-| Temperature | **ERA5-Land**, ~9 km |
-| Snowfall and precipitation | **ERA5**, ~31 km |
+| Period | 2022-11-01 → 2026-04-30, **daily and hourly** (30,648 hours) |
+| Temperature, humidity, dew point, modelled snow depth | **ERA5-Land**, ~9 km |
+| Precipitation, rain, snowfall, surface pressure | **ERA5**, ~31 km |
 | Licence | Copernicus Climate Change Service (C3S) information 2022–2026 |
 
 **ERA5-Land returns no precipitation at this point through that API.** Rather
 than let a missing variable be summed to zero, the code falls back to ERA5 and
 labels the source in both the data and the metadata file. Every reanalysis
 column in this release names which model it came from.
+
+**The hourly series was added on 25 November 2026**, for the snowmaking window
+in `METHODS.md` §22: wet-bulb temperature needs temperature, humidity and
+pressure at the hour, not the day. ERA5-Land serves neither precipitation nor
+surface pressure at this point, so both come from ERA5; pressure is dominated
+by elevation and both models report the same 2,235 m here, so the coarser grid
+costs nothing for that one variable. Modelled snow depth is fetched and
+inspected but **no claim in this release rests on it**: it is a 9 km cell's own
+snowpack at one elevation.
+
+**What "2 235 m" means.** Open-Meteo does not return the raw cell; it reports
+the elevation of the requested point from its own terrain model and shifts
+temperature from the cell's orography to that height at a standard 6.5 °C/km.
+This project's Copernicus DEM gives 2,238 m at the same coordinate, so the two
+independent terrain models agree there to **3 m**. Everything below that
+elevation in §22 is carried down by the same fixed gradient, stated and swept
+across ±2 °C, because it is the largest assumption in that section.
 
 One ERA5-Land cell is ~9 km across against an operating area of 17.8 km²
 spanning 1 516 m of relief. These series say what kind of winter a season was.
@@ -401,7 +418,28 @@ before settling here.
 
 ---
 
-## 11. Licences and attribution
+## 11. Published work this release leans on
+
+Not data, but not this project's own either: the conventions and formulas that
+decide what counts as what. Each is named where it is used.
+
+| Source | What it supplies | Used in |
+|---|---|---|
+| Horn, B.K.P. (1981), *Hill shading and the reflectance map* | the 3×3 slope and aspect operator | `METHODS.md` §3 |
+| Dozier, J. & Frew, J. (1990), *Rapid calculation of terrain parameters* | sky view factor | §3 |
+| BC *All Season Resort Guidelines*, Ch. II | the green/blue/red/black gradient classes, a Canadian convention and not a Kazakh standard | §8 |
+| Buck, A.L. (1996), *Buck Research CR-1A manual* | saturation vapour pressure over water | §22.4 |
+| Stull, R. (2011), *Wet-bulb temperature from relative humidity and air temperature*, J. Appl. Meteor. Climatol. 50, [doi:10.1175/JAMC-D-11-0143.1](https://doi.org/10.1175/JAMC-D-11-0143.1) | the closed-form wet bulb this release checks itself against, and does not use | §22.4 |
+| López-Moreno, J.I. et al. (2018), *Air and wet bulb temperature lapse rates and their impact on snowmaking in a Pyrenean ski resort*, Theor. Appl. Climatol., [doi:10.1007/s00704-018-2448-y](https://doi.org/10.1007/s00704-018-2448-y) | snowmaking hours defined as hours with wet bulb below −2 °C, and the lapse-rate problem this release inherits | §22.4 |
+| NSW *Climate change impacts on alpine snowmaking conditions* | a second use of the −2 °C threshold, and the finding that relative changes are insensitive to which threshold is picked | §22.4 |
+| TechnoAlpin wet-bulb calculator (equipment maker) | the ≈ −2.5 °C start-up figure quoted by industry | §22.4 |
+
+pvlib's clear-sky implementation (Ineichen–Perez) is listed under software in
+`METHODS.md` §20, with its own citation.
+
+---
+
+## 12. Licences and attribution
 
 * **Copernicus DEM GLO-30** — © DLR e.V. 2010–2014 and © Airbus Defence and Space
   GmbH 2014–2018, under the Copernicus DEM open licence; via the AWS Open Data

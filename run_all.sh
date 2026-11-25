@@ -14,22 +14,25 @@ if [[ -d .venv ]]; then source .venv/bin/activate; fi
 python -c "import rasterio, pvlib, pystac_client, planetary_computer" || {
   echo "Missing dependencies. Run: pip install -r requirements.txt" >&2; exit 1; }
 
-echo "== 1/7  terrain, horizon and insolation =="
+echo "== 1/8  terrain, horizon and insolation =="
 (cd src && KZ_AREA=cluster  python pipeline_terrain.py)
 (cd src && KZ_AREA=superski python pipeline_terrain.py)
 
-echo "== 2/7  sunshine hours =="
+echo "== 2/8  sunshine hours =="
 (cd src && KZ_AREA=cluster  python pipeline_sun.py 2027)
 (cd src && KZ_AREA=superski python pipeline_sun.py 2027)
 
-echo "== 3/7  Sentinel-2 cache for the window, sliced from the cluster =="
+echo "== 3/8  Sentinel-2 cache for the window, sliced from the cluster =="
 KZ_AREA=superski python src/slice_window_cache.py
 
-echo "== 4/7  the drawn operating boundary and the QGIS pack =="
+echo "== 4/8  the drawn operating boundary and the QGIS pack =="
 (cd src && KZ_AREA=superski python build_qgis_pack.py)
 (cd src && KZ_AREA=superski python pipeline_operating_area.py)
 
-echo "== 5/7  notebooks =="
+echo "== 5/8  snow sufficiency on the pistes =="
+KZ_AREA=superski python src/pipeline_snow_sufficiency.py
+
+echo "== 6/8  notebooks =="
 for nb in 01_dem_terrain_and_insolation \
           02_sentinel2_snow_persistence \
           03_resort_planning_insights \
@@ -41,12 +44,12 @@ for nb in 01_dem_terrain_and_insolation \
     --ExecutePreprocessor.timeout=5400 "notebooks/$nb.ipynb"
 done
 
-echo "== 6/7  PDFs and the extent review =="
+echo "== 7/8  PDFs and the extent review =="
 KZ_AREA=cluster python src/build_extent_review.py
 python src/build_brief.py
 python src/build_demo.py
 
-echo "== 7/7  done =="
+echo "== 8/8  done =="
 echo "GeoTIFFs (cluster)     : $(ls outputs/cluster/geotiff/*.tif | wc -l | tr -d ' ')"
 echo "GeoTIFFs (superski)    : $(ls outputs/superski/geotiff/*.tif | wc -l | tr -d ' ')"
 echo "operating-area tables  : $(ls outputs/superski/tables/operating_area_*.csv | wc -l | tr -d ' ')"

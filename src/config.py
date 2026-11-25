@@ -207,6 +207,31 @@ SPRING_WINDOW = ("03-11", "04-20")
 SPRING_SHIFT_DAYS = 10
 
 # --------------------------------------------------------------------------
+# Snow sufficiency on the pistes: is the natural season long enough, and where
+# it is not, what does the weather allow to be made?
+# --------------------------------------------------------------------------
+# Air temperature is measured in one ERA5-Land cell at 2,235 m and carried to
+# other elevations with a fixed lapse rate. This is the largest assumption in
+# the snowmaking numbers: it is a standard gradient, not a measured local one,
+# and winter inversions in the Almaty valley break it. Everything downstream is
+# therefore also reported across LAPSE_SENSITIVITY_C so the reader can see how
+# far a wrong lapse rate moves the answer.
+LAPSE_RATE_C_PER_KM = 6.5            # standard atmosphere; Open-Meteo uses the same
+LAPSE_SENSITIVITY_C = (-2.0, -1.0, 0.0, 1.0, 2.0)
+
+# Wet-bulb thresholds for snow production, in C. Published thresholds run from
+# about -1 to -4 (Lopez-Moreno et al. 2018 define snowmaking hours as hours with
+# wet bulb below -2; equipment makers quote about -2.5 to start a system), so
+# three are carried rather than one assumed value, as with piste width.
+SNOWMAKING_WETBULB_C = (-2.0, -4.0, -6.0)
+
+# Elevation bands for the sufficiency tables. Wider than ELEV_BAND_M because
+# each band must hold enough piste-gradient pixels to have a median worth
+# quoting.
+SUFFICIENCY_BAND_M = 200.0
+RAIN_ON_SNOW_MM = 1.0                # daily rain at band elevation that counts
+
+# --------------------------------------------------------------------------
 # Terrain / planning bands
 # --------------------------------------------------------------------------
 SKIABLE_SLOPE_MIN = 15.0

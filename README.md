@@ -191,6 +191,56 @@ rasterised boundary is a single connected component — ample vertical for the
 published 60 km of runs. The second revision of the boundary added 479 ha entirely
 above 2,362 m, lifting the top from 3,225 m to 3,291 m.
 
+## Will there be enough snow on the pistes?
+
+*Added 25 November 2026. `METHODS.md` §22; sources in `DATA.md` §6.1. Snow
+frequency says whether a pixel looked like snow on a date. It does not say
+whether the ground that carries pistes holds snow long enough, without
+breaking, or what can be made where it does not. These four findings are that
+question.*
+
+**13. The gentle ground holds its snow; the ground the runs descend does not.**
+At the same 1,800–2,000 m, the gentle ground (35.5 ha, median slope 10.5°) was
+snow-covered on **95 %** of usable March dates and held snow for an observed
+**130 days**; the 15–35° ground beside it (67.4 ha, median slope 27.8°) managed
+**42 %** and **99 days**. The gentle shelves there sit at 47.7 kWh/m² of
+December sun against 78.7 on the steeper ground — at this elevation the gentle
+ground is the *shaded* ground, which is the reverse of the site-wide pattern in
+finding 8 and the reason it keeps its snow. The snowmaking case at the bottom of
+this mountain is about the descent routes, not the beginner benches.
+
+**14. The natural season is 93–167 days at the bottom and unmeasurable at the top.**
+Across four seasons the beginner band's observed snow span ran 130, 135, 130 and
+**93 days**. Adding the gaps in the satellite record either side, the shortest
+season's upper bound (135) lands exactly on the longest season's lower bound
+(135): 2025/26 was the shortest of the four, and **four seasons of optical
+satellite cannot say by how much**. At and above 2,400 m the record mostly never
+sees bare ground at all: averaged over the four seasons, **74–87 %** of pixels
+have no bare-ground look before the first snow and **74–96 %** none after the
+last, so the ~171 days those bands report is the 1 November – 30 April
+observation window, not a measurement.
+
+**15. The cover was never seen to break, and that says less than it sounds.**
+Median breaks inside the span: **0**, continuity 0.97–1.00, every band, every
+season. But with 15–25 usable looks spread over six months the median gap
+between them is about twelve days, so no thaw shorter than that is visible. The
+temperature record fills the hole the satellite leaves: inside the observed
+season at 1,800–2,000 m, **57 % of days had a maximum above freezing**, 58–71
+days froze and thawed on the same day, and **10.8 days a season brought rain on
+snow**. The low ground keeps its cover by repeatedly passing through the melting
+point, not by staying frozen.
+
+**16. The weather allows the missing snow to be made, and the finding survives ±2 °C.**
+At 1,900 m the four seasons gave a mean **270 hours below −4 °C wet bulb in
+November** (171–305 across seasons) and **539 in December** (350–710); at the
+−2 °C threshold the literature most often uses, 375 and 644. Temperature at band
+elevation is extrapolated from a 2,235 m reanalysis cell at a standard
+6.5 °C/km — the largest assumption in this section — so it is swept: even 2 °C
+warmer than assumed, November still gives **171.5 hours**. Thaw counts are less
+robust, moving by a factor of two over the same sweep, and are quoted with it.
+None of this is a snowmaking budget: water, pumping and gun type are not
+published.
+
 ## What survives being stress-tested
 
 *`METHODS.md` §14 (does the DEM choice change the answer), §6 (the coverage
@@ -243,8 +293,11 @@ and every figure caption says which boundary it was computed over.
 
 A snow frequency here is *the share of usable satellite dates on which a pixel
 looked like snow*. It is **not** ski days, **not** snow depth, and **not** a
-snowmaking cost. `METHODS.md` §18 lists what this study cannot tell you and what
-measurement would answer each question instead.
+snowmaking cost. Findings 13–16 go as far as open data honestly reach — how long
+the cover lasted, how often it was seen to break, how many hours the weather
+allowed snow to be made — and `METHODS.md` §22.6 is explicit that none of that
+is a depth, a water volume or a budget. `METHODS.md` §18 lists what this study
+cannot tell you at all, and what measurement would answer each question instead.
 
 ---
 
@@ -266,7 +319,7 @@ the five sources catalogued, costed and not used are its §8.*
 | Freshest scene | 2026-11-07 (`S2B_43TFH_20261107_0_L2A`), 33% usable pixels, 25% of those snow |
 | Cross-checks | **77 Landsat 8/9** scenes · **NASADEM** and **ALOS AW3D30** · **MODIS** 46 usable days |
 | Reference vectors | OpenStreetMap: 21 lift lines (21.1 km), 32 pistes (24.4 km), 23 stations |
-| Weather context | ERA5-Land and ERA5, daily, 2022-11-01 → 2026-04-30 |
+| Weather context | ERA5-Land and ERA5, daily **and hourly** (30,648 hours), 2022-11-01 → 2026-04-30 |
 | Published outlooks | Kazhydromet winter 2026/27 and C3S November 2026 — transcribed, not modelled |
 | Sources in all | **12 catalogued, 7 used** |
 
@@ -294,7 +347,7 @@ METHODS.md                 what is done with it — formulas, masks, thresholds,
 ORIENTATION.md             the route back in: what is current, what was retracted,
                            every assumption in one table, and what was never done
 LICENSE                    MIT for the code and figures; the data carry their own
-                           terms, listed in DATA.md §11
+                           terms, listed in DATA.md §12
 kok-zhailau-brief.pdf      6-slide brief
 almaty-superski-gis-demo.pdf  4-slide demo: operating area, validation, handover
 notebooks/                 01 terrain & insolation · 02 snow · 03 planning & 2027
@@ -312,6 +365,8 @@ src/                       the analysis library the notebooks call, and the
   pipeline_sun.py            hours of direct sun
   slice_window_cache.py      hands the window the cluster's scenes, unresampled
   pipeline_operating_area.py one command to rebuild everything the boundary decides
+  snow_sufficiency.py        season length, continuity, the snowmaking window
+  pipeline_snow_sufficiency.py  is there enough snow on the pistes?
   build_qgis_pack.py         rebuilds qgis/ on the current analysis grid
   build_extent_review.py     all three study areas in one figure
   build_brief.py, build_demo.py   the two PDFs
@@ -322,7 +377,7 @@ outputs/superski/          50 GeoTIFFs, 19 figures, 40 tables  (the study area:
 outputs/cluster/           24 GeoTIFFs, 9 figures, 15 tables    (cluster 404 km²)
 docs/                      the extent review, and the published outlooks with URLs
 requirements.txt           pinned environment
-run_all.sh                 end-to-end reproduction: two areas, seven steps
+run_all.sh                 end-to-end reproduction: two areas, eight steps
 ```
 
 Nothing under `data/` is committed, and neither is the Sentinel-2 scene cache,
@@ -411,4 +466,4 @@ aerial-imagery computer vision at MarineTech. Co-author,
 *Contains modified Copernicus Sentinel data 2022–2026, processed by ESA · Copernicus
 DEM GLO-30 © DLR/Airbus · Copernicus Climate Change Service information 2026 ·
 OpenStreetMap © contributors, ODbL · clear-sky model: pvlib. Every source, endpoint
-and licence is in [DATA.md](DATA.md).*
+and licence is in [DATA.md](DATA.md) §12.*

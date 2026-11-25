@@ -9,7 +9,7 @@ Every number quoted in `README.md` and in the two PDFs comes from a CSV written
 by that code into `outputs/superski/tables/` or `outputs/cluster/tables/`.
 
 This file is **what is done with the data**: formulas, thresholds, masks,
-validation and limits. **[`DATA.md`](DATA.md) is where the data came from** —
+validation and limits, in 22 sections. **[`DATA.md`](DATA.md) is where the data came from** —
 every dataset with its endpoint, resolution, epoch, projection, datum, licence
 and the cost of relying on it. Each source is named below where it is used and
 documented in full there.
@@ -848,3 +848,174 @@ the rest.
 
 Nothing above is inherited from those releases without being recomputed on the
 current window and masked to the current boundary.
+
+Section 22 was added on 25 November 2026, after the rest. It answers a question
+the earlier sections do not: whether the snow that is there adds up to a season
+on the ground that will carry pistes. It introduced one new dataset — hourly
+ERA5-Land and ERA5 — and no change to anything already published.
+
+---
+
+## 22. Snow sufficiency on the pistes
+
+Added 25 November 2026. Everything above answers *where* snow is and *how often*
+a pixel looked like snow. None of it answers the operator's question: will the
+ground that carries pistes hold snow long enough, without breaking, and where it
+will not, can the missing snow be made? This section is that question, measured
+three ways.
+
+Code: `src/snow_sufficiency.py` and `src/snow.season_span`, run by
+`KZ_AREA=superski python src/pipeline_snow_sufficiency.py`.
+
+### 22.1 Where it is measured
+
+Two readings of "piste ground", carried side by side rather than picking one,
+both inside the drawn boundary and on the 20 m snow grid:
+
+* **gentle**, slope ≤ 19.29° — what beginner and intermediate runs need, the
+  ground section 10 counts as green/blue;
+* **skiable**, 15–35° — the project's standard definition of ski terrain, which
+  keeps these tables comparable with sections 11 and 12.
+
+Both are cut into 200 m elevation bands (`SUFFICIENCY_BAND_M`). A band carrying
+fewer than 100 bracketed pixels — 4 ha — is dropped rather than quoted; at this
+site that drops exactly one row, the 1.6 ha sliver where the boundary's bottom
+edge clips into 1,775–1,800 m. `band_elev_min_m` and `band_elev_max_m` give the
+real elevation range behind every row, because the boundary cuts several bands
+in half. The gentle bands sum to 361.7 ha against the 364 ha section 10 reports
+on the 30 m grid: the same ground, counted on a finer mesh.
+
+### 22.2 The observed season, and why it is a lower bound
+
+`snow.season_span` walks one season's valid observations twice. The first pass
+records, per pixel, the first and the last date with a snow detection. The
+second finds the last snow-free look before the first snow, the first snow-free
+look after the last snow, and counts the snow-free looks **inside** the span.
+
+The reported `span_days` is `last_snow_day − first_snow_day`: the interval the
+record actually saw snow across. It is **not** an interpolated count of
+snow-covered days. With a median of 15–25 usable looks a season, interpolation
+would invent days nobody observed.
+
+That makes the span a lower bound, and the two brackets say by how much:
+`median_span_upper_days` adds the onset and melt-out gaps. At the beginner band
+the observed spans across four seasons are 130, 135, 130 and 93 days, and the
+upper bounds 145, 167, 144 and 135. The shortest season's upper bound lands
+exactly on the longest season's lower bound, so `seasons_resolved` is **false**
+there: 2025/26 was the shortest of the four, the direction is certain, and four
+seasons of optical satellite cannot say by how much. The envelope columns carry
+what can be said — **93 to 167 days** at 1,800–2,000 m, **148 to 177** at
+2,200–2,400.
+
+**Censoring is reported, not averaged in.** Where no snow-free look exists
+before the first snow detection, or after the last, the season extends past
+what the record can see. At and above 2,400 m that is the normal case: averaged
+over the four seasons, 0.736–0.873 of pixels are left-censored and 0.737–0.962
+right-censored, and in the worst season of each band 0.872–0.990 and
+0.959–1.000. So the ~171 days those bands report is the 1 November – 30 April
+observation window, not a measurement. The 2,200–2,400 m band is the transition:
+0.780 left-censored but only 0.390 right, so its melt-out is seen and its onset
+is not. `seasons_resolved` means nothing where censoring is high, and the
+column sits next to `max_left_censored_share` and `max_right_censored_share` so
+it cannot be read alone.
+
+### 22.3 Continuity: the cover was never seen to break
+
+`breaks` counts snow-free valid observations strictly inside the span, and
+`continuity` is snow looks over snow-plus-free looks inside it. Across every
+band and season the median is **0 breaks** and continuity 0.97–1.00.
+
+This is a weaker statement than it looks, and the limit is worth stating
+plainly: with 15–25 looks spread over six months, the median gap between usable
+observations is about twelve days, so **no thaw shorter than that is visible**.
+"Never seen to break" is not "never broke". Section 22.5 measures, from an
+independent dataset, what the satellite is too sparse to see.
+
+### 22.4 The snowmaking window
+
+Hourly ERA5-Land temperature, relative humidity and dew point, with surface
+pressure and precipitation from ERA5, at the plateau reference point —
+`DATA.md` §6.1 has the request and the cells. One cell, one elevation: Open-Meteo
+reports 2,235 m for that point and this project's Copernicus DEM says 2,238 m,
+so the two independent terrain models agree there to 3 m.
+
+**Wet-bulb temperature** is solved from the psychrometric equation
+
+    e_s(Tw) − e = A · p · (T − Tw),     A = 6.6 × 10⁻⁴ K⁻¹ over water
+
+by bisection, with `e_s` from Buck (1996) and `e` from the measured relative
+humidity. Pressure is carried explicitly because it moves the answer at this
+altitude. Two checks are written to `wet_bulb_method_check.csv` rather than
+asserted:
+
+| compared with | median Δ | p05 … p95 | hours below −4 °C |
+|---|---|---|---|
+| Stull (2011) closed form, a sea-level fit | **+0.28 °C** | −0.69 … +0.49 | 8,447 here vs 8,708 |
+| the same solver at sea-level pressure | **−0.30 °C** | −0.66 … −0.06 | 8,447 here vs 8,023 |
+
+So using the familiar closed form would have over-counted the snowmaking window
+by 3.1 %, and ignoring the ~800 hPa of this altitude would have under-counted it
+by 5.0 %. Both are small; both are now measured.
+
+**Thresholds.** Published wet-bulb thresholds for snow production run from about
+−1 to −4 °C. López-Moreno et al. (2018) define snowmaking hours as hours with
+wet bulb below −2 °C in exactly this kind of study, and equipment makers quote
+about −2.5 °C to start a system. Three are carried — **−2, −4, −6 °C** — as with
+piste width, rather than assuming one. The New South Wales alpine assessment
+reports that *relative* changes are insensitive to which threshold is chosen,
+which is the reason to show all three and quote none as the answer.
+
+**The elevation correction is the largest assumption in this section.** The cell
+sits at 2,235 m; the beginner ground is 335 m below it. Temperature is carried
+down at a fixed **6.5 °C/km** (`LAPSE_RATE_C_PER_KM`, the standard atmosphere,
+and also what Open-Meteo itself applies), pressure by the hypsometric formula,
+and **relative humidity unchanged** — an assumption, not a measurement. This is
+a model's own vertical gradient, not a measured local one, and winter inversions
+in the Almaty valley break it; López-Moreno et al. studied precisely that in a
+Pyrenean resort. So every downstream number is swept across ±2 °C:
+
+| at 1,900 m | −2 °C | 0 | +2 °C |
+|---|---|---|---|
+| November hours below −4 °C wet bulb | 361.5 | **269.5** | 171.5 |
+| December hours below −4 °C wet bulb | 633.2 | **538.8** | 441.8 |
+| thaw days inside the observed season | 48.8 | **69.5** | 90.0 |
+| rain-on-snow days | 5.2 | **10.8** | 17.2 |
+
+The window survives the sweep: even 2 °C warmer than assumed, November at the
+beginner ground still gives 171 hours below −4 °C. The thaw counts do not
+survive it as precisely — they move by a factor of two — and are quoted with
+that range. A measured local lapse rate from Kazhydromet station pairs would
+replace this entirely, and that is the single cheapest improvement available to
+this section.
+
+### 22.5 Joining the two: what the weather did inside the observed season
+
+For each band and season the window runs from that band's median first snow
+detection to its median last one — not the calendar season — so the counts
+answer "what happened to the snow that was actually there". Windows shorter than
+14 days are dropped.
+
+* **thaw day**: daily maximum above 0 °C at band elevation
+* **freeze-thaw day**: maximum above 0 °C and minimum below it on the same day
+* **rain-on-snow day**: total precipitation ≥ 1 mm with the band's daily mean
+  temperature above freezing. The rain/snow split is re-made at band elevation
+  rather than taken from ERA5's own, which belongs to a 31 km cell at 2,235 m
+* **melting degree-days**: the sum of positive daily mean temperatures
+
+### 22.6 What this section cannot tell you
+
+* **No depth, no water volume, no cost.** Nothing here is a snowmaking budget.
+  Production rate depends on water supply, pumping capacity and gun type, none
+  of which is published for this project. ERA5-Land does carry a modelled snow
+  depth and it is fetched, but it belongs to a 9 km cell at one elevation and is
+  not used for any claim.
+* **One reanalysis cell.** Every temperature here descends from a single point,
+  spread across 1,775–3,291 m by a fixed gradient. There is no local wind, no
+  cold-air pooling and no valley inversion in it.
+* **The satellite cannot see short thaws**, as 22.3 says, so continuity is an
+  upper bound on how continuous the cover really was.
+* **Four seasons is not a climatology.** Nothing here is a forecast, and no
+  probability is attached to any of it.
+* Sentinel-1 SAR would see wet snow directly, through cloud and at night, and
+  is the one addition that would turn "the cover was never seen to break" into
+  a measurement. `DATA.md` §8 says why it is not here yet.

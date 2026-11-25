@@ -121,6 +121,156 @@ def season_summary(df: pd.DataFrame, seasons: dict) -> pd.DataFrame:
 
 
 # --------------------------------------------------------------------------
+# Hourly reanalysis: wet-bulb temperature and the snowmaking window.
+#
+# Snow frequency from orbit answers "was there snow on that date". It cannot
+# answer "will there be enough snow on the pistes", because that question is
+# about how long cover lasts, how often it breaks, and - on ground where nature
+# does not deliver - how many hours the weather allows snow to be made. The
+# first two come from the satellite record (see snow.py); the third needs
+# hourly temperature and humidity, which is what these functions fetch.
+# --------------------------------------------------------------------------
+
+HOURLY_LAND_VARS = "temperature_2m,relative_humidity_2m,dew_point_2m,snow_depth"
+# Surface pressure and precipitation both come from ERA5: ERA5-Land serves
+# neither at this point through the archive API. Pressure is dominated by
+# elevation, and the two models report the same 2,235 m here, so the coarser
+# grid costs nothing for that one variable.
+HOURLY_ERA5_VARS = "precipitation,rain,snowfall,surface_pressure"
+
+
+def _archive_hourly(start, end, lat, lon, hourly, model, timeout=600):
+    q = dict(latitude=lat, longitude=lon, start_date=start, end_date=end,
+             hourly=hourly, timezone="Asia/Almaty", models=model)
+    url = f"{ERA5_ARCHIVE}?{urllib.parse.urlencode(q)}"
+    with urllib.request.urlopen(url, timeout=timeout) as r:
+        return json.load(r)
+
+
+def era5_hourly(start: str, end: str, lat: float = PLATEAU_POINT[1],
+                lon: float = PLATEAU_POINT[0], cache: bool = True) -> pd.DataFrame:
+    """Hourly reanalysis at the plateau reference point, one cell, its own height.
+
+    ERA5-Land (~9 km) carries temperature, relative humidity, dew point, surface
+    pressure and modelled snow depth. It returns no precipitation at this point
+    through the archive API, so rain and snowfall come from ERA5 (~31 km) and are
+    labelled as such.
+
+    Nothing is corrected to any other height here. `at_elevation()` does that
+    explicitly, with the lapse rate it is handed, because that correction is the
+    largest assumption in everything downstream and it should be visible.
+    """
+    key = INTERIM / f"reanalysis_hourly_{start}_{end}.csv"
+    meta_key = INTERIM / f"reanalysis_hourly_{start}_{end}.meta.json"
+    if cache and key.exists():
+        df = pd.read_csv(key, parse_dates=["time"])
+        df.attrs.update(json.load(open(meta_key)))
+        return df
+
+    land = _archive_hourly(start, end, lat, lon, HOURLY_LAND_VARS, "era5_land")
+    df = pd.DataFrame(land["hourly"]).rename(columns={"time": "time"})
+    era5 = _archive_hourly(start, end, lat, lon, HOURLY_ERA5_VARS, "era5")
+    df = df.merge(pd.DataFrame(era5["hourly"]), on="time", how="left")
+    df["time"] = pd.to_datetime(df["time"])
+
+    meta = {
+        "temperature_dataset": "ERA5-Land hourly via Open-Meteo Historical Weather "
+                               "API (~9 km grid)",
+        "precipitation_dataset": "ERA5 hourly (~31 km) - ERA5-Land returns "
+                                 "neither precipitation nor surface pressure at "
+                                 "this point",
+        "request_point_lon": lon, "request_point_lat": lat,
+        "era5_land_cell_elevation_m": land.get("elevation"),
+        "era5_cell_elevation_m": era5.get("elevation"),
+        "era5_land_cell": [land.get("latitude"), land.get("longitude")],
+        "era5_cell": [era5.get("latitude"), era5.get("longitude")],
+        "timezone": land.get("timezone"),
+        "units": {**land.get("hourly_units", {}), **era5.get("hourly_units", {})},
+        "retrieved": date.today().isoformat(),
+        "caveat": ("One reanalysis cell at one model elevation. Snow depth is the "
+                   "model's own snowpack in a 9 km cell whose orography is far "
+                   "smoother than this valley: it says what kind of winter a season "
+                   "was, not how deep the snow was on any slope."),
+    }
+    if cache:
+        df.to_csv(key, index=False)
+        json.dump(meta, open(meta_key, "w"), indent=1)
+    df.attrs.update(meta)
+    return df
+
+
+def saturation_vapour_pressure_hpa(t_c):
+    """Buck (1996) saturation vapour pressure over liquid water, hPa."""
+    t = np.asarray(t_c, dtype="float64")
+    return 6.1121 * np.exp((18.678 - t / 234.5) * t / (257.14 + t))
+
+
+def wet_bulb_c(t_c, rh_pct, p_hpa, psychrometric_const=6.6e-4, iters: int = 40):
+    """Wet-bulb temperature from the psychrometric equation, solved numerically.
+
+        e_s(Tw) - e = A * p * (T - Tw),      A = 6.6e-4 per K over water
+
+    Bisection on Tw in [T - 50, T], vectorised. Pressure is carried explicitly
+    because it moves the answer: holding T and RH fixed, the wet bulb at the
+    ~800 hPa of 2,000 m runs 0.2-0.35 C below its sea-level value, since thinner
+    air evaporates more water per degree of cooling. Stull's (2011) closed form
+    is both a sea-level fit and a least-squares fit that degrades in the cold,
+    dry corner; over the conditions here it reads 0.4-0.7 C colder than this
+    solution, which would over-count snowmaking hours. `stull_wet_bulb_c` is
+    kept alongside so the comparison can be reported rather than asserted -
+    METHODS section 22 does that.
+    """
+    t = np.asarray(t_c, dtype="float64")
+    rh = np.clip(np.asarray(rh_pct, dtype="float64"), 1.0, 100.0)
+    p = np.asarray(p_hpa, dtype="float64")
+    e = saturation_vapour_pressure_hpa(t) * rh / 100.0
+    lo, hi = t - 50.0, t.copy()
+    for _ in range(iters):
+        mid = 0.5 * (lo + hi)
+        f = saturation_vapour_pressure_hpa(mid) - e - psychrometric_const * p * (t - mid)
+        too_cold = f < 0                      # e_s(mid) too low -> Tw is higher
+        lo = np.where(too_cold, mid, lo)
+        hi = np.where(too_cold, hi, mid)
+    return 0.5 * (lo + hi)
+
+
+def stull_wet_bulb_c(t_c, rh_pct):
+    """Stull (2011) closed-form wet bulb, a sea-level fit. For comparison only."""
+    t = np.asarray(t_c, dtype="float64")
+    rh = np.clip(np.asarray(rh_pct, dtype="float64"), 5.0, 99.0)
+    return (t * np.arctan(0.151977 * np.sqrt(rh + 8.313659))
+            + np.arctan(t + rh) - np.arctan(rh - 1.676331)
+            + 0.00391838 * rh ** 1.5 * np.arctan(0.023101 * rh) - 4.686035)
+
+
+def at_elevation(df: pd.DataFrame, target_m: float, cell_m: float,
+                 lapse_c_per_km: float, offset_c: float = 0.0) -> pd.DataFrame:
+    """Move the cell's hourly temperature to a target elevation, explicitly.
+
+    Temperature is shifted by `lapse_c_per_km`, pressure by the hypsometric
+    formula, and **relative humidity is carried across unchanged** - an
+    assumption, not a measurement. `offset_c` is the sensitivity handle: the
+    whole series is shifted by it so the reader can see how much a wrong lapse
+    rate moves the answer.
+
+    This is a fixed gradient applied to a 9 km reanalysis cell. It is not a
+    measured local lapse rate, and winter inversions in the Almaty valley break
+    it. METHODS section 22 says so, and names what would replace it.
+    """
+    dz_km = (target_m - cell_m) / 1000.0
+    out = df.copy()
+    out["elevation_m"] = target_m
+    out["temperature_2m"] = df["temperature_2m"] - lapse_c_per_km * dz_km + offset_c
+    # hypsometric: p2 = p1 * exp(-g*dz / (R*Tbar)), Tbar in kelvin
+    tbar = 0.5 * (df["temperature_2m"] + out["temperature_2m"]) + 273.15
+    out["surface_pressure"] = df["surface_pressure"] * np.exp(
+        -9.80665 * (target_m - cell_m) / (287.05 * tbar))
+    out["wet_bulb_c"] = wet_bulb_c(out["temperature_2m"], out["relative_humidity_2m"],
+                                   out["surface_pressure"])
+    return out
+
+
+# --------------------------------------------------------------------------
 # Officially published seasonal outlooks, transcribed from primary documents.
 # --------------------------------------------------------------------------
 SEASONAL_OUTLOOKS = {

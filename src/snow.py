@@ -154,6 +154,88 @@ def meltout_interval(days: list[dict], season: str) -> dict:
     }
 
 
+def season_span(days: list[dict], season: str) -> dict:
+    """Bracket the whole snow season per pixel, and count how often it broke.
+
+    `meltout_interval` brackets one end. This brackets both and reports what
+    happened in between, because "will there be enough snow on the pistes" is a
+    question about the length of cover and its continuity, not about the date it
+    vanished.
+
+    Per pixel, from the valid observations of one season:
+
+    * `first_snow_day`, `last_snow_day` - the observed extent of snow cover
+    * `onset_bracket_days` - gap between the last snow-free look before the
+      first snow look; `meltout_bracket_days`, the same on the other side
+    * `span_days` = last_snow_day - first_snow_day, the **observed** span. It is
+      not an interpolated count of snow-covered days: with ~28 looks a season,
+      that interpolation would invent days nobody saw
+    * `breaks` - snow-free valid observations *inside* the span. This is the
+      continuity measure: a span of 150 days with 4 breaks is not a season
+    * `left_censored` / `right_censored` - no snow-free look exists before the
+      first, or after the last, snow detection, so the real season starts
+      earlier or ends later than the record can show. At the top of this site
+      that is the normal case in spring and must be reported, not averaged in
+    """
+    s, e = SEASONS[season]
+    sel = sorted([r for r in days if _d(s) <= _d(r["date"]) <= _d(e)],
+                 key=lambda r: r["date"])
+    if not sel:
+        raise ValueError(f"no observations in season {season}")
+    shape = sel[0]["valid"].shape
+    origin = _d(s)
+    offs = [float((_d(r["date"]) - origin).days) for r in sel]
+
+    nan = lambda: np.full(shape, np.nan, "float32")
+    first_snow, last_snow = nan(), nan()
+    n_valid = np.zeros(shape, "int16")
+    n_snow = np.zeros(shape, "int16")
+
+    for t_off, rec in zip(offs, sel):                       # pass 1: snow extent
+        v = rec["valid"].astype(bool)
+        sn = rec["snow"].astype(bool) & v
+        n_valid += v.astype("int16")
+        n_snow += sn.astype("int16")
+        first_snow = np.where(sn & np.isnan(first_snow), t_off, first_snow)
+        last_snow = np.where(sn, t_off, last_snow)
+
+    last_free_before, first_free_after = nan(), nan()
+    breaks = np.zeros(shape, "int16")
+    snow_in_span = np.zeros(shape, "int16")
+    for t_off, rec in zip(offs, sel):                       # pass 2: edges and gaps
+        v = rec["valid"].astype(bool)
+        sn = rec["snow"].astype(bool) & v
+        free = v & ~sn
+        before = free & (t_off < first_snow)
+        last_free_before = np.where(before, t_off, last_free_before)
+        after = free & (t_off > last_snow) & np.isnan(first_free_after)
+        first_free_after = np.where(after, t_off, first_free_after)
+        inside = (t_off > first_snow) & (t_off < last_snow)
+        breaks += (free & inside).astype("int16")
+        snow_in_span += (sn & inside).astype("int16")
+
+    has = ~np.isnan(first_snow)
+    span = np.where(has, last_snow - first_snow, np.nan).astype("float32")
+    with np.errstate(invalid="ignore", divide="ignore"):
+        continuity = np.where(has & ((snow_in_span + breaks) > 0),
+                              snow_in_span / np.maximum(snow_in_span + breaks, 1),
+                              np.nan).astype("float32")
+    return {
+        "season": season, "origin": s, "n_dates": len(sel),
+        "first_snow_day": first_snow, "last_snow_day": last_snow,
+        "onset_bracket_days": np.where(has, first_snow - last_free_before,
+                                       np.nan).astype("float32"),
+        "meltout_bracket_days": np.where(has, first_free_after - last_snow,
+                                         np.nan).astype("float32"),
+        "span_days": span, "breaks": breaks, "continuity": continuity,
+        "left_censored": has & np.isnan(last_free_before),
+        "right_censored": has & np.isnan(first_free_after),
+        "n_valid": n_valid, "n_snow": n_snow,
+        "has_snow": has,
+        "estimated_fraction": float(has.mean()),
+    }
+
+
 def day_to_date(day_offset: float, origin: str) -> str:
     return (_d(origin) + timedelta(days=float(day_offset))).isoformat()
 

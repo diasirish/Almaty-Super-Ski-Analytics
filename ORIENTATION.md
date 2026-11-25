@@ -11,9 +11,11 @@ into the logic. `README.md` is the result; this file is the route to it.
 An independent open-data study of the mountains above Almaty, built to show four
 organisations working on Almaty SuperSki that the author can do their GIS,
 validate their models locally and handle their weather data. It is **not**
-commissioned by anyone. It measures three things on real terrain — **gradient**,
-**hours of direct winter sun** and **how often snow is actually there** — and
-then spends about half its length trying to break its own results.
+commissioned by anyone. It measures four things on real terrain — **gradient**,
+**hours of direct winter sun**, **how often snow is actually there** and, since
+25 November 2026, **whether that snow adds up to a season on the ground that
+will carry pistes** — and then spends about half its length trying to break its
+own results.
 
 The single most sellable finding is not a number about the mountain. It is this:
 **open DEMs agree to four decimal places on elevation and fall apart once you
@@ -33,6 +35,7 @@ Do these in order. Nothing here needs the pipeline to be re-run.
 | 3 | **`notebooks/06_operating_boundary.ipynb`** | the study area and the two rectangles it replaced; renders on GitHub | 10 min |
 | 4 | `METHODS.md` §9 and §18 | the two published figures that disagree, and what the study cannot tell you | 5 min |
 | 5 | `DATA.md` §1 and §8 | every source in one table, and the five that were costed and not used | 5 min |
+| 6 | `METHODS.md` §22 | the newest chapter: is there enough snow on the pistes, and what can be made | 10 min |
 
 If you read only one thing after the demo, read `METHODS.md` §18. It is the list
 of questions this work does **not** answer, with the measurement each one needs —
@@ -55,6 +58,10 @@ the fastest way to avoid quoting a number for something it was never measuring.
 | **December snow map covers only 52 % of the site** | **`06` §6** | `operating_area_snow_by_month.csv` |
 | DEM agreement does not survive differentiation | `05` §4 | `dem_propagation.csv` |
 | Kok Zhailau vs Shymbulak vs Oi-Qaragai | `05` §3 | `three_area_matched_differences.csv` |
+| **Gentle ground keeps snow; the descent routes do not** | METHODS §22 | `piste_snow_sufficiency.csv` |
+| **Season 93–167 days low, unmeasurable above 2,200 m** | METHODS §22.2 | `piste_snow_season_summary.csv` |
+| **Cover never seen to break, but 57 % of days thaw** | METHODS §22.3, §22.5 | `thaw_and_rain_on_snow_by_band.csv` |
+| **270 h below −4 °C wet bulb in November at 1,900 m** | METHODS §22.4 | `snowmaking_hours_by_band_month.csv` |
 
 ---
 
@@ -100,6 +107,8 @@ and each lives in `src/config.py`.
 | black threshold | > 31° | the steep class |
 | cloud filter | scene cloud < 15 % | which scenes enter at all |
 | horizon buffer | 6 km | terrain included beyond the window when ray-marching |
+| lapse rate | 6.5 °C/km | **carries one reanalysis cell at 2,235 m down to every band — the largest assumption in METHODS §22, swept across ±2 °C** |
+| wet-bulb thresholds | −2 / −4 / −6 °C | what counts as a snowmaking hour; never one assumed value |
 | working margin | 1 km around the boundary | how much context the compute rectangle carries |
 | reference season | 2022/23 | the single season insolation is quoted for |
 | piste width | 30 / 40 / 50 m | never one assumed value; all three always carried |
@@ -147,6 +156,8 @@ src/               the library. Nothing is computed twice:
                      pipeline_sun.py          sunshine hours for one area
                      slice_window_cache.py    give the window its S2 cache
                      pipeline_operating_area.py   everything the boundary decides
+                     snow_sufficiency.py      season length, continuity, snowmaking
+                     pipeline_snow_sufficiency.py  enough snow on the pistes?
                      build_qgis_pack.py       rebuild qgis/ on the current grid
                      build_extent_review.py   the three study areas in one figure
                      build_brief.py / build_demo.py   the two PDFs
@@ -198,6 +209,10 @@ Worth re-reading before quoting any of it to someone else.
 * Insolation is **clear-sky**. There is no cloud model in it.
 * The December snow figure describes the sunnier ~half of the site, because
   shaded ground fails the four-observation test more often. Measured, not hidden.
+* A snow season length here is the **observed** span between the first and last
+  snow detection — a lower bound, censored above 2,200 m where the record never
+  sees bare ground. Snowmaking hours are what the weather allows, never a water
+  volume or a cost.
 * No boundary here is official, and no planned lift alignment is drawn anywhere,
   because none has been published.
 * Nothing addresses protected-area status. The site lies against Ile-Alatau
@@ -210,7 +225,12 @@ orbit cannot supply it.
 
 ## 9. Not done
 
-Three pieces of work were scoped and deliberately set aside:
+**Done on 25 November 2026, and no longer on this list:** snow sufficiency on
+the pistes — season length, continuity, thaw and rain-on-snow, and the
+snowmaking window (`METHODS.md` §22). It was the piece the demand work below
+depends on, since ski days start with whether there is snow to ski on.
+
+Three pieces of work remain scoped and deliberately set aside:
 
 1. **Demand forecast and audience structure** — beginners against advanced.
    The gradient half exists (nb 06 §4); the demand half does not.
